@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
 import { BottomNav, SiteHeader } from "../components/BottomNav";
+import { PWAInstallPrompt } from "../components/PWAInstallPrompt";
 
 /**
  * Satoshi (Fontshare, ITF Free Font License — free for commercial use).
@@ -31,6 +32,21 @@ export const metadata: Metadata = {
   title: "Artiza — Vetted artisans in Ilisan, Ogun State",
   description:
     "Plumbers, solar installers, tilers, carpenters and more, visited and verified in person around Ilisan. Read the record for free, unlock a contact for ₦500.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Artiza",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   keywords: [
     "Ilisan",
     "Ogun State",
@@ -68,6 +84,7 @@ export default function RootLayout({
             {children}
           </main>
           <BottomNav />
+          <PWAInstallPrompt />
         </AppProvider>
       </body>
     </html>

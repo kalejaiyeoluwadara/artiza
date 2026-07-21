@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   AccountIcon,
@@ -83,9 +84,20 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-5xl items-center gap-8 px-6">
         <Link
           href="/"
-          className="text-lg font-bold tracking-tight text-ink"
+          className="pressable flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-ink"
         >
-          Artiza<span className="text-accent">.</span>
+          <div className="relative size-7 overflow-hidden rounded-lg border border-line bg-canvas shadow-xs">
+            <Image
+              src="/icon-192.png"
+              alt="Artiza Logo"
+              width={28}
+              height={28}
+              className="size-full object-cover"
+            />
+          </div>
+          <span>
+            Artiza<span className="text-accent">.</span>
+          </span>
         </Link>
 
         <nav aria-label="Primary" className="ml-auto">
