@@ -152,9 +152,16 @@ export function BannerRailSkeleton() {
  * on desktop — past that, placeholders promise more than the page will
  * likely hold.
  */
-export function ArtisanGridSkeleton({ count = 6 }: { count?: number }) {
+export function ArtisanGridSkeleton({
+  count = 6,
+  className = "mt-4",
+}: {
+  count?: number;
+  /** Top margin, so the placeholder grid sits exactly where the real one will. */
+  className?: string;
+}) {
   return (
-    <ul aria-hidden className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <ul aria-hidden className={`grid gap-3 sm:grid-cols-2 lg:grid-cols-3 ${className}`}>
       {Array.from({ length: count }, (_, i) => (
         <li key={i}>
           <ArtisanCardSkeleton />

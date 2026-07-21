@@ -42,7 +42,7 @@ export function BannerRail() {
         onScroll={onScroll}
         className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 md:mx-0 md:px-0"
       >
-        {BANNERS.map((banner, i) => (
+        {banners.map((banner, i) => (
           <li
             key={banner.id}
             className="flex w-[85%] shrink-0 snap-center sm:w-[60%] lg:w-[46%]"
@@ -87,7 +87,7 @@ export function BannerRail() {
       {/* Position readout, not a control — tapping dots would compete with
           the swipe that already moves the rail. */}
       <div aria-hidden className="mt-2.5 flex justify-center gap-1.5">
-        {BANNERS.map((banner, i) => (
+        {banners.map((banner, i) => (
           <span
             key={banner.id}
             className={`h-1.5 rounded-full transition-all duration-300 ease-out ${

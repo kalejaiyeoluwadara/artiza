@@ -24,7 +24,6 @@ function useAsync<T>(load: () => Promise<T>, fallback: T) {
     // Guards against a read from a previous attempt landing after a newer
     // one and overwriting it.
     let live = true;
-    setState("loading");
 
     load()
       .then((value) => {
@@ -44,7 +43,12 @@ function useAsync<T>(load: () => Promise<T>, fallback: T) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attempt]);
 
-  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  // Back to placeholders, then re-run the read. Both live here rather than
+  // in the effect, so the effect never sets state during a render pass.
+  const retry = useCallback(() => {
+    setState("loading");
+    setAttempt((n) => n + 1);
+  }, []);
 
   return {
     data,

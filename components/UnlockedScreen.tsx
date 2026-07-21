@@ -1,22 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { ARTISANS, Artisan } from "../lib/artisans";
+import { Artisan } from "../lib/artisans";
+import { useArtisans } from "../lib/useData";
 import { useUnlocks } from "../lib/useUnlocks";
 import { ArtisanCard } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { Placeholder } from "./Placeholder";
+import { ArtisanGridSkeleton, LoadingLabel, Skeleton } from "./Skeleton";
 
 /** Contacts already paid for. Reads the same store the unlock writes. */
 export function UnlockedScreen() {
   const { isUnlocked, unlock, unlockedIds, ready } = useUnlocks();
+  const { artisans, loading } = useArtisans();
   const [selected, setSelected] = useState<Artisan | null>(null);
 
-  // Nothing renders until storage is read, so the empty state never
-  // flashes for someone who has unlocks.
-  if (!ready) return <div className="flex-1" />;
+  // Two reads have to land — the unlock record and the register — and the
+  // empty state must never flash at someone who has unlocks, so the screen
+  // waits on both behind placeholders.
+  if (!ready || loading) {
+    return (
+      <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
+        <LoadingLabel>Loading your unlocked contacts</LoadingLabel>
+        <h1 className="title-lg text-ink">Unlocked</h1>
+        <Skeleton className="mt-2 h-3 w-52 rounded-md" />
+        <ArtisanGridSkeleton count={3} className="mt-5" />
+      </div>
+    );
+  }
 
-  const unlocked = ARTISANS.filter((a) => unlockedIds.includes(a.id));
+  const unlocked = artisans.filter((a) => unlockedIds.includes(a.id));
 
   if (unlocked.length === 0) {
     return (

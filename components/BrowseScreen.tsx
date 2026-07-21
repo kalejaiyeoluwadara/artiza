@@ -29,6 +29,9 @@ import {
   Skeleton,
 } from "./Skeleton";
 
+/** One screenful: six cards is two full rows on desktop, six scrolls on mobile. */
+const PAGE = 6;
+
 /**
  * Renders the register for whatever query the search bar currently holds,
  * and owns the one sheet instance. A single sheet shared by every entry
@@ -66,9 +69,23 @@ export function BrowseScreen({
     [artisans, filters]
   );
 
+  /* "All artisans" names a database table, not a place you'd want to look.
+     Everyone here works in one town, so the heading says so — and a trade
+     filter just narrows the same sentence. */
   const heading = filters.trade
-    ? `${TRADE_LABELS[filters.trade]}s`
-    : "All artisans";
+    ? `${TRADE_LABELS[filters.trade]}s in Ilisan`
+    : "Hands in Ilisan";
+
+  /* The register is a browse surface, not an index: the first page is what
+     anyone actually reads, and the rails above already made the case for the
+     ones worth seeing first. The rest is one tap away.
+
+     Expansion is stored as the query it belongs to rather than a boolean, so
+     changing trade collapses the list back without an effect to reset it. */
+  const [expandedFor, setExpandedFor] = useState<Filters | null>(null);
+  const expanded = expandedFor === filters;
+  const shown = expanded ? results : results.slice(0, PAGE);
+  const more = results.length - shown.length;
 
   /* Promotion and discovery both only lead an unfiltered screen. Once someone
      has said what they want, a rail that ignores it reads as noise — and the
@@ -171,9 +188,30 @@ export function BrowseScreen({
           <h2 id="browse-heading" className="title text-ink">
             {heading}
           </h2>
-          <p className="caption">
-            {results.length} {results.length === 1 ? "artisan" : "artisans"}
-          </p>
+          {/* The count was a readout; as a button it does the same job and
+              also says what tapping gets you. It only appears when there is
+              actually something held back. */}
+          {more > 0 ? (
+            <button
+              type="button"
+              onClick={() => setExpandedFor(filters)}
+              className="pressable shrink-0 text-[0.8125rem] font-semibold text-accent"
+            >
+              View all {results.length}
+            </button>
+          ) : expanded && results.length > PAGE ? (
+            <button
+              type="button"
+              onClick={() => setExpandedFor(null)}
+              className="pressable shrink-0 text-[0.8125rem] font-semibold text-accent"
+            >
+              Show fewer
+            </button>
+          ) : (
+            <p className="caption shrink-0">
+              {results.length} {results.length === 1 ? "artisan" : "artisans"}
+            </p>
+          )}
         </div>
 
         {results.length === 0 ? (
@@ -193,7 +231,7 @@ export function BrowseScreen({
           </div>
         ) : (
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((artisan) => (
+            {shown.map((artisan) => (
               <li key={artisan.id}>
                 <ArtisanCard
                   artisan={artisan}
