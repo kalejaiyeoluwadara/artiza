@@ -35,29 +35,29 @@ export function ArtisanCard({
       <CoverPhoto artisan={artisan} />
 
       <div className="flex w-full flex-1 flex-col p-4">
-        <div className="-mt-11 flex w-full items-end gap-3">
-          <Avatar
-            name={artisan.name}
-            src={artisan.photo}
-            size="size-14"
-            className="ring-4 ring-card"
+        {/* The portrait is the only thing that laps the cover — it needs its
+            own stacking context or the positioned cover paints over it. The
+            name sits clear of the photo, on the card surface where it reads. */}
+        <Avatar
+          name={artisan.name}
+          src={artisan.photo}
+          size="size-14"
+          className="relative z-10 -mt-12 ring-4 ring-card"
+        />
+
+        <h3 className="headline mt-2.5 flex items-center gap-1.5 text-ink">
+          <span className="truncate">{artisan.name}</span>
+          <BadgeCheck
+            size={16}
+            strokeWidth={2.2}
+            className="shrink-0 text-accent"
+            aria-label="Verified"
           />
-          <div className="min-w-0 flex-1 pb-0.5">
-            <h3 className="headline flex items-center gap-1.5 text-ink">
-              <span className="truncate">{artisan.name}</span>
-              <BadgeCheck
-                size={16}
-                strokeWidth={2.2}
-                className="shrink-0 text-accent"
-                aria-label="Verified"
-              />
-            </h3>
-            <p className="caption mt-0.5 flex items-center gap-0.5">
-              <MapPin size={11} strokeWidth={2} />
-              {artisan.location}
-            </p>
-          </div>
-        </div>
+        </h3>
+        <p className="caption mt-0.5 flex items-center gap-0.5">
+          <MapPin size={11} strokeWidth={2} />
+          {artisan.location}
+        </p>
 
         <p className="mt-3 line-clamp-2 text-sm text-sub">{artisan.note}</p>
 

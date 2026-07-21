@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Search, KeyRound, User } from "lucide-react";
+import {
+  AccountIcon,
+  BrowseIcon,
+  SearchIcon,
+  UnlockedIcon,
+} from "./TabIcons";
 
 const TABS = [
-  { href: "/", label: "Browse", icon: LayoutGrid },
-  { href: "/search", label: "Search", icon: Search },
-  { href: "/unlocked", label: "Unlocked", icon: KeyRound },
-  { href: "/account", label: "Account", icon: User },
+  { href: "/", label: "Browse", icon: BrowseIcon },
+  { href: "/search", label: "Search", icon: SearchIcon },
+  { href: "/unlocked", label: "Unlocked", icon: UnlockedIcon },
+  { href: "/account", label: "Account", icon: AccountIcon },
 ] as const;
 
 function useIsActive() {
@@ -18,9 +23,12 @@ function useIsActive() {
 }
 
 /**
- * Mobile only. Translucent material floating over content. Switching
- * tabs happens dozens of times a session, so the only transition is
- * colour — movement would slow the most-repeated action in the app.
+ * Mobile only. A solid card-coloured floor, not a translucent film:
+ * photography scrolling underneath a blurred bar muddied both. Depth comes
+ * from a hairline and one soft upward shadow instead.
+ *
+ * Switching tabs happens dozens of times a session, so the only transition
+ * is colour — movement would slow the most-repeated action in the app.
  */
 export function BottomNav() {
   const isActive = useIsActive();
@@ -28,10 +36,10 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="chrome fixed inset-x-0 bottom-0 z-50 border-t border-line md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-card shadow-[0_-8px_28px_-16px_rgba(0,0,0,0.18)] md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="mx-auto grid max-w-md grid-cols-4">
+      <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(href);
           return (
@@ -39,12 +47,24 @@ export function BottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`pressable flex min-h-14 flex-col items-center justify-center gap-0.5 py-1.5 ${
-                  active ? "text-accent" : "text-sub"
-                }`}
+                className="pressable flex min-h-14 flex-col items-center justify-center gap-1 py-1.5"
               >
-                <Icon size={22} strokeWidth={active ? 2.3 : 1.8} />
-                <span className="text-[0.6875rem] font-medium">{label}</span>
+                {/* The accent-soft pill carries the selection, so the icon
+                    itself never has to grow or move to say "you are here". */}
+                <span
+                  className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors duration-200 ease-out ${
+                    active ? "bg-accent-soft text-accent" : "text-sub"
+                  }`}
+                >
+                  <Icon size={21} active={active} />
+                </span>
+                <span
+                  className={`text-[0.6875rem] transition-colors duration-200 ease-out ${
+                    active ? "font-semibold text-accent" : "font-medium text-sub"
+                  }`}
+                >
+                  {label}
+                </span>
               </Link>
             </li>
           );

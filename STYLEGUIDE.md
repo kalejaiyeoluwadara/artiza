@@ -6,7 +6,7 @@ Tokens live in [app/globals.css](app/globals.css). This document explains the re
 
 ## Direction: app-grade
 
-Artiza should feel like a native app that happens to run in the browser — not a website. That means: **no marketing hero, content first.** The home screen opens with a large title, a search field, and the artisan list itself. Chrome is translucent and floats over scrolling content. Buttons are pills. Surfaces are white cards on a soft grouped background. Motion feels physical: instant press feedback, springs, nothing scripted or slow.
+Artiza should feel like a native app that happens to run in the browser — not a website. That means: **no marketing hero, content first.** The home screen opens with a large title, the search bar and its trade rail, then the artisan list itself. Chrome is translucent and floats over scrolling content. Buttons are pills. Surfaces are white cards on a soft grouped background. Motion feels physical: instant press feedback, springs, nothing scripted or slow.
 
 Reference grammar: iOS system apps and the best marketplace apps (Airbnb, Thumbtack). The apple-design skill in `.claude/skills/apple-design/` is the authority on motion and materials — follow it.
 
@@ -28,31 +28,36 @@ Semantic tokens, one accent. **Light only** — the app ships a single, delibera
 | `accent` | `#0D7A5F` | Actions, money, verified. The only accent. |
 | `accent-soft` | 10% accent | Tinted fills: avatars, badges, active nav pill. |
 | `danger` | `#E5484D` | Errors, failed payment. State only. |
-| `chrome` | translucent canvas | Tab bar, header, and sheet footer material. |
+| `chrome` | translucent canvas | Desktop header, sheet footer, and chips floated on photos. |
 
 ### Rules
 
 - **One accent.** Emerald means action, money, and verification. No second hue; Featured is `accent-soft` fill, verified is an accent checkmark.
 - **Elevation is a whisper.** Cards get `shadow-[0_1px_2px_rgba(0,0,0,0.04)]` at most. Depth comes from surface layering (canvas → card), not drop shadows.
-- **Chrome is a material.** Tab bar and header use `.chrome` (blur + saturate + translucent background) with content scrolling underneath. `prefers-reduced-transparency` makes it solid — already handled in `globals.css`.
+- **Chrome is a material.** The desktop header, the sheet footer, and labels floated on photos use `.chrome` (blur + saturate + translucent background) with content scrolling underneath. `prefers-reduced-transparency` makes it solid — already handled in `globals.css`.
+- **The bottom tab bar is not chrome.** It is solid `bg-card` with a `border-line` hairline and one soft upward shadow. Photography scrolling under a blurred bar muddied both the bar and the photo; the tab bar is the app's floor, so it stays opaque.
 - Never style with raw hex or stock Tailwind palette colours (`zinc-*`, `emerald-*`); always the tokens.
 
 ## Type
 
-**System font stack** (`-apple-system` → SF on Apple, Segoe/Roboto elsewhere). It ships optical sizing and per-size tracking tuning that a webfont can't match, costs 0 bytes, and is exactly what makes the UI read as native. No display font.
+**Satoshi** (Fontshare, ITF Free Font License — free for commercial use), self-hosted from `app/fonts/` via `next/font/local`.
 
-Tracking is size-specific — tight when large, neutral when small:
+Why not the system stack: it ships excellent metrics but zero brand — it makes every app look like every other app. Satoshi is a geometric sans with a large x-height, so it stays legible at 13px captions while carrying real presence at 800 on a title. One 42KB variable file covers 300–900, there's no third-party connection to open on a slow network, and `adjustFontFallback` generates a metric-matched Arial fallback so the swap doesn't shift the layout.
+
+Tracking is size-specific — tight when large, near-neutral when small. A single fixed `letter-spacing` would be wrong at one end or the other. Geometric sans sets loose by default, so the body carries a global `-0.006em` and each step tightens further:
 
 | Class | Size | Weight | Tracking | Use |
 |---|---|---|---|---|
-| `.title-lg` | 34px | 700 | −0.022em | One per screen, iOS large-title style. |
-| `.title` | 22px | 700 | −0.017em | Section headings. |
-| `.headline` | 17px | 600 | −0.01em | Card titles, row titles. |
-| body | 15–17px | 400 | 0 | Prose, notes. Use Tailwind text sizes. |
-| `.caption` | 13px | 400 | 0 | Meta, secondary rows. Preset `sub` colour. |
-| `.figure` | inherit | 600 | −0.01em | Tabular numerals: prices, ratings, counts. |
+| `.title-lg` | 34→40px (clamp) | 800 | −0.038em | One per screen, large-title style. |
+| `.title` | 22px | 700 | −0.026em | Section headings. |
+| `.headline` | 17px | 600 | −0.016em | Card titles, row titles. |
+| body | 15–17px | 400 | −0.006em | Prose, notes. Use Tailwind text sizes. |
+| `.caption` | 13px | 500 | +0.001em | Meta, secondary rows. Preset `sub` colour. |
+| `.figure` | inherit | 600 | −0.014em | Tabular numerals: prices, ratings, counts. |
 
-Prices are written `₦500`, no space, no decimals, always in `.figure` so digits never reflow.
+Hierarchy comes from **weight and tracking together**, not size alone — 800 at the top against 400 body is what reads as premium rather than merely large.
+
+Satoshi ships real `tnum`, so `.figure` sets `font-feature-settings: "tnum" 1` and prices, ratings, and counts never reflow when a digit changes. Prices are written `₦500` — no space, no decimals, always in `.figure`.
 
 ## Shape & layout
 
@@ -85,12 +90,17 @@ The apple-design skill governs. House rules:
 
 ## Components
 
+- **Search bar** — the home screen's query, always readable back. Mobile is one full-round `bg-card` pill: search glyph, the trade as a semibold line, area and rating as a caption under it, and a `bg-fill` circle carrying an accent count badge when filters are on. From `sm` the same query opens out into three segments — **Trade · Area · Rating**, each a `.caption` label over a semibold value, split by `w-px bg-line` hairlines — closed by an accent circle button. Every part opens the same filter sheet; nothing here is a text input.
+- **Filter sheet** — grouped option chips (trade, area, rating floor) that apply on tap, with a pinned `.chrome` footer button that carries the live count ("Show 6 artisans") and only closes. Reset sits top-right, disabled at zero.
+- **Trade rail** — the fast lane under the search bar: horizontally scrolling icon-over-label items, active is `text-ink` plus a 2px ink underline. Underline rather than a filled chip, so it doesn't compete with the bar above it. Tapping the active trade clears it.
+- **Promotion yields to intent.** The featured carousel and the banner rail only render on an unfiltered screen. Once someone has said what they want, a paid slot that ignores it is noise.
 - **Buttons** — pills. Primary: `bg-accent text-white`, semibold, only for the paid action or the screen's single main action. Quiet actions are `bg-fill text-ink` or plain text.
-- **Artisan card** — `bg-card rounded-2xl overflow-hidden`: a 16:10 cover photo of the artisan's work with the trade chip (`.chrome`) and any Featured badge floated on it, then the round portrait lapping the cover edge (`-mt-11`, `ring-4 ring-card`), name + verified check, location caption, two-line note, figure row (rating · yrs · jobs), and a footer showing the price with a chevron. The whole card is one tap target that opens the sheet.
+- **Artisan card** — `bg-card rounded-2xl overflow-hidden`: a 16:10 cover photo of the artisan's work with the trade chip (`.chrome`) and any Featured badge floated on it, then the round portrait lapping the cover edge (`-mt-12`, `relative z-10`, `ring-4 ring-card` — the positioned cover paints over anything static, so only the portrait laps it and it carries its own stacking context). Below the photo, clear of it: name + verified check, location caption, two-line note, figure row (rating · yrs · jobs), and a footer showing the price with a chevron. The whole card is one tap target that opens the sheet.
 - **Featured card** — the promoted slot, so it's the most image-forward surface: photo fills the card, type sits on a bottom-up scrim in white, portrait ringed in `white/70`.
 - **Banner rail** — the app's one promotional surface, under the search field. Full-bleed photo cards (`aspect-2/1`, `5/2` from `sm`) at 85% viewport width so the next one peeks, snap-centre scrolling, white type on a `from-black/80` bottom-up scrim, one white pill CTA. Dots below are a **position readout, not a control**, derived from real `scrollLeft` — nothing auto-advances.
 - **Sealed contact** — `bg-fill rounded-2xl` module: masked number at full tabular width (`+234 8•• ••• ••••`) with a small "Locked" tag, and one pill button that carries the price: "Unlock contact · ₦500". Redaction, never blur — the number's shape is honest about what you're buying.
-- **Chips** — full-round; active is `bg-ink text-canvas` (inverted, not accent — accent stays reserved for actions/money).
+- **Bottom tab bar** — solid `bg-card`, hairline top border, soft upward shadow, safe-area padding. The active tab is an `accent-soft` pill behind the icon plus an accent semibold label; colour is the only thing that transitions (200ms), never size or position.
+- **Chips** — full-round; active is `bg-ink text-canvas` (inverted, not accent — accent stays reserved for actions/money). They live inside the filter sheet now; the home screen filters through the search bar and trade rail.
 - **Artisan detail sheet** — the list is for choosing, the sheet is for buying. Cards open it; unlocking only happens inside it, with the contact module pinned to a translucent footer so the paid action is never scrolled away.
 - **Empty states** — say what to do next, never just that nothing is here. No illustrations.
 

@@ -1,7 +1,31 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
 import { BottomNav, SiteHeader } from "../components/BottomNav";
+
+/**
+ * Satoshi (Fontshare, ITF Free Font License — free for commercial use).
+ * Self-hosted rather than CDN-linked: one 42KB variable file covers the
+ * whole 300–900 range, so there is no third-party connection to open on
+ * a slow connection and no flash of a second weight loading.
+ */
+const satoshi = localFont({
+  src: "./fonts/Satoshi-Variable.woff2",
+  variable: "--font-satoshi",
+  weight: "300 900",
+  display: "swap",
+  // Sized so the system fallback occupies nearly the same space and the
+  // swap doesn't shove the layout around.
+  adjustFontFallback: "Arial",
+  fallback: [
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "sans-serif",
+  ],
+});
 
 export const metadata: Metadata = {
   title: "Artiza — Vetted artisans in Ilisan, Ogun State",
@@ -30,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`${satoshi.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-canvas text-ink">
         <a
           href="#main-content"

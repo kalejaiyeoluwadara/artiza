@@ -32,10 +32,11 @@
   --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
 
-  /* System font: ships optical sizing and tracking tables tuned per
-     platform. Overriding it needs a reason we don't have. */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif,
-    system-ui, "Segoe UI", Roboto, sans-serif;
+  /* Satoshi: geometric with a large x-height, so it stays legible at
+     caption sizes while carrying real presence at 800 on the titles.
+     The system stack has no brand; this does. */
+  --font-sans: var(--font-satoshi), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
 
   /* Springs approximated as strong ease-outs for CSS-only motion. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -52,8 +53,13 @@
   body {
     font-family: var(--font-sans);
     color: var(--ink);
+    /* Satoshi's geometric curves render heavy without this on macOS. */
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+    /* Slight negative tracking across the board: geometric sans set at
+       default spacing reads loose next to the system stack. */
+    letter-spacing: -0.006em;
   }
 
   :focus-visible {
@@ -69,39 +75,44 @@
 }
 
 @layer components {
-  /* Tracking is size-specific: tight when large, neutral small. */
+  /* Tracking is size-specific: tight when large, slightly open when
+     small. One fixed letter-spacing would be wrong at both ends. */
   .title-lg {
-    font-size: 2.125rem; /* 34 — iOS large title */
-    line-height: 1.12;
-    font-weight: 700;
-    letter-spacing: -0.022em;
+    font-size: clamp(2.125rem, 7vw, 2.5rem); /* 34 → 40 */
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.038em;
   }
 
   .title {
     font-size: 1.375rem; /* 22 */
-    line-height: 1.2;
+    line-height: 1.18;
     font-weight: 700;
-    letter-spacing: -0.017em;
+    letter-spacing: -0.026em;
   }
 
   .headline {
     font-size: 1.0625rem; /* 17 */
     line-height: 1.3;
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.016em;
   }
 
   .caption {
     font-size: 0.8125rem; /* 13 */
     line-height: 1.35;
+    font-weight: 500;
+    letter-spacing: 0.001em;
     color: var(--sub);
   }
 
-  /* Prices, ratings, counts — never reflow on a digit change. */
+  /* Prices, ratings, counts — never reflow on a digit change. Satoshi
+     ships tnum, so this is a real feature and not a hopeful hint. */
   .figure {
+    font-feature-settings: "tnum" 1;
     font-variant-numeric: tabular-nums;
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.014em;
   }
 
   /* Feedback lands on pointer-down, instantly. */

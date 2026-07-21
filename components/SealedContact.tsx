@@ -1,7 +1,9 @@
 "use client";
 
-import { Lock, MessageCircle } from "lucide-react";
-import { UNLOCK_PRICE, phoneGroups } from "../lib/artisans";
+import { Lock, PhoneCall } from "lucide-react";
+import { Artisan, UNLOCK_PRICE, channelsFor, formatPhone, phoneE164, phoneGroups } from "../lib/artisans";
+import { WhatsAppIcon } from "./BrandIcons";
+import { CopyButton } from "./ContactPanel";
 
 /**
  * The signature moment. The number is withheld, not hidden — masked
@@ -12,21 +14,22 @@ import { UNLOCK_PRICE, phoneGroups } from "../lib/artisans";
  * orchestrated animation: groups resolve left to right.
  */
 export function SealedContact({
-  phone,
-  name,
+  artisan,
   unlocked,
   onUnlock,
 }: {
-  phone: string;
-  name: string;
+  artisan: Artisan;
   unlocked: boolean;
   onUnlock: () => void;
 }) {
+  const { phone, name } = artisan;
   const groups = phoneGroups(phone);
+  const channels = channelsFor(artisan);
+  const whatsapp = channels.find((c) => c.kind === "whatsapp");
 
   return (
     <div className="rounded-2xl bg-fill p-3">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         <p
           className="figure text-[1.0625rem] text-ink"
           aria-label={
@@ -45,7 +48,9 @@ export function SealedContact({
           ))}
         </p>
 
-        {!unlocked && (
+        {unlocked ? (
+          <CopyButton value={phoneE164(phone)} label="phone number" />
+        ) : (
           <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-sub">
             <Lock size={12} strokeWidth={2.2} />
             Locked
@@ -53,29 +58,51 @@ export function SealedContact({
         )}
       </div>
 
-      <div className="mt-3">
-        {unlocked ? (
+      {unlocked ? (
+        <div className="mt-3 flex gap-2">
+          {whatsapp && (
+            <a
+              href={whatsapp.href}
+              target="_blank"
+              rel="noreferrer"
+              className="pressable hover-dim flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
+            >
+              <WhatsAppIcon size={17} />
+              WhatsApp
+            </a>
+          )}
           <a
-            href={`https://wa.me/${phone}`}
-            target="_blank"
-            rel="noreferrer"
-            className="pressable hover-dim flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
+            href={`tel:${phoneE164(phone)}`}
+            aria-label={`Call ${name} on ${formatPhone(phone)}`}
+            className="pressable hover-dim flex flex-1 items-center justify-center gap-2 rounded-full bg-card py-3 text-[0.9375rem] font-semibold text-ink"
           >
-            <MessageCircle size={16} strokeWidth={2.2} />
-            Message on WhatsApp
+            <PhoneCall size={16} strokeWidth={2.2} />
+            Call
           </a>
-        ) : (
+        </div>
+      ) : (
+        <>
           <button
             type="button"
             onClick={onUnlock}
-            className="pressable hover-dim flex w-full items-center justify-center rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
+            className="pressable hover-dim mt-3 flex w-full items-center justify-center rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
           >
             Unlock contact · ₦{UNLOCK_PRICE}
           </button>
-        )}
-      </div>
+          <p className="caption mt-2 text-center">
+            {channelList(channels.map((c) => c.label))} · paid once, kept
+            forever
+          </p>
+        </>
+      )}
     </div>
   );
+}
+
+/** "WhatsApp, Call, Text and Instagram" — an Oxford-free list, as spoken. */
+function channelList(labels: string[]): string {
+  if (labels.length < 2) return labels.join("");
+  return `${labels.slice(0, -1).join(", ")} and ${labels[labels.length - 1]}`;
 }
 
 /**

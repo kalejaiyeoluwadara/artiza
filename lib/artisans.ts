@@ -15,6 +15,24 @@ export interface Review {
   text: string;
 }
 
+/**
+ * Everything the ₦500 buys. Phone is the spine — call, WhatsApp and SMS all
+ * hang off it — so only the handles that vary are stored per artisan.
+ */
+export interface Contact {
+  /** Only set when WhatsApp lives on a different line to the main number. */
+  whatsapp?: string;
+  /** Handle without the @. */
+  instagram?: string;
+  email?: string;
+  /** Second line, e.g. a shop landline or apprentice.  */
+  altPhone?: string;
+  /** Typical reply window, set by the team at verification. */
+  respondsIn: string;
+  /** Working days and hours, in the artisan's own words. */
+  availability: string;
+}
+
 export interface Artisan {
   id: string;
   name: string;
@@ -28,6 +46,8 @@ export interface Artisan {
   reviewCount: number;
   /** Stored bare, formatted at render. */
   phone: string;
+  /** The rest of the sealed detail — handles, hours, second line. */
+  contact: Contact;
   /** Square portrait. Shot by the team on the verification visit. */
   photo: string;
   /** Past work. First one is the card cover, the rest are thumbnails. */
@@ -130,6 +150,12 @@ export const ARTISANS: Artisan[] = [
     rating: 4.8,
     reviewCount: 21,
     phone: "2348031234567",
+    contact: {
+      instagram: "tundetiles_ilisan",
+      email: "tunde.bakare@artiza.ng",
+      respondsIn: "Usually replies within an hour",
+      availability: "Mon–Sat, 8am–6pm",
+    },
     photo: portrait("1522529599102-193c0d76b5b6"),
     work: [
       scene("1523413555809-0fb1d4da238d"),
@@ -171,6 +197,14 @@ export const ARTISANS: Artisan[] = [
     rating: 4.9,
     reviewCount: 28,
     phone: "2348084445556",
+    contact: {
+      whatsapp: "2348084445557",
+      instagram: "umehsolar",
+      email: "victor@umehsolar.ng",
+      altPhone: "2348084445558",
+      respondsIn: "Usually replies same day",
+      availability: "Mon–Sat, 7:30am–7pm",
+    },
     photo: portrait("1645395375692-502558949baa"),
     work: [
       scene("1660330589257-813305a4a383"),
@@ -206,6 +240,12 @@ export const ARTISANS: Artisan[] = [
     rating: 4.7,
     reviewCount: 39,
     phone: "2348062223334",
+    contact: {
+      instagram: "alaowoodworks",
+      email: "segunalao.works@gmail.com",
+      respondsIn: "Usually replies within 2 hours",
+      availability: "Mon–Fri, 8am–5pm",
+    },
     photo: portrait("1688240817677-d28b8e232dd4"),
     work: [
       scene("1590880795696-20c7dfadacde"),
@@ -241,6 +281,11 @@ export const ARTISANS: Artisan[] = [
     rating: 4.6,
     reviewCount: 30,
     phone: "2348027771234",
+    contact: {
+      altPhone: "2348027771235",
+      respondsIn: "Usually picks up first try",
+      availability: "Daily, 7am–8pm · emergencies any time",
+    },
     photo: portrait("1562173650-f61426fbe683"),
     work: [
       scene("1676210134188-4c05dd172f89"),
@@ -276,6 +321,12 @@ export const ARTISANS: Artisan[] = [
     rating: 4.6,
     reviewCount: 16,
     phone: "2348073334445",
+    contact: {
+      instagram: "funmi.finishes",
+      email: "funmi.adebayo@artiza.ng",
+      respondsIn: "Usually replies within an hour",
+      availability: "Mon–Sat, 8am–6pm",
+    },
     photo: portrait("1620424037570-15137a4a562d"),
     work: [
       scene("1567113463300-102a7eb3cb26"),
@@ -311,6 +362,12 @@ export const ARTISANS: Artisan[] = [
     rating: 4.9,
     reviewCount: 44,
     phone: "2348091112223",
+    contact: {
+      instagram: "bisilaundry_ilisan",
+      email: "bisilaundry@gmail.com",
+      respondsIn: "Usually replies within 30 minutes",
+      availability: "Mon–Sun, 7am–7pm · pickup by request",
+    },
     photo: portrait("1534470717-233b39a41c54"),
     work: [
       scene("1548768041-2fceab4c0b85"),
@@ -346,6 +403,12 @@ export const ARTISANS: Artisan[] = [
     rating: 4.7,
     reviewCount: 25,
     phone: "2348055556667",
+    contact: {
+      whatsapp: "2348055556668",
+      email: "musa.danjuma@artiza.ng",
+      respondsIn: "Usually replies within 2 hours",
+      availability: "Daily, 8am–8pm · call-outs after hours",
+    },
     photo: portrait("1621905252507-b35492cc74b4"),
     work: [
       scene("1621905252472-943afaa20e20"),
@@ -381,6 +444,11 @@ export const ARTISANS: Artisan[] = [
     rating: 4.4,
     reviewCount: 9,
     phone: "2348038889990",
+    contact: {
+      instagram: "chukatiles",
+      respondsIn: "Usually replies within an hour",
+      availability: "Mon–Sat, 9am–6pm",
+    },
     photo: portrait("1684916929613-2a93a0173e8e"),
     work: [
       scene("1547414857-c9f61632b250"),
@@ -408,6 +476,29 @@ export const ARTISANS: Artisan[] = [
   },
 ];
 
+/** Rating floors offered in the filter sheet. `null` is "any". */
+export const RATING_FLOORS = [4, 4.5, 4.8] as const;
+
+export interface Filters {
+  trade: Trade | null;
+  minRating: number | null;
+}
+
+export const NO_FILTERS: Filters = { trade: null, minRating: null };
+
+/** How many filters are actually narrowing the register — drives the badge. */
+export function activeFilterCount(filters: Filters): number {
+  return Object.values(filters).filter((v) => v !== null).length;
+}
+
+export function filterArtisans(list: Artisan[], filters: Filters): Artisan[] {
+  return list.filter(
+    (a) =>
+      (!filters.trade || a.trade === filters.trade) &&
+      (!filters.minRating || a.rating >= filters.minRating),
+  );
+}
+
 /** Featured first, then by jobs completed. Promotion is the only lever. */
 export function rankArtisans(list: Artisan[]): Artisan[] {
   return [...list].sort((a, b) => {
@@ -423,4 +514,134 @@ export function rankArtisans(list: Artisan[]): Artisan[] {
 export function phoneGroups(phone: string): string[] {
   const rest = phone.replace(/^234/, "");
   return [`+234`, rest.slice(0, 3), rest.slice(3, 6), rest.slice(6, 10)];
+}
+
+/** One flat string for links and copy: +2348031234567. */
+export function phoneE164(phone: string): string {
+  return `+${phone}`;
+}
+
+/** Display form for a secondary line: +234 803 123 4567. */
+export function formatPhone(phone: string): string {
+  return phoneGroups(phone).join(" ");
+}
+
+export type ChannelKind =
+  | "call"
+  | "whatsapp"
+  | "sms"
+  | "instagram"
+  | "email"
+  | "alt";
+
+export interface Channel {
+  kind: ChannelKind;
+  /** Button label — a verb, since every channel is an action. */
+  label: string;
+  /** What the channel actually resolves to, shown once unlocked. */
+  value: string;
+  href: string;
+  /** Opens off-platform in a new tab rather than handing off to the OS. */
+  external?: boolean;
+}
+
+/**
+ * Every way to reach an artisan, ordered by how people in Ilisan actually
+ * make first contact: WhatsApp, then a call, then everything else. Channels
+ * the artisan doesn't have simply don't appear — no dead buttons.
+ */
+export function channelsFor(artisan: Artisan): Channel[] {
+  const { contact } = artisan;
+  const whatsapp = contact.whatsapp ?? artisan.phone;
+
+  const channels: Channel[] = [
+    {
+      kind: "whatsapp",
+      label: "WhatsApp",
+      value: formatPhone(whatsapp),
+      href: `https://wa.me/${whatsapp}?text=${encodeURIComponent(
+        `Hi ${artisan.name.split(" ")[0]}, I found you on Artiza.`,
+      )}`,
+      external: true,
+    },
+    {
+      kind: "call",
+      label: "Call",
+      value: formatPhone(artisan.phone),
+      href: `tel:${phoneE164(artisan.phone)}`,
+    },
+    {
+      kind: "sms",
+      label: "Text",
+      value: formatPhone(artisan.phone),
+      href: `sms:${phoneE164(artisan.phone)}`,
+    },
+  ];
+
+  if (contact.instagram) {
+    channels.push({
+      kind: "instagram",
+      label: "Instagram",
+      value: `@${contact.instagram}`,
+      href: `https://instagram.com/${contact.instagram}`,
+      external: true,
+    });
+  }
+
+  if (contact.email) {
+    channels.push({
+      kind: "email",
+      label: "Email",
+      value: contact.email,
+      href: `mailto:${contact.email}`,
+    });
+  }
+
+  if (contact.altPhone) {
+    channels.push({
+      kind: "alt",
+      label: "Second line",
+      value: formatPhone(contact.altPhone),
+      href: `tel:${phoneE164(contact.altPhone)}`,
+    });
+  }
+
+  return channels;
+}
+
+/**
+ * A vCard so the contact lands in the phone's address book, not just the
+ * browser. Escapes per RFC 6350 and keeps CRLF line endings — iOS is strict.
+ */
+export function vCardFor(artisan: Artisan): string {
+  const esc = (value: string) =>
+    value.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;");
+  const [first, ...rest] = artisan.name.split(" ");
+  const last = rest.join(" ");
+
+  const lines = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `N:${esc(last)};${esc(first)};;;`,
+    `FN:${esc(artisan.name)}`,
+    `ORG:${esc(TRADE_LABELS[artisan.trade])} · Ilisan`,
+    `TITLE:${esc(TRADE_LABELS[artisan.trade])}`,
+    `TEL;TYPE=CELL:${phoneE164(artisan.phone)}`,
+  ];
+
+  if (artisan.contact.altPhone) {
+    lines.push(`TEL;TYPE=WORK:${phoneE164(artisan.contact.altPhone)}`);
+  }
+  if (artisan.contact.email) lines.push(`EMAIL:${esc(artisan.contact.email)}`);
+  if (artisan.contact.instagram) {
+    lines.push(`URL:https://instagram.com/${artisan.contact.instagram}`);
+  }
+
+  lines.push(
+    `ADR;TYPE=WORK:;;${esc(artisan.location)};Ilisan;Ogun State;;Nigeria`,
+    `NOTE:${esc(`Verified by Artiza, ${artisan.verifiedSince}. ${artisan.note}`)}`,
+    "END:VCARD",
+  );
+
+  return lines.join("\r\n");
 }

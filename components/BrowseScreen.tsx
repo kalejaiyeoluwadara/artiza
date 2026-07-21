@@ -6,24 +6,30 @@ import { BadgeCheck, Star } from "lucide-react";
 import {
   ARTISANS,
   Artisan,
+  Filters,
+  NO_FILTERS,
   TRADE_COVERS,
   TRADE_LABELS,
-  Trade,
+  activeFilterCount,
+  filterArtisans,
   rankArtisans,
 } from "../lib/artisans";
 import { useUnlocks } from "../lib/useUnlocks";
 import { ArtisanCard, Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
 
-const TRADES = Object.keys(TRADE_LABELS) as Trade[];
-
 /**
- * Owns the browse state and the one sheet instance. A single sheet
- * shared by every entry point keeps the open/close transition identical
- * wherever you tapped from.
+ * Renders the register for whatever query the search bar currently holds,
+ * and owns the one sheet instance. A single sheet shared by every entry
+ * point keeps the open/close transition identical wherever you tapped from.
  */
-export function BrowseScreen() {
-  const [trade, setTrade] = useState<Trade | null>(null);
+export function BrowseScreen({
+  filters,
+  onChange,
+}: {
+  filters: Filters;
+  onChange: (next: Filters) => void;
+}) {
   const [selected, setSelected] = useState<Artisan | null>(null);
   const { isUnlocked, unlock } = useUnlocks();
 
@@ -33,19 +39,27 @@ export function BrowseScreen() {
   );
 
   const results = useMemo(
-    () => rankArtisans(ARTISANS.filter((a) => !trade || a.trade === trade)),
-    [trade]
+    () => rankArtisans(filterArtisans(ARTISANS, filters)),
+    [filters]
   );
+
+  const heading = filters.trade
+    ? `${TRADE_LABELS[filters.trade]}s`
+    : "All artisans";
 
   return (
     <>
-      {featured.length > 0 && (
+      {/* Promotion only leads an unfiltered screen. Once someone has said
+          what they want, a paid slot that ignores it reads as noise. */}
+      {activeFilterCount(filters) === 0 && featured.length > 0 && (
         <section aria-labelledby="featured-heading" className="mt-7">
           <h2 id="featured-heading" className="title text-ink">
             Featured
           </h2>
-          {/* Snap carousel, edge-to-edge on mobile. */}
-          <div className="no-scrollbar -mx-4 mt-3 snap-x snap-mandatory overflow-x-auto px-4 md:mx-0 md:px-0">
+          {/* Snap carousel, edge-to-edge on mobile. Snap points align to the
+              scrollport, not the content box, so the rail needs matching
+              scroll-padding or the first card lands flush against the edge. */}
+          <div className="no-scrollbar -mx-4 mt-3 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 md:mx-0 md:scroll-px-0 md:px-0">
             <ul className="flex w-max gap-3">
               {featured.map((artisan) => (
                 <li key={artisan.id} className="snap-start">
@@ -61,22 +75,9 @@ export function BrowseScreen() {
       )}
 
       <section aria-labelledby="browse-heading" className="mt-7">
-        <div className="no-scrollbar -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
-          <div className="flex w-max gap-2 md:w-auto md:flex-wrap">
-            <Chip active={trade === null} onClick={() => setTrade(null)}>
-              All
-            </Chip>
-            {TRADES.map((t) => (
-              <Chip key={t} active={trade === t} onClick={() => setTrade(t)}>
-                {TRADE_LABELS[t]}
-              </Chip>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-5 flex items-baseline justify-between">
+        <div className="flex items-baseline justify-between">
           <h2 id="browse-heading" className="title text-ink">
-            {trade ? `${TRADE_LABELS[trade]}s` : "All artisans"}
+            {heading}
           </h2>
           <p className="caption">
             {results.length} {results.length === 1 ? "artisan" : "artisans"}
@@ -84,10 +85,20 @@ export function BrowseScreen() {
         </div>
 
         {results.length === 0 ? (
-          <p className="mt-4 rounded-2xl bg-card p-8 text-center text-sm text-sub">
-            No {trade && TRADE_LABELS[trade].toLowerCase()}s listed in Ilisan
-            yet. Try another trade — the team adds artisans weekly.
-          </p>
+          <div className="mt-4 rounded-2xl bg-card p-8 text-center">
+            <p className="text-sm text-sub">
+              {activeFilterCount(filters) > 1
+                ? "Nothing matches all of those at once. Drop a filter — the team adds artisans weekly."
+                : "Nobody listed here yet. Try another trade — the team adds artisans weekly."}
+            </p>
+            <button
+              type="button"
+              onClick={() => onChange(NO_FILTERS)}
+              className="pressable hover-fill mt-4 rounded-full bg-fill px-4 py-2 text-sm font-semibold text-ink"
+            >
+              Clear filters
+            </button>
+          </div>
         ) : (
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((artisan) => (
@@ -182,31 +193,6 @@ function FeaturedCard({
           <span className="ml-1 font-normal text-white/70">jobs</span>
         </span>
       </p>
-    </button>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`pressable shrink-0 rounded-full px-4 py-2 text-sm font-medium ${
-        active
-          ? "bg-ink text-canvas"
-          : "hover-fill bg-card text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
-      }`}
-    >
-      {children}
     </button>
   );
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import { Artisan, TRADE_LABELS } from "../lib/artisans";
 import { Avatar } from "./ArtisanCard";
+import { ContactPanel } from "./ContactPanel";
 import { SealedContact } from "./SealedContact";
 import { Sheet } from "./Sheet";
 
@@ -84,11 +85,13 @@ export function ArtisanSheet({
               Visited and verified by the Artiza team · {artisan.verifiedSince}
             </p>
 
+            <ContactPanel artisan={artisan} unlocked={unlocked} />
+
             {artisan.work.length > 0 && (
               <Section title="Past work">
                 {/* Edge-to-edge rail: the photos are the evidence, so they
                     get the full width of the sheet rather than a grid. */}
-                <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-5">
+                <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-2.5 overflow-x-auto px-5">
                   {artisan.work.map((src, i) => (
                     <div
                       key={src}
@@ -172,8 +175,7 @@ export function ArtisanSheet({
             }}
           >
             <SealedContact
-              phone={artisan.phone}
-              name={artisan.name}
+              artisan={artisan}
               unlocked={unlocked}
               onUnlock={onUnlock}
             />
