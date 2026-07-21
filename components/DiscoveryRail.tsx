@@ -79,7 +79,7 @@ function RailCard({
     <button
       type="button"
       onClick={onOpen}
-      className="pressable group flex h-full w-44 flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+      className="pressable group flex h-full w-44 flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
     >
       <div className="relative aspect-4/3 w-full overflow-hidden bg-fill">
         <Image

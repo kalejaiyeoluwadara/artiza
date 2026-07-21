@@ -9,7 +9,6 @@ import {
   Copy,
   Star,
   Check,
-  Sparkles,
   Search,
   ChevronRight,
   BadgeCheck,
@@ -18,6 +17,7 @@ import {
   Briefcase,
   Unlock,
 } from "lucide-react";
+import { CreditCoinIcon } from "./CreditCoinIcon";
 import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
 import { useUnlocks } from "../lib/useUnlocks";
@@ -99,10 +99,10 @@ export function UnlockedScreen() {
 
         <Link
           href="/account"
-          className="pressable group flex items-center gap-2.5 rounded-full bg-card border border-line px-4 py-2 text-sm font-semibold text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+          className="pressable group flex items-center gap-2.5 rounded-full bg-card border border-line px-4 py-2 text-sm font-semibold text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
         >
-          <span className="flex size-7 items-center justify-center rounded-full bg-accent-soft">
-            <Sparkles className="size-3.5 text-accent" />
+          <span className="flex size-7 items-center justify-center rounded-full bg-accent-soft text-accent">
+            <CreditCoinIcon size={14} />
           </span>
           <span>
             {credits > 0 ? `${credits} credits` : "Buy Bundle"}
@@ -120,14 +120,14 @@ export function UnlockedScreen() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search your unlocked contacts..."
-            className="w-full rounded-2xl border border-line bg-card py-3 pl-11 pr-4 text-[0.9375rem] text-ink placeholder:text-faint focus:border-accent focus:outline-hidden shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+            className="w-full rounded-2xl border border-line bg-card py-3 pl-11 pr-4 text-[0.9375rem] text-ink placeholder:text-faint focus:border-accent focus:outline-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
           />
         </div>
       )}
 
       {/* Post-Job Rating Banner */}
       {unratedArtisans.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-accent/15 bg-accent-soft/50 p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-accent/15 bg-accent-soft/50 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
           <div className="flex items-start gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/10">
               <Star size={18} strokeWidth={2.2} className="text-accent" fill="currentColor" />
@@ -147,7 +147,7 @@ export function UnlockedScreen() {
               <button
                 key={artisan.id}
                 onClick={() => setRatingArtisan(artisan)}
-                className="pressable flex shrink-0 items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                className="pressable flex shrink-0 items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
               >
                 <Avatar name={artisan.name} src={artisan.photo} size="size-10 text-sm" />
                 <div className="text-left">
@@ -183,7 +183,7 @@ export function UnlockedScreen() {
             const coverSrc = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
 
             return (
-              <li key={artisan.id} className="flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+              <li key={artisan.id} className="flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                 {/* Work photo cover */}
                 <button
                   type="button"

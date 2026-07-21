@@ -71,7 +71,7 @@ export function SearchScreen() {
         }}
         className="mt-4"
       >
-        <div className="flex items-center gap-3 rounded-full bg-card py-3 pr-3 pl-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
+        <div className="flex items-center gap-3 rounded-full bg-card py-3 pr-3 pl-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
           <Search
             size={18}
             strokeWidth={2.2}
@@ -136,7 +136,7 @@ export function SearchScreen() {
           {/* One grouped list, not a grid of cards: search is scanning, and
               a row that fits four to a screen is easier to scan than a
               photo you have to admire. */}
-          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             {hits.map(({ artisan, field: matched, value }) => (
               <li key={artisan.id}>
                 <ResultRow
@@ -197,7 +197,7 @@ function Idle({
             </button>
           </div>
 
-          <ul className="mt-2.5 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <ul className="mt-2.5 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             {recents.map((query) => (
               <li key={query} className="flex items-center">
                 <button
@@ -242,7 +242,7 @@ function Idle({
               <button
                 type="button"
                 onClick={() => onPick(suggestion)}
-                className="pressable hover-fill rounded-full bg-card px-4 py-2 text-sm font-medium text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                className="pressable hover-fill rounded-full bg-card px-4 py-2 text-sm font-medium text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
               >
                 {suggestion}
               </button>

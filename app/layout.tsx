@@ -5,6 +5,8 @@ import { AppProvider } from "../context/AppContext";
 import { BottomNav, SiteHeader } from "../components/BottomNav";
 import { PWAInstallPrompt } from "../components/PWAInstallPrompt";
 
+import { PageTransition } from "../components/PageTransition";
+
 /**
  * Satoshi (Fontshare, ITF Free Font License — free for commercial use).
  * Self-hosted rather than CDN-linked: one 42KB variable file covers the
@@ -60,7 +62,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f2f2f7",
+  themeColor: "#fbfbfd",
   colorScheme: "light",
 };
 
@@ -81,7 +83,7 @@ export default function RootLayout({
         <AppProvider>
           <SiteHeader />
           <main id="main-content" className="flex flex-1 flex-col">
-            {children}
+            <PageTransition>{children}</PageTransition>
           </main>
           <BottomNav />
           <PWAInstallPrompt />

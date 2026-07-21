@@ -18,7 +18,7 @@ Semantic tokens, one accent. **Light only** — the app ships a single, delibera
 
 | Token | Value | Use |
 |---|---|---|
-| `canvas` | `#F2F2F7` | Page ground (grouped background). |
+| `canvas` | `#FBFBFD` | Page ground (near-white; cards sit on it by shadow, not by tone). |
 | `card` | `#FFFFFF` | Raised surfaces: cards, sheets, fields. |
 | `fill` | `rgba(120,120,128,.10)` | Quiet fills: search, chips, contact module. |
 | `line` | `rgba(60,60,67,.10)` | Separators on chrome. |

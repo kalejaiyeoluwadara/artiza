@@ -44,7 +44,7 @@ export function SearchBar({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="pressable flex w-full items-center gap-3 rounded-full bg-card py-2.5 pr-2.5 pl-4 text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:hidden"
+          className="pressable flex w-full items-center gap-3 rounded-full bg-card py-2.5 pr-2.5 pl-4 text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:hidden"
         >
           <Search size={18} strokeWidth={2.2} className="shrink-0 text-ink" />
           <span className="min-w-0 flex-1">
@@ -59,7 +59,7 @@ export function SearchBar({
         </button>
 
         {/* sm+: the same query, opened out into its parts. */}
-        <div className="hidden items-center rounded-full bg-card p-1.5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:flex">
+        <div className="hidden items-center rounded-full bg-card p-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:flex">
           <Segment label="Trade" value={tradeLabel} onClick={() => setOpen(true)} />
           <Divider />
           <Segment
