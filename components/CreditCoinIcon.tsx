@@ -3,9 +3,9 @@
 import { motion } from "framer-motion";
 
 /**
- * A custom credit-coin icon that pulses with a subtle shimmer.
+ * A custom credit-coin icon with a subtle animated shimmer.
  * Two concentric circles with an embossed "A" (for Artiza) monogram
- * and a small animated shine sweep across the surface.
+ * and a periodic shine sweep across the surface.
  *
  * Designed to sit inside the 28×28 pill next to the credits / "Buy Bundle"
  * label on the Unlocked screen.
@@ -37,7 +37,7 @@ export function CreditCoinIcon({ size = 14 }: { size?: number }) {
           r="8"
           stroke="currentColor"
           strokeWidth="1"
-          opacity="0.4"
+          opacity="0.35"
           fill="none"
         />
         {/* "A" monogram — Artiza */}
@@ -47,21 +47,20 @@ export function CreditCoinIcon({ size = 14 }: { size?: number }) {
         />
       </svg>
 
-      {/* Animated shimmer — a diagonal highlight that sweeps across */}
+      {/* Shimmer — a diagonal glint that sweeps across periodically */}
       <motion.span
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden rounded-full"
-        style={{ maskImage: "radial-gradient(circle, white, transparent)" }}
       >
         <motion.span
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
-          style={{ width: "200%", left: "-100%" }}
-          animate={{ left: ["−100%", "100%"] }}
+          className="absolute inset-y-0 w-[60%] bg-gradient-to-r from-transparent via-white/60 to-transparent"
+          initial={{ x: "-120%" }}
+          animate={{ x: ["-120%", "220%"] }}
           transition={{
-            duration: 2.4,
+            duration: 1.6,
             repeat: Infinity,
-            repeatDelay: 4,
-            ease: "easeInOut",
+            repeatDelay: 5,
+            ease: [0.4, 0, 0.2, 1],
           }}
         />
       </motion.span>

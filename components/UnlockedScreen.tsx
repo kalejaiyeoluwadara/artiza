@@ -142,19 +142,21 @@ export function UnlockedScreen() {
             </div>
           </div>
 
-          <div className="no-scrollbar -mx-4 mt-4 flex gap-2.5 overflow-x-auto px-4 pb-0.5">
+          {/* Mobile stacks full-width rows; from sm it becomes the
+              edge-bleeding horizontal scroller. */}
+          <div className="no-scrollbar mt-4 flex flex-col gap-2.5 sm:-mx-4 sm:flex-row sm:overflow-x-auto sm:px-4 sm:pb-0.5">
             {unratedArtisans.map((artisan) => (
               <button
                 key={artisan.id}
                 onClick={() => setRatingArtisan(artisan)}
-                className="pressable flex shrink-0 items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                className="pressable flex w-full items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:w-auto sm:shrink-0"
               >
                 <Avatar name={artisan.name} src={artisan.photo} size="size-10 text-sm" />
-                <div className="text-left">
-                  <h4 className="text-sm font-bold text-ink">{artisan.name}</h4>
-                  <p className="caption text-[11px]">{TRADE_LABELS[artisan.trade]}</p>
+                <div className="min-w-0 text-left">
+                  <h4 className="truncate text-sm font-bold text-ink">{artisan.name}</h4>
+                  <p className="caption truncate text-[11px]">{TRADE_LABELS[artisan.trade]}</p>
                 </div>
-                <div className="ml-1 flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white">
+                <div className="ml-auto flex shrink-0 items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white sm:ml-1">
                   <Star size={11} fill="currentColor" />
                   Rate
                 </div>
@@ -188,7 +190,7 @@ export function UnlockedScreen() {
                 <button
                   type="button"
                   onClick={() => setSelected(artisan)}
-                  className="pressable group relative aspect-[16/10] w-full overflow-hidden bg-fill"
+                  className="pressable group relative w-full md:aspect-[16/10] w-full overflow-hidden bg-fill"
                 >
                   <Image
                     src={coverSrc}
@@ -223,7 +225,7 @@ export function UnlockedScreen() {
                       name={artisan.name}
                       src={artisan.photo}
                       size="size-12 text-base"
-                      className="relative z-10 -mt-10 ring-[3px] ring-card"
+                      className="relative z-10  ring-[3px] ring-card"
                     />
                     <div className="min-w-0 flex-1 pt-0.5">
                       <h3 className="headline flex items-center gap-1.5 text-ink">
