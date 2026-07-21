@@ -1,26 +1,145 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------
+   Artiza design tokens — see STYLEGUIDE.md
+   Direction: "The Dossier". Warm-black ground, brass as the single
+   accent, contact details sealed until paid for.
+   --------------------------------------------------------------- */
+
+@theme {
+  /* Ground & surface — warm-cast blacks, never neutral grey */
+  --color-ink: #0c0b09; /* page ground */
+  --color-ash: #161410; /* raised surface: cards, sheets, inputs */
+  --color-ash-hi: #1f1c17; /* hover / pressed surface */
+  --color-line: #292520; /* hairlines, dividers, borders */
+
+  /* Accent — the only chromatic colour in the system */
+  --color-brass: #c39a4e; /* verified, price, unlock, focus */
+  --color-brass-hi: #d8b064; /* hover on brass */
+  --color-brass-dim: #6b5427; /* brass at rest: rules, inactive marks */
+
+  /* Text */
+  --color-bone: #f0ebe0; /* primary text */
+  --color-smoke: #a09a8d; /* secondary text, labels */
+  --color-mute: #6d675d; /* disabled, placeholder */
+
+  /* Status — state only, never decoration */
+  --color-clay: #d0553f; /* errors, failed payment */
+  --color-moss: #6f9160; /* payment confirmed */
+
+  /* Type */
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 3.5rem;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.035em;
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-h3--letter-spacing: -0.01em;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-micro: 0.75rem;
+  --text-micro--line-height: 1.4;
+  --text-micro--letter-spacing: 0.09em;
+
+  /* Radius — document-like and tight. Nothing here is soft. */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  /* Built-in CSS easings are too weak to read as intentional. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* enter, exit, press */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    background: var(--color-ink);
+    color-scheme: dark;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Every focusable thing gets the same brass ring. No exceptions. */
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: var(--color-brass);
+    color: var(--color-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+@layer components {
+  /* Headings: Archivo held slightly narrow, so a heading reads as a
+     registry plate rather than a marketing headline. */
+  .type-display {
+    font-stretch: 92%;
+    font-weight: 700;
+  }
+
+  /* Eyebrows, table headers, data labels. */
+  .type-label {
+    font-size: var(--text-micro);
+    line-height: var(--text-micro--line-height);
+    letter-spacing: var(--text-micro--letter-spacing);
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--color-smoke);
+  }
+
+  /* Prices, ratings, years of experience, job counts. */
+  .type-figure {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* Any pressable element. Confirms the interface heard the tap. */
+  .pressable {
+    transition: transform 160ms var(--ease-out), background-color 160ms ease,
+      border-color 160ms ease, color 160ms ease;
+  }
+
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
+  /* Touch devices fire :hover on tap, which reads as a stuck state. */
+  @media (hover: hover) and (pointer: fine) {
+    .hover-lift:hover {
+      background-color: var(--color-brass-hi);
+    }
+
+    .hover-surface:hover {
+      background-color: var(--color-ash-hi);
+      border-color: var(--color-brass-dim);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
