@@ -18,7 +18,7 @@ export function TradeIllustration({ trade }: { trade: Trade }) {
       fill="none"
       aria-hidden
       focusable="false"
-      className="size-10"
+      className="size-9"
     >
       <Art />
     </svg>
@@ -33,7 +33,7 @@ export function AllIllustration() {
       fill="none"
       aria-hidden
       focusable="false"
-      className="size-10"
+      className="size-9"
     >
       <rect x="6" y="6" width="12.5" height="12.5" rx="4" fill="var(--ink)" />
       <rect

@@ -73,14 +73,14 @@ function RailItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="pressable flex w-19 shrink-0 flex-col items-center gap-1.5"
+      className="pressable flex w-18 shrink-0 flex-col items-center gap-1.5"
     >
       {/* Selection is a ring, not a fill: the tint belongs to the trade, so
           the state has to be told in something the trade doesn't own. Only
           the ring colour transitions — never size or position. */}
       <span
         style={{ background: tint }}
-        className={`flex size-16 items-center justify-center rounded-2xl ring-2 ring-offset-2 ring-offset-canvas transition-[box-shadow] duration-200 ${
+        className={`flex size-14 items-center justify-center rounded-2xl ring-2 ring-offset-2 ring-offset-canvas transition-[box-shadow] duration-200 ${
           active ? "ring-ink" : "ring-transparent"
         }`}
       >

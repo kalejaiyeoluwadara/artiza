@@ -42,6 +42,8 @@ export interface Artisan {
   yearsExperience: number;
   /** Jobs unlocked through Artiza — the credibility signal. */
   jobsCompleted: number;
+  /** Contact unlocks in the last 30 days. Drives the trending rail. */
+  recentUnlocks: number;
   rating: number;
   reviewCount: number;
   /** Stored bare, formatted at render. */
@@ -157,6 +159,7 @@ export const ARTISANS: Artisan[] = [
     location: "Babcock Road",
     yearsExperience: 8,
     jobsCompleted: 34,
+    recentUnlocks: 9,
     rating: 4.8,
     reviewCount: 21,
     phone: "2348031234567",
@@ -204,6 +207,7 @@ export const ARTISANS: Artisan[] = [
     location: "Expressway Junction",
     yearsExperience: 6,
     jobsCompleted: 41,
+    recentUnlocks: 14,
     rating: 4.9,
     reviewCount: 28,
     phone: "2348084445556",
@@ -247,6 +251,7 @@ export const ARTISANS: Artisan[] = [
     location: "Irolu Road",
     yearsExperience: 12,
     jobsCompleted: 57,
+    recentUnlocks: 6,
     rating: 4.7,
     reviewCount: 39,
     phone: "2348062223334",
@@ -288,6 +293,7 @@ export const ARTISANS: Artisan[] = [
     location: "Town Centre",
     yearsExperience: 9,
     jobsCompleted: 46,
+    recentUnlocks: 17,
     rating: 4.6,
     reviewCount: 30,
     phone: "2348027771234",
@@ -328,6 +334,7 @@ export const ARTISANS: Artisan[] = [
     location: "Palace Area",
     yearsExperience: 7,
     jobsCompleted: 23,
+    recentUnlocks: 5,
     rating: 4.6,
     reviewCount: 16,
     phone: "2348073334445",
@@ -369,6 +376,7 @@ export const ARTISANS: Artisan[] = [
     location: "Toll Gate",
     yearsExperience: 5,
     jobsCompleted: 62,
+    recentUnlocks: 21,
     rating: 4.9,
     reviewCount: 44,
     phone: "2348091112223",
@@ -410,6 +418,7 @@ export const ARTISANS: Artisan[] = [
     location: "Babcock Road",
     yearsExperience: 11,
     jobsCompleted: 38,
+    recentUnlocks: 11,
     rating: 4.7,
     reviewCount: 25,
     phone: "2348055556667",
@@ -451,6 +460,7 @@ export const ARTISANS: Artisan[] = [
     location: "Irolu Road",
     yearsExperience: 4,
     jobsCompleted: 12,
+    recentUnlocks: 4,
     rating: 4.4,
     reviewCount: 9,
     phone: "2348038889990",
@@ -515,6 +525,67 @@ export function rankArtisans(list: Artisan[]): Artisan[] {
     if (a.featured !== b.featured) return a.featured ? -1 : 1;
     return b.jobsCompleted - a.jobsCompleted;
   });
+}
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** `verifiedSince` as a sortable month count. "Mar 2026" → 24315. */
+function verifiedMonth(artisan: Artisan): number {
+  const [month, year] = artisan.verifiedSince.split(" ");
+  return Number(year) * 12 + Math.max(0, MONTHS.indexOf(month));
+}
+
+/** How many artisans a discovery rail carries before it stops. */
+const RAIL_SIZE = 6;
+
+/**
+ * Most unlocked in the last 30 days. Demand, not reputation — a good artisan
+ * with a quiet month drops out, which is the whole point of the rail.
+ */
+export function trendingArtisans(list: Artisan[] = ARTISANS): Artisan[] {
+  return [...list]
+    .sort((a, b) => b.recentUnlocks - a.recentUnlocks)
+    .slice(0, RAIL_SIZE);
+}
+
+/**
+ * Newest to the register. Cut by an age window rather than a fixed count, so
+ * the rail empties out in a quiet month instead of calling a January listing new.
+ */
+export function newArtisans(list: Artisan[] = ARTISANS): Artisan[] {
+  if (list.length === 0) return [];
+  const newest = Math.max(...list.map(verifiedMonth));
+  return [...list]
+    .filter((a) => newest - verifiedMonth(a) < 4)
+    .sort((a, b) => verifiedMonth(b) - verifiedMonth(a))
+    .slice(0, RAIL_SIZE);
+}
+
+/** Minimum reviews before a rating is worth ranking on. */
+const RATED_THRESHOLD = 15;
+
+/**
+ * Highest rated, but only among artisans with enough reviews to mean it —
+ * a 5.0 off three jobs isn't a top rating, it's a small sample.
+ */
+export function topRatedArtisans(list: Artisan[] = ARTISANS): Artisan[] {
+  return [...list]
+    .filter((a) => a.reviewCount >= RATED_THRESHOLD)
+    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
+    .slice(0, RAIL_SIZE);
 }
 
 /**

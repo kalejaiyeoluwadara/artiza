@@ -175,6 +175,57 @@
     transition-duration: 60ms;
   }
 
+  /* Loading placeholder. Same quiet fill the search field and chips use,
+     so an unfilled surface reads as "not here yet" rather than as a new
+     component with its own colour.
+
+     It fades in after 120ms: a fast response paints real content before
+     the skeleton is ever visible, so a quick query never flashes grey.
+     The sweep is slow and low-contrast — a page of them shouldn't
+     shimmer like a slot machine. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: var(--fill);
+    animation: skeleton-in 160ms var(--ease-out) 120ms both;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.5),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: skeleton-sweep 1.4s var(--ease-in-out) 400ms infinite;
+  }
+
+  @keyframes skeleton-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes skeleton-sweep {
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  /* The sweep is decoration; the fill alone carries the meaning. */
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+      display: none;
+    }
+  }
+
   /* Floating bars: translucent material, content scrolls beneath. */
   .chrome {
     background: var(--chrome);

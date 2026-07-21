@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { BadgeCheck, Star } from "lucide-react";
 import {
-  ARTISANS,
   Artisan,
   Filters,
   NO_FILTERS,
@@ -12,11 +11,23 @@ import {
   TRADE_LABELS,
   activeFilterCount,
   filterArtisans,
+  newArtisans,
   rankArtisans,
+  topRatedArtisans,
+  trendingArtisans,
 } from "../lib/artisans";
+import { useArtisans } from "../lib/useData";
 import { useUnlocks } from "../lib/useUnlocks";
 import { ArtisanCard, Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
+import { DiscoveryRail } from "./DiscoveryRail";
+import {
+  ArtisanGridSkeleton,
+  DiscoveryRailSkeleton,
+  FeaturedRailSkeleton,
+  LoadingLabel,
+  Skeleton,
+} from "./Skeleton";
 
 /**
  * Renders the register for whatever query the search bar currently holds,
@@ -33,25 +44,90 @@ export function BrowseScreen({
   const [selected, setSelected] = useState<Artisan | null>(null);
   const { isUnlocked, unlock } = useUnlocks();
 
+  /* The register arrives asynchronously — the fixtures resolve immediately
+     today, a query won't. Every cut below derives from what the read
+     returned, so nothing here has to change when the database lands. */
+  const { artisans, loading, error, retry } = useArtisans();
+
   const featured = useMemo(
-    () => rankArtisans(ARTISANS.filter((a) => a.featured)),
-    []
+    () => rankArtisans(artisans.filter((a) => a.featured)),
+    [artisans]
   );
 
+  /* The three sorted cuts of the same register. Each one answers a different
+     question a visitor arrives with: who's busy, who's just been vetted, who
+     has the record. */
+  const trending = useMemo(() => trendingArtisans(artisans), [artisans]);
+  const arrivals = useMemo(() => newArtisans(artisans), [artisans]);
+  const topRated = useMemo(() => topRatedArtisans(artisans), [artisans]);
+
   const results = useMemo(
-    () => rankArtisans(filterArtisans(ARTISANS, filters)),
-    [filters]
+    () => rankArtisans(filterArtisans(artisans, filters)),
+    [artisans, filters]
   );
 
   const heading = filters.trade
     ? `${TRADE_LABELS[filters.trade]}s`
     : "All artisans";
 
+  /* Promotion and discovery both only lead an unfiltered screen. Once someone
+     has said what they want, a rail that ignores it reads as noise — and the
+     results they asked for should be the next thing they see. */
+  const browsing = activeFilterCount(filters) === 0;
+
+  /* A failed read is not an empty register — saying "nobody listed here"
+     when the query fell over would be a lie, and it hides the retry. */
+  if (error) {
+    return (
+      <section className="mt-7">
+        <h2 className="title text-ink">{heading}</h2>
+        <div className="mt-4 rounded-2xl bg-card p-8 text-center">
+          <p className="text-sm text-sub">
+            The register didn&apos;t load. Check your connection and try again.
+          </p>
+          <button
+            type="button"
+            onClick={retry}
+            className="pressable hover-fill mt-4 rounded-full bg-fill px-4 py-2 text-sm font-semibold text-ink"
+          >
+            Try again
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  /* Placeholders trace the layout the read is about to fill: same rails in
+     the same order, same card geometry, real headings. The section titles
+     are copy rather than data, so they are already true. */
+  if (loading) {
+    return (
+      <>
+        <LoadingLabel>Loading artisans</LoadingLabel>
+
+        {browsing && (
+          <>
+            <FeaturedRailSkeleton />
+            <DiscoveryRailSkeleton kind="trending" />
+            <DiscoveryRailSkeleton kind="new" />
+            <DiscoveryRailSkeleton kind="top-rated" />
+          </>
+        )}
+
+        <section className="mt-7">
+          <div className="flex items-baseline justify-between">
+            <h2 className="title text-ink">{heading}</h2>
+            <Skeleton className="h-3 w-16 rounded-md" />
+          </div>
+          <ArtisanGridSkeleton />
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
-      {/* Promotion only leads an unfiltered screen. Once someone has said
-          what they want, a paid slot that ignores it reads as noise. */}
-      {activeFilterCount(filters) === 0 && featured.length > 0 && (
+      {browsing && featured.length > 0 && (
         <section aria-labelledby="featured-heading" className="mt-7">
           <h2 id="featured-heading" className="title text-ink">
             Featured
@@ -72,6 +148,22 @@ export function BrowseScreen({
             </ul>
           </div>
         </section>
+      )}
+
+      {browsing && (
+        <>
+          <DiscoveryRail
+            kind="trending"
+            artisans={trending}
+            onOpen={setSelected}
+          />
+          <DiscoveryRail kind="new" artisans={arrivals} onOpen={setSelected} />
+          <DiscoveryRail
+            kind="top-rated"
+            artisans={topRated}
+            onOpen={setSelected}
+          />
+        </>
       )}
 
       <section aria-labelledby="browse-heading" className="mt-7">

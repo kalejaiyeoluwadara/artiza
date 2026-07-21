@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { BANNERS } from "../lib/artisans";
+import { useBanners } from "../lib/useData";
+import { BannerRailSkeleton } from "./Skeleton";
 
 /**
  * The one promotional surface in the app. It sits under the search field
@@ -15,6 +16,7 @@ import { BANNERS } from "../lib/artisans";
 export function BannerRail() {
   const railRef = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(0);
+  const { banners, loading, error } = useBanners();
 
   // Derived from real scroll position, so the dots stay honest during a
   // flick, a drag, or a keyboard scroll.
@@ -26,6 +28,12 @@ export function BannerRail() {
     const step = card.offsetWidth + 12; // gap-3
     setActive(Math.round(rail.scrollLeft / step));
   }
+
+  if (loading) return <BannerRailSkeleton />;
+
+  // Promotion is the one thing the page can do without. A failed or empty
+  // offers read takes the rail out rather than showing an apology for it.
+  if (error || banners.length === 0) return null;
 
   return (
     <section aria-label="Offers" className="mt-5">
