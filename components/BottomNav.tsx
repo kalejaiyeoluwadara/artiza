@@ -18,9 +18,9 @@ function useIsActive() {
 }
 
 /**
- * Mobile only. Tab bars are used dozens of times a session, so there is
- * no transition animation here beyond colour — movement would make the
- * most-repeated action in the product feel slow.
+ * Mobile only. Translucent material floating over content. Switching
+ * tabs happens dozens of times a session, so the only transition is
+ * colour — movement would slow the most-repeated action in the app.
  */
 export function BottomNav() {
   const isActive = useIsActive();
@@ -28,34 +28,23 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-ink/90 backdrop-blur-md md:hidden"
+      className="chrome fixed inset-x-0 bottom-0 z-50 border-t border-line md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="mx-auto grid max-w-md grid-cols-4">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(href);
           return (
-            <li key={href} className="relative">
-              {/* Active marker sits on the border, echoing the featured rule. */}
-              <span
-                aria-hidden
-                className="absolute inset-x-0 top-0 h-0.5 bg-brass"
-                style={{
-                  opacity: active ? 1 : 0,
-                  transition: "opacity 160ms var(--ease-out)",
-                }}
-              />
+            <li key={href}>
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`pressable flex min-h-14 flex-col items-center justify-center gap-1 py-2 ${
-                  active ? "text-brass" : "text-smoke"
+                className={`pressable flex min-h-14 flex-col items-center justify-center gap-0.5 py-1.5 ${
+                  active ? "text-accent" : "text-sub"
                 }`}
               >
-                <Icon size={19} strokeWidth={active ? 2.4 : 1.9} />
-                <span className="type-label text-[0.625rem] text-current">
-                  {label}
-                </span>
+                <Icon size={22} strokeWidth={active ? 2.3 : 1.8} />
+                <span className="text-[0.6875rem] font-medium">{label}</span>
               </Link>
             </li>
           );
@@ -65,19 +54,21 @@ export function BottomNav() {
   );
 }
 
-/** Desktop counterpart. Same destinations, same vocabulary. */
+/** Desktop counterpart. Same destinations, same names. */
 export function SiteHeader() {
   const isActive = useIsActive();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-ink/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-300 items-center gap-8 px-6 md:px-10">
-        <Link href="/" className="type-display text-h3 text-bone">
-          Artiza
-          <span className="text-brass">.</span>
+    <header className="chrome sticky top-0 z-50 hidden border-b border-line md:block">
+      <div className="mx-auto flex h-14 max-w-5xl items-center gap-8 px-6">
+        <Link
+          href="/"
+          className="text-lg font-bold tracking-tight text-ink"
+        >
+          Artiza<span className="text-accent">.</span>
         </Link>
 
-        <nav aria-label="Primary" className="ml-auto hidden md:block">
+        <nav aria-label="Primary" className="ml-auto">
           <ul className="flex items-center gap-1">
             {TABS.map(({ href, label }) => {
               const active = isActive(href);
@@ -86,8 +77,8 @@ export function SiteHeader() {
                   <Link
                     href={href}
                     aria-current={active ? "page" : undefined}
-                    className={`hover-surface rounded-sm border border-transparent px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                      active ? "text-brass" : "text-smoke"
+                    className={`pressable hover-fill rounded-full px-3.5 py-1.5 text-sm font-medium ${
+                      active ? "bg-accent-soft text-accent" : "text-sub"
                     }`}
                   >
                     {label}
@@ -98,7 +89,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <span className="type-label ml-auto md:ml-0">Ilisan · Ogun</span>
+        <span className="caption">Ilisan · Ogun</span>
       </div>
     </header>
   );

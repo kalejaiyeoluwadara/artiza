@@ -1,16 +1,7 @@
-import type { Metadata } from "next";
-import { Archivo } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
 import { BottomNav, SiteHeader } from "../components/BottomNav";
-
-// One family across the whole product. Hierarchy comes from weight and
-// width, so the `wdth` axis has to come along for the display styles.
-const archivo = Archivo({
-  variable: "--font-archivo",
-  subsets: ["latin"],
-  axes: ["wdth"],
-});
 
 export const metadata: Metadata = {
   title: "Artiza — Vetted artisans in Ilisan, Ogun State",
@@ -28,20 +19,22 @@ export const metadata: Metadata = {
   ],
 };
 
+export const viewport: Viewport = {
+  themeColor: "#f2f2f7",
+  colorScheme: "light",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${archivo.variable} h-full`}
-    >
-      <body className="min-h-full flex flex-col bg-ink font-sans text-bone">
+    <html lang="en" className="h-full">
+      <body className="flex min-h-full flex-col bg-canvas text-ink">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:rounded-sm focus:bg-brass focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
         >
           Skip to main content
         </a>

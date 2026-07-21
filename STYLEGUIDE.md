@@ -4,138 +4,118 @@ Tokens live in [app/globals.css](app/globals.css). This document explains the re
 
 ---
 
-## Direction: The Dossier
+## Direction: app-grade
 
-Artiza vets artisans. Vetting produces a record, and the one field on that record you actually need — the phone number — is sealed until you pay ₦500.
+Artiza should feel like a native app that happens to run in the browser — not a website. That means: **no marketing hero, content first.** The home screen opens with a large title, a search field, and the artisan list itself. Chrome is translucent and floats over scrolling content. Buttons are pills. Surfaces are white cards on a soft grouped background. Motion feels physical: instant press feedback, springs, nothing scripted or slow.
 
-So the product reads as a **vetted record**, not a marketplace listing: warm-black ground, brass as the mark of verification, artisan profiles laid out as a file rather than a card. The customer is spending money on trust, so the interface has to look like it takes the vetting seriously.
-
-**What this is not:** a card grid on a light background with coloured category chips. That's every classifieds site, and it gives us no way to make ₦500 feel earned.
+Reference grammar: iOS system apps and the best marketplace apps (Airbnb, Thumbtack). The apple-design skill in `.claude/skills/apple-design/` is the authority on motion and materials — follow it.
 
 ---
 
 ## Colour
 
-Six colours plus two status values. Brass is the only chromatic colour in the system — everything else is a warm neutral.
+Semantic tokens, one accent. **Light only** — the app ships a single, deliberate appearance, so components never branch on colour scheme.
 
-| Token | Hex | Use |
+| Token | Value | Use |
 |---|---|---|
-| `ink` | `#0C0B09` | Page ground. Warm-cast black, never neutral grey. |
-| `ash` | `#161410` | Raised surfaces: profile cards, sheets, inputs. |
-| `ash-hi` | `#1F1C17` | Hover and pressed states on raised surfaces. |
-| `line` | `#292520` | Hairlines, dividers, borders. |
-| `brass` | `#C39A4E` | Verified marks, prices, unlock actions, focus rings. |
-| `brass-hi` | `#D8B064` | Hover on brass. |
-| `brass-dim` | `#6B5427` | Brass at rest — inactive rules and marks. |
-| `bone` | `#F0EBE0` | Primary text. |
-| `smoke` | `#A09A8D` | Secondary text and labels. |
-| `mute` | `#6D675D` | Disabled text, placeholders. |
-| `clay` | `#D0553F` | Errors, failed payment. State only. |
-| `moss` | `#6F9160` | Payment confirmed. State only. |
+| `canvas` | `#F2F2F7` | Page ground (grouped background). |
+| `card` | `#FFFFFF` | Raised surfaces: cards, sheets, fields. |
+| `fill` | `rgba(120,120,128,.10)` | Quiet fills: search, chips, contact module. |
+| `line` | `rgba(60,60,67,.10)` | Separators on chrome. |
+| `ink` | `#0E0E11` | Primary label. |
+| `sub` | `#7D7D84` | Secondary label. |
+| `faint` | `#B9B9C0` | Tertiary label, placeholders, masked digits, grabber. |
+| `accent` | `#0D7A5F` | Actions, money, verified. The only accent. |
+| `accent-soft` | 10% accent | Tinted fills: avatars, badges, active nav pill. |
+| `danger` | `#E5484D` | Errors, failed payment. State only. |
+| `chrome` | translucent canvas | Tab bar, header, and sheet footer material. |
 
 ### Rules
 
-- **Brass is scarce.** If brass appears in more than three places on a screen, one of them is decoration — remove it. Reserve it for verification, money, and the unlock.
-- **Featured vs. verified is a treatment difference, not a new hue.** Verified is a brass outline mark. Featured is a solid brass fill. No second accent colour gets added for this.
-- **Never a gradient on brass.** It's a metal, not a glow.
-- Contrast floor: `bone` and `smoke` on `ink`/`ash` both clear 7:1. `mute` is for disabled only and is deliberately below AA — never use it for content someone has to read.
-
----
+- **One accent.** Emerald means action, money, and verification. No second hue; Featured is `accent-soft` fill, verified is an accent checkmark.
+- **Elevation is a whisper.** Cards get `shadow-[0_1px_2px_rgba(0,0,0,0.04)]` at most. Depth comes from surface layering (canvas → card), not drop shadows.
+- **Chrome is a material.** Tab bar and header use `.chrome` (blur + saturate + translucent background) with content scrolling underneath. `prefers-reduced-transparency` makes it solid — already handled in `globals.css`.
+- Never style with raw hex or stock Tailwind palette colours (`zinc-*`, `emerald-*`); always the tokens.
 
 ## Type
 
-**Archivo**, one family, hierarchy from weight and width. Loaded with the `wdth` axis in [app/layout.tsx](app/layout.tsx).
+**System font stack** (`-apple-system` → SF on Apple, Segoe/Roboto elsewhere). It ships optical sizing and per-size tracking tuning that a webfont can't match, costs 0 bytes, and is exactly what makes the UI read as native. No display font.
 
-Not Inter or Geist: this is the one place a single-family system can still have a voice, and Archivo held slightly narrow at heavy weights reads like signage and registry plates — right for a record, and immediately not-a-default.
+Tracking is size-specific — tight when large, neutral when small:
 
-| Role | Size | Weight | Notes |
-|---|---|---|---|
-| `text-display` | 3.5rem / 1.0 | 700 | Hero only, once per page. Pair with `.type-display`. |
-| `text-h1` | 2.5rem / 1.05 | 700 | Page title, artisan name. |
-| `text-h2` | 1.75rem / 1.15 | 600 | Section heads. |
-| `text-h3` | 1.25rem / 1.3 | 600 | Card titles, subsections. |
-| `text-body` | 1rem / 1.6 | 400 | Prose, reviews, descriptions. |
-| `text-sm` | 0.875rem / 1.5 | 400 | Meta, helper text, timestamps. |
-| `.type-label` | 0.75rem / 1.4 | 500 | Uppercase, `+0.09em`. Eyebrows, table headers, field labels. |
+| Class | Size | Weight | Tracking | Use |
+|---|---|---|---|---|
+| `.title-lg` | 34px | 700 | −0.022em | One per screen, iOS large-title style. |
+| `.title` | 22px | 700 | −0.017em | Section headings. |
+| `.headline` | 17px | 600 | −0.01em | Card titles, row titles. |
+| body | 15–17px | 400 | 0 | Prose, notes. Use Tailwind text sizes. |
+| `.caption` | 13px | 400 | 0 | Meta, secondary rows. Preset `sub` colour. |
+| `.figure` | inherit | 600 | −0.01em | Tabular numerals: prices, ratings, counts. |
 
-Three helper classes carry the personality:
+Prices are written `₦500`, no space, no decimals, always in `.figure` so digits never reflow.
 
-- `.type-display` — sets `font-stretch: 92%` and weight 700. Apply to `text-display`, `text-h1`, `text-h2`. This narrowing is the typographic signature; without it the type is generic.
-- `.type-label` — the uppercase tracked micro style. Used for every data label on a profile.
-- `.type-figure` — tabular figures, weight 600. Every price, rating, year count, and job count. Naira amounts must never reflow when a digit changes.
+## Shape & layout
 
-Tabular numerals are on globally via `body`. Prices are written `₦500`, no space, no decimals.
+- Radius: **16px (`rounded-2xl`) for cards and fields, full-round for buttons and chips.** Soft and app-like — nothing sharp, nothing 4px.
+- Content max width `max-w-5xl`, gutters 16px mobile / 24px desktop.
+- Mobile is the primary surface: bottom tab bar, edge-to-edge horizontal scroll rails (`-mx-4 px-4` + `.no-scrollbar`), safe-area padding, 44px+ targets.
+- Desktop gets the same content in a wider grid plus a translucent top header; the tab bar disappears at `md`.
+- Lists: single column mobile, 2-up `sm`, 3-up `lg`.
 
----
+## Motion
 
-## Layout
+The apple-design skill governs. House rules:
 
-- Content max width **1200px**. Gutters: 24px mobile, 40px from `md`.
-- Grid: 4 columns mobile, 12 columns from `lg`.
-- **Profile pages split 7/5**, not 50/50 — portfolio and reviews left, the sealed contact panel right. The asymmetry keeps the paid action from reading as an equal-weight sidebar.
-- Spacing is an 8px rhythm (Tailwind's default scale). Section vertical rhythm: 64px mobile, 96px desktop.
-- Radius: `xs` 2px, `sm` 4px, `md` 8px. Tight and document-like. Full-round only on filter chips, where the pill shape means "toggle". No large radii anywhere.
-- Borders are `1px solid line`. Elevation comes from surface colour (`ink` → `ash` → `ash-hi`), not shadow. There are no drop shadows in this system except on the unlock modal.
+- **Feedback on pointer-down, instantly.** `.pressable` scales to 0.97 with a 60ms in / 160ms out — press feels immediate, release feels smooth.
+- **Frequency budget.** Tab switches and chip toggles animate colour only. Browse-list items never stagger. The unlock reveal is the app's one orchestrated moment: masked digit groups resolve left→right, 90ms apart, blur burning off.
+- Springs (Framer Motion) for anything gesture-driven or interruptible; CSS `--ease-out` for simple state changes. Never `ease-in`.
+- `prefers-reduced-motion` collapses everything to cuts — global, in `globals.css`. The sheet additionally drops drag entirely and cross-fades.
 
-Balanced responsive: design desktop and mobile in parallel. Tap targets 44px minimum everywhere, since a large share of traffic is phone-first.
+### The sheet
 
----
+`components/Sheet.tsx` is the app's one modal surface and its most physical interaction. Rules it encodes, straight from apple-design:
 
-## The signature: the seal
-
-The one element Artiza is remembered by. Every artisan profile shows the contact line as **present but withheld** — a hairline-ruled brass strip with the digits redacted:
-
-```
-┌──────────────────────────────────────────┐
-│ CONTACT                          ⬢ SEALED│
-│ +234 8•• ••• ••••                        │
-│ ──────────────────────────────────────── │
-│ Unlock for ₦500        [ Unlock contact ]│
-└──────────────────────────────────────────┘
-```
-
-- Redaction, not blur. Blur is the generic SaaS paywall and looks like a rendering bug on a slow phone. Withheld digits become brass dots at the same tabular width, so the number's shape is honest about what you're buying.
-- The first four digits and country code stay visible. It proves the record is real.
-- The seal mark (⬢) is the same glyph used for the verified badge, at label size.
-- **Unlock animation:** digits resolve left to right in groups, 90ms apart, ~400ms total, `--ease-quiet`. This is the only orchestrated motion in the product. Everything else is a 150ms opacity or transform.
-- Respect `prefers-reduced-motion` — the reveal becomes a straight cut. Already handled globally in `globals.css`.
-
----
+- **Drag starts only from the grabber** (`useDragControls` + `dragListener={false}`), so sheet content scrolls without the two gestures ever needing disambiguation.
+- **Dismiss is decided by momentum projection**, not distance: `offset + (v/1000)·d/(1−d)` with `d = 0.998`. A fast flick dismisses; a slow long drag snaps back.
+- **Release velocity is handed to the exit spring**, so there's no seam between the finger letting go and the sheet flying out.
+- **Rubber-band upward** (`dragConstraints={{ top: 0 }}`, `dragElastic={0.04}`) — resistance, never a hard stop.
+- **Enter and exit share one path**: up from the bottom, down to the bottom.
+- Drawer spring is `bounce: 0.2`, `duration: 0.35` — the apple-design drawer row (damping 0.8 / response 0.3). Bounce is earned here because a drag preceded it.
+- Sheet height is measured in a **ref callback, not after the enter animation** — the scrim ramp and dismiss threshold both divide by it, and both would be wrong on a first-open drag otherwise.
 
 ## Components
 
-Hand-rolled with Tailwind. No component library. Keep the primitive set small:
+- **Buttons** — pills. Primary: `bg-accent text-white`, semibold, only for the paid action or the screen's single main action. Quiet actions are `bg-fill text-ink` or plain text.
+- **Artisan card** — `bg-card rounded-2xl overflow-hidden`: a 16:10 cover photo of the artisan's work with the trade chip (`.chrome`) and any Featured badge floated on it, then the round portrait lapping the cover edge (`-mt-11`, `ring-4 ring-card`), name + verified check, location caption, two-line note, figure row (rating · yrs · jobs), and a footer showing the price with a chevron. The whole card is one tap target that opens the sheet.
+- **Featured card** — the promoted slot, so it's the most image-forward surface: photo fills the card, type sits on a bottom-up scrim in white, portrait ringed in `white/70`.
+- **Banner rail** — the app's one promotional surface, under the search field. Full-bleed photo cards (`aspect-2/1`, `5/2` from `sm`) at 85% viewport width so the next one peeks, snap-centre scrolling, white type on a `from-black/80` bottom-up scrim, one white pill CTA. Dots below are a **position readout, not a control**, derived from real `scrollLeft` — nothing auto-advances.
+- **Sealed contact** — `bg-fill rounded-2xl` module: masked number at full tabular width (`+234 8•• ••• ••••`) with a small "Locked" tag, and one pill button that carries the price: "Unlock contact · ₦500". Redaction, never blur — the number's shape is honest about what you're buying.
+- **Chips** — full-round; active is `bg-ink text-canvas` (inverted, not accent — accent stays reserved for actions/money).
+- **Artisan detail sheet** — the list is for choosing, the sheet is for buying. Cards open it; unlocking only happens inside it, with the contact module pinned to a translucent footer so the paid action is never scrolled away.
+- **Empty states** — say what to do next, never just that nothing is here. No illustrations.
 
-**Buttons**
-- Primary — `bg-brass text-ink`, weight 600, radius `sm`. Only for the paid action: unlock, buy bundle, submit rating.
-- Secondary — `bg-ash border border-line text-bone`, hover `bg-ash-hi`.
-- Ghost — text only, `text-smoke`, hover `text-bone`.
-- One primary button per screen. If two things look equally primary, neither is.
+## Photography
 
-**Artisan card** — `bg-ash`, `border-line`, radius `sm`. Photo, name (`h3`), skill (`.type-label`), location, then a data strip of rating / years / jobs done in `.type-figure`. Featured cards get a solid brass top rule, 2px.
+Photos are the product's evidence — the work is what's being judged, so it leads every surface. Two kinds, and they never swap roles:
 
-**Rating** — filled brass, empty `brass-dim`. Always paired with a numeric count in `.type-figure` — five stars with no count is a credibility claim we haven't earned.
+- **Portrait** — square, face-aware crop, always circular. Shot by the team on the verification visit. The `accent-soft` initials circle stays as the fallback for anyone not yet photographed; it is a fallback, not the default.
+- **Work** — the artisan's own portfolio. `work[0]` is the card cover, the rest fill the "Past work" rail in the sheet. `TRADE_COVERS[trade]` backs up any artisan with no photos yet, so a card is never a blank slab.
 
-**Empty states** — say what to do, not that nothing is here. "No tilers listed in Ilisan yet. Try plumbers or carpenters." Never an illustration.
-
----
+Rules: photos always sit on `bg-fill` while loading, always through `next/image` with a `sizes` hint, and always under a gradient **scrim** (never a flat tint) when type sits on top — the scrim keeps labels legible without draining colour out of the work. Only the first banner is `priority`. Hover scale is `1.03` over 500ms, desktop only, and never on the portrait.
 
 ## Voice
 
 - Plain verbs, sentence case, no exclamation marks.
-- The action keeps its name through the flow: the button says **Unlock contact**, the confirmation says **Contact unlocked**.
-- Naming is customer-side. "Unlock contact", not "purchase credit". "Rate this artisan", not "submit review".
-- Errors state what happened and what to do: "Payment didn't go through. Your card wasn't charged — try again or use transfer." No apologies, no vagueness.
-- Never call artisans "service providers", "vendors", or "listings". They're artisans, or named by trade — plumber, tiler, solar installer.
-
----
+- The action keeps its name through the flow: **Unlock contact** → **Contact unlocked**.
+- Customer-side naming: "Unlock contact", not "purchase credit". "Rate this artisan", not "submit review".
+- Errors say what happened and what to do: "Payment didn't go through. Your card wasn't charged — try again or use transfer."
+- They're artisans, or named by trade — never "service providers", "vendors", or "listings".
 
 ## Quality floor
 
-Non-negotiable on every screen, and not worth mentioning in the UI:
-
-- Responsive to 360px wide.
-- Visible brass focus ring on every interactive element (global, in `globals.css` — don't override it per-component).
-- `prefers-reduced-motion` respected.
-- Images optimised through `next/image`; portfolio photos lazy-loaded below the fold. Assume a slow connection.
-- Every icon-only button has an accessible name.
+- Responsive to 360px; layout spacing in rem so Dynamic Type doesn't break it.
+- Visible accent focus ring on everything interactive (global — don't override).
+- `prefers-reduced-motion` and `prefers-reduced-transparency` respected (global).
+- Hover states gated behind `@media (hover: hover) and (pointer: fine)`.
+- Images via `next/image`, lazy below the fold. Assume a slow connection.
+- Every icon-only control has an accessible name.

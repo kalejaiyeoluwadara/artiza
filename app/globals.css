@@ -2,134 +2,153 @@
 
 /* ---------------------------------------------------------------
    Artiza design tokens — see STYLEGUIDE.md
-   Direction: "The Dossier". Warm-black ground, brass as the single
-   accent, contact details sealed until paid for.
+   Direction: app-grade, iOS-native feel. Light and dark from one
+   semantic set; emerald is the only accent.
    --------------------------------------------------------------- */
 
-@theme {
-  /* Ground & surface — warm-cast blacks, never neutral grey */
-  --color-ink: #0c0b09; /* page ground */
-  --color-ash: #161410; /* raised surface: cards, sheets, inputs */
-  --color-ash-hi: #1f1c17; /* hover / pressed surface */
-  --color-line: #292520; /* hairlines, dividers, borders */
+:root {
+  --canvas: #f2f2f7; /* grouped background */
+  --card: #ffffff; /* raised surface */
+  --fill: rgba(120, 120, 128, 0.1); /* quiet fills: search, chips */
+  --line: rgba(60, 60, 67, 0.1); /* separators */
+  --ink: #0e0e11; /* primary label */
+  --sub: #7d7d84; /* secondary label */
+  --faint: #b9b9c0; /* tertiary label, placeholders */
+  --accent: #0d7a5f; /* actions, money, verified */
+  --accent-soft: rgba(13, 122, 95, 0.1);
+  --danger: #e5484d;
+  --chrome: rgba(242, 242, 247, 0.78); /* translucent bars */
+}
 
-  /* Accent — the only chromatic colour in the system */
-  --color-brass: #c39a4e; /* verified, price, unlock, focus */
-  --color-brass-hi: #d8b064; /* hover on brass */
-  --color-brass-dim: #6b5427; /* brass at rest: rules, inactive marks */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-card: var(--card);
+  --color-fill: var(--fill);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-sub: var(--sub);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
 
-  /* Text */
-  --color-bone: #f0ebe0; /* primary text */
-  --color-smoke: #a09a8d; /* secondary text, labels */
-  --color-mute: #6d675d; /* disabled, placeholder */
+  /* System font: ships optical sizing and tracking tables tuned per
+     platform. Overriding it needs a reason we don't have. */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif,
+    system-ui, "Segoe UI", Roboto, sans-serif;
 
-  /* Status — state only, never decoration */
-  --color-clay: #d0553f; /* errors, failed payment */
-  --color-moss: #6f9160; /* payment confirmed */
-
-  /* Type */
-  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-
-  --text-display: 3.5rem;
-  --text-display--line-height: 1;
-  --text-display--letter-spacing: -0.035em;
-  --text-h1: 2.5rem;
-  --text-h1--line-height: 1.05;
-  --text-h1--letter-spacing: -0.03em;
-  --text-h2: 1.75rem;
-  --text-h2--line-height: 1.15;
-  --text-h2--letter-spacing: -0.02em;
-  --text-h3: 1.25rem;
-  --text-h3--line-height: 1.3;
-  --text-h3--letter-spacing: -0.01em;
-  --text-body: 1rem;
-  --text-body--line-height: 1.6;
-  --text-sm: 0.875rem;
-  --text-sm--line-height: 1.5;
-  --text-micro: 0.75rem;
-  --text-micro--line-height: 1.4;
-  --text-micro--letter-spacing: 0.09em;
-
-  /* Radius — document-like and tight. Nothing here is soft. */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-
-  /* Built-in CSS easings are too weak to read as intentional. */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* enter, exit, press */
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement */
+  /* Springs approximated as strong ease-outs for CSS-only motion. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @layer base {
+  /* Light only — the app ships a single, deliberate appearance. */
   html {
-    background: var(--color-ink);
-    color-scheme: dark;
+    background: var(--canvas);
+    color-scheme: light;
   }
 
   body {
     font-family: var(--font-sans);
-    font-variant-numeric: tabular-nums;
+    color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* Every focusable thing gets the same brass ring. No exceptions. */
   :focus-visible {
-    outline: 2px solid var(--color-brass);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
-    border-radius: var(--radius-xs);
+    border-radius: 8px;
   }
 
   ::selection {
-    background: var(--color-brass);
-    color: var(--color-ink);
+    background: var(--accent);
+    color: #fff;
   }
 }
 
 @layer components {
-  /* Headings: Archivo held slightly narrow, so a heading reads as a
-     registry plate rather than a marketing headline. */
-  .type-display {
-    font-stretch: 92%;
+  /* Tracking is size-specific: tight when large, neutral small. */
+  .title-lg {
+    font-size: 2.125rem; /* 34 — iOS large title */
+    line-height: 1.12;
     font-weight: 700;
+    letter-spacing: -0.022em;
   }
 
-  /* Eyebrows, table headers, data labels. */
-  .type-label {
-    font-size: var(--text-micro);
-    line-height: var(--text-micro--line-height);
-    letter-spacing: var(--text-micro--letter-spacing);
-    font-weight: 500;
-    text-transform: uppercase;
-    color: var(--color-smoke);
+  .title {
+    font-size: 1.375rem; /* 22 */
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.017em;
   }
 
-  /* Prices, ratings, years of experience, job counts. */
-  .type-figure {
+  .headline {
+    font-size: 1.0625rem; /* 17 */
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .caption {
+    font-size: 0.8125rem; /* 13 */
+    line-height: 1.35;
+    color: var(--sub);
+  }
+
+  /* Prices, ratings, counts — never reflow on a digit change. */
+  .figure {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
 
-  /* Any pressable element. Confirms the interface heard the tap. */
+  /* Feedback lands on pointer-down, instantly. */
   .pressable {
-    transition: transform 160ms var(--ease-out), background-color 160ms ease,
-      border-color 160ms ease, color 160ms ease;
+    transition: transform 160ms var(--ease-out), opacity 160ms ease,
+      background-color 160ms ease, color 160ms ease;
   }
 
   .pressable:active {
     transform: scale(0.97);
+    transition-duration: 60ms;
   }
 
-  /* Touch devices fire :hover on tap, which reads as a stuck state. */
+  /* Floating bars: translucent material, content scrolls beneath. */
+  .chrome {
+    background: var(--chrome);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .chrome {
+      background: var(--canvas);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+
+  /* Hover is desktop-only; taps must never leave a stuck state. */
   @media (hover: hover) and (pointer: fine) {
-    .hover-lift:hover {
-      background-color: var(--color-brass-hi);
+    .hover-dim:hover {
+      opacity: 0.85;
     }
 
-    .hover-surface:hover {
-      background-color: var(--color-ash-hi);
-      border-color: var(--color-brass-dim);
+    .hover-fill:hover {
+      background-color: var(--fill);
     }
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 

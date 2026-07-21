@@ -1,88 +1,77 @@
 "use client";
 
-import { useState } from "react";
-import { Hexagon, Phone } from "lucide-react";
+import { Lock, MessageCircle } from "lucide-react";
 import { UNLOCK_PRICE, phoneGroups } from "../lib/artisans";
 
 /**
- * The signature element. The number is shown as withheld, not hidden —
- * redacted rather than blurred, so the shape of what you're buying is
- * honest and it never reads as a rendering bug on a slow connection.
+ * The signature moment. The number is withheld, not hidden — masked
+ * digits at full tabular width, so what you're paying for has an honest
+ * shape and nothing reflows on reveal.
  *
- * Rare interaction (once per artisan, ever), so it earns real motion.
- * It is the only orchestrated animation in the product.
+ * Unlocking happens once per artisan, ever, so it keeps the app's only
+ * orchestrated animation: groups resolve left to right.
  */
 export function SealedContact({
   phone,
   name,
-  compact = false,
+  unlocked,
+  onUnlock,
 }: {
   phone: string;
   name: string;
-  compact?: boolean;
+  unlocked: boolean;
+  onUnlock: () => void;
 }) {
-  const [unlocked, setUnlocked] = useState(false);
   const groups = phoneGroups(phone);
 
   return (
-    <div className="rounded-sm border border-line bg-ink/60 p-3">
-      <div className="flex items-center justify-between gap-2">
-        <span className="type-label">Contact</span>
-        <span
-          className={`type-label flex items-center gap-1 ${
-            unlocked ? "text-brass" : "text-brass-dim"
-          }`}
-          style={{ transition: "color 200ms var(--ease-out)" }}
+    <div className="rounded-2xl bg-fill p-3">
+      <div className="flex items-center justify-between gap-3">
+        <p
+          className="figure text-[1.0625rem] text-ink"
+          aria-label={
+            unlocked
+              ? `${name}'s phone number: ${groups.join(" ")}`
+              : "Phone number locked until unlocked"
+          }
         >
-          <Hexagon
-            size={11}
-            strokeWidth={2.5}
-            fill={unlocked ? "currentColor" : "none"}
-          />
-          {unlocked ? "Open" : "Sealed"}
-        </span>
+          {groups.map((group, i) => (
+            <Digits
+              key={i}
+              group={group}
+              masked={i > 0 && !unlocked}
+              index={i}
+            />
+          ))}
+        </p>
+
+        {!unlocked && (
+          <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-sub">
+            <Lock size={12} strokeWidth={2.2} />
+            Locked
+          </span>
+        )}
       </div>
 
-      <p
-        className={`type-figure mt-2 flex flex-wrap items-baseline gap-x-2 text-bone ${
-          compact ? "text-h3" : "text-h3 sm:text-h2"
-        }`}
-        aria-label={
-          unlocked
-            ? `${name}'s phone number: ${groups.join(" ")}`
-            : "Phone number sealed until unlocked"
-        }
-      >
-        {groups.map((group, i) => (
-          <Digits key={i} group={group} masked={i > 0 && !unlocked} index={i} />
-        ))}
-      </p>
-
-      <div className="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3">
+      <div className="mt-3">
         {unlocked ? (
           <a
             href={`https://wa.me/${phone}`}
             target="_blank"
             rel="noreferrer"
-            className="pressable inline-flex w-full items-center justify-center gap-2 rounded-sm bg-brass px-4 py-2.5 text-sm font-semibold text-ink hover-lift"
+            className="pressable hover-dim flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
           >
-            <Phone size={14} strokeWidth={2.5} />
+            <MessageCircle size={16} strokeWidth={2.2} />
             Message on WhatsApp
           </a>
         ) : (
-          <>
-            <span className="text-sm text-smoke">
-              <span className="type-figure text-bone">₦{UNLOCK_PRICE}</span> to
-              unlock
-            </span>
-            <button
-              type="button"
-              onClick={() => setUnlocked(true)}
-              className="pressable rounded-sm bg-brass px-4 py-2.5 text-sm font-semibold text-ink hover-lift"
-            >
-              Unlock contact
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={onUnlock}
+            className="pressable hover-dim flex w-full items-center justify-center rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
+          >
+            Unlock contact · ₦{UNLOCK_PRICE}
+          </button>
         )}
       </div>
     </div>
@@ -90,8 +79,9 @@ export function SealedContact({
 }
 
 /**
- * Masked digits render as brass dots at the same tabular width, so the
- * number never reflows when it resolves. Groups resolve left to right.
+ * Masked digits render as dots at the same tabular width. On unlock,
+ * groups resolve left to right with a touch of blur burning off, so the
+ * crossfade reads as one number resolving rather than two overlapping.
  */
 function Digits({
   group,
@@ -103,14 +93,15 @@ function Digits({
   index: number;
 }) {
   return (
-    <span className="relative inline-block">
-      {/* Reserves the final width up front — nothing shifts on reveal. */}
+    <span className="relative mr-1.5 inline-block last:mr-0">
+      {/* Reserves final width — nothing shifts when digits resolve. */}
       <span aria-hidden className="invisible">
         {group}
       </span>
 
       <span
-        className="absolute inset-0 text-brass-dim"
+        aria-hidden
+        className="absolute inset-0 text-faint"
         style={{
           opacity: masked ? 1 : 0,
           transition: `opacity 140ms var(--ease-out) ${

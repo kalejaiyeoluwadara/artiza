@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Artiza
 
-Visual direction, tokens, components, and voice are defined in `STYLEGUIDE.md`. Read it before writing any UI. Design tokens are implemented in `app/globals.css` — use the token names (`bg-ash`, `text-brass`, `.type-label`), never raw hex or stock Tailwind palette colours (`zinc-*`, `amber-*`).
+Visual direction, tokens, components, and voice are defined in `STYLEGUIDE.md`. Read it before writing any UI. Design tokens are implemented in `app/globals.css` — use the token names (`bg-card`, `text-accent`, `.headline`, `.figure`), never raw hex or stock Tailwind palette colours (`zinc-*`, `emerald-*`). Motion follows the apple-design skill in `.claude/skills/apple-design/`.
 
 ## Product Scope
 

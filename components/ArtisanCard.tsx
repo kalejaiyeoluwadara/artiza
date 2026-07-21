@@ -1,89 +1,171 @@
-import { MapPin, Star } from "lucide-react";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
-import { SealedContact } from "./SealedContact";
+"use client";
 
-export function ArtisanCard({ artisan }: { artisan: Artisan }) {
+import Image from "next/image";
+import { BadgeCheck, ChevronRight, MapPin, Star } from "lucide-react";
+import {
+  Artisan,
+  TRADE_COVERS,
+  TRADE_LABELS,
+  UNLOCK_PRICE,
+} from "../lib/artisans";
+
+/**
+ * A row in the list, not a self-contained page. The whole card is the
+ * tap target and opens the detail sheet — unlocking lives there, so
+ * browsing stays about choosing rather than buying.
+ *
+ * The photo leads: you judge a hand worker by their work, so the cover is
+ * the job and the portrait laps onto it as the second layer of proof.
+ */
+export function ArtisanCard({
+  artisan,
+  unlocked,
+  onOpen,
+}: {
+  artisan: Artisan;
+  unlocked: boolean;
+  onOpen: () => void;
+}) {
   return (
-    <article className="hover-surface relative flex h-full flex-col overflow-hidden rounded-sm border border-line bg-ash transition-colors duration-200">
-      {/* Featured is a solid brass rule, not a second accent colour. */}
-      {artisan.featured && (
-        <div className="h-0.5 w-full bg-brass" aria-hidden />
-      )}
+    <button
+      type="button"
+      onClick={onOpen}
+      className="pressable group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+    >
+      <CoverPhoto artisan={artisan} />
 
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <header className="flex items-start gap-3">
-          <Monogram name={artisan.name} />
-          <div className="min-w-0 flex-1">
-            <h3 className="type-display truncate text-h3 text-bone">
-              {artisan.name}
+      <div className="flex w-full flex-1 flex-col p-4">
+        <div className="-mt-11 flex w-full items-end gap-3">
+          <Avatar
+            name={artisan.name}
+            src={artisan.photo}
+            size="size-14"
+            className="ring-4 ring-card"
+          />
+          <div className="min-w-0 flex-1 pb-0.5">
+            <h3 className="headline flex items-center gap-1.5 text-ink">
+              <span className="truncate">{artisan.name}</span>
+              <BadgeCheck
+                size={16}
+                strokeWidth={2.2}
+                className="shrink-0 text-accent"
+                aria-label="Verified"
+              />
             </h3>
-            <p className="type-label mt-0.5 text-brass">
-              {TRADE_LABELS[artisan.trade]}
+            <p className="caption mt-0.5 flex items-center gap-0.5">
+              <MapPin size={11} strokeWidth={2} />
+              {artisan.location}
             </p>
           </div>
-          {artisan.featured && (
-            <span className="type-label shrink-0 rounded-xs bg-brass px-1.5 py-0.5 text-ink">
-              Featured
-            </span>
-          )}
-        </header>
+        </div>
 
-        <p className="mt-3 flex items-center gap-1.5 text-sm text-smoke">
-          <MapPin size={13} strokeWidth={2} className="shrink-0" />
-          {artisan.location}
-        </p>
+        <p className="mt-3 line-clamp-2 text-sm text-sub">{artisan.note}</p>
 
-        <p className="mt-2 line-clamp-2 text-sm text-smoke">{artisan.note}</p>
-
-        {/* The record: what the ₦500 is backed by. */}
-        <dl className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-sm border border-line bg-line">
-          <Stat label="Rating">
-            <Star size={12} strokeWidth={2.5} fill="currentColor" className="text-brass" />
+        <div className="figure mt-3 flex items-center gap-4 text-sm text-ink">
+          <span className="flex items-center gap-1">
+            <Star
+              size={13}
+              strokeWidth={2.2}
+              fill="currentColor"
+              className="text-accent"
+            />
             {artisan.rating.toFixed(1)}
-            <span className="ml-0.5 text-xs font-normal text-mute">
-              ({artisan.reviewCount})
-            </span>
-          </Stat>
-          <Stat label="Experience">
+            <span className="font-normal text-sub">({artisan.reviewCount})</span>
+          </span>
+          <span>
             {artisan.yearsExperience}
-            <span className="ml-0.5 text-xs font-normal text-mute">yrs</span>
-          </Stat>
-          <Stat label="Jobs">{artisan.jobsCompleted}</Stat>
-        </dl>
+            <span className="ml-1 font-normal text-sub">yrs exp</span>
+          </span>
+          <span>
+            {artisan.jobsCompleted}
+            <span className="ml-1 font-normal text-sub">jobs</span>
+          </span>
+        </div>
 
-        <p className="type-label mt-3">Verified {artisan.verifiedSince}</p>
+        <div className="mt-3 flex-1" />
 
-        <div className="mt-4 flex-1" />
-
-        <SealedContact phone={artisan.phone} name={artisan.name} compact />
+        <div className="flex w-full items-center justify-between border-t border-line pt-3">
+          <span className="text-sm font-medium text-accent">
+            {unlocked ? "Contact unlocked" : `₦${UNLOCK_PRICE} to unlock contact`}
+          </span>
+          <ChevronRight
+            size={16}
+            strokeWidth={2.2}
+            aria-hidden
+            className="text-faint"
+          />
+        </div>
       </div>
-    </article>
+    </button>
   );
 }
 
-function Stat({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+/**
+ * The artisan's own work when we have it, the trade's stock scene when we
+ * don't — the card is never a blank slab.
+ */
+function CoverPhoto({ artisan }: { artisan: Artisan }) {
+  const src = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
+
   return (
-    <div className="bg-ash px-2 py-2.5 text-center">
-      <dt className="type-label">{label}</dt>
-      <dd className="type-figure mt-1 flex items-center justify-center gap-1 text-sm text-bone">
-        {children}
-      </dd>
+    <div className="relative aspect-16/10 w-full overflow-hidden bg-fill">
+      <Image
+        src={src}
+        alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
+        fill
+        sizes="(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw"
+        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+      />
+      {/* Scrim, not a tint: keeps the overlaid labels legible on any photo
+          without draining the colour out of the work. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-linear-to-b from-black/30 via-black/0 to-black/20"
+      />
+      <span className="chrome absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
+        {TRADE_LABELS[artisan.trade]}
+      </span>
+      {artisan.featured && (
+        <span className="absolute right-3 top-3 rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">
+          Featured
+        </span>
+      )}
     </div>
   );
 }
 
 /**
- * Stands in for a portrait until the team photographs each artisan.
- * Initials on ash with a brass hairline reads as a record photo slot
- * rather than a missing image.
+ * The artisan's face, shot by the team on the verification visit. Initials
+ * on an accent fill stay the fallback for anyone not yet photographed —
+ * an avatar slot, never a broken image.
  */
-function Monogram({ name }: { name: string }) {
+export function Avatar({
+  name,
+  src,
+  size = "size-12 text-[0.9375rem]",
+  className = "",
+}: {
+  name: string;
+  src?: string;
+  size?: string;
+  className?: string;
+}) {
+  if (src) {
+    return (
+      <span
+        className={`relative shrink-0 overflow-hidden rounded-full bg-accent-soft ${size} ${className}`}
+      >
+        <Image
+          src={src}
+          alt={name}
+          fill
+          sizes="128px"
+          className="object-cover"
+        />
+      </span>
+    );
+  }
+
   const initials = name
     .split(" ")
     .slice(0, 2)
@@ -93,7 +175,7 @@ function Monogram({ name }: { name: string }) {
   return (
     <span
       aria-hidden
-      className="type-display grid size-11 shrink-0 place-items-center rounded-sm border border-brass-dim bg-ink text-sm text-brass"
+      className={`grid shrink-0 place-items-center rounded-full bg-accent-soft font-semibold text-accent ${size} ${className}`}
     >
       {initials}
     </span>
