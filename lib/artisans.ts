@@ -72,6 +72,16 @@ export const TRADE_LABELS: Record<Trade, string> = {
   laundry: "Laundry",
 };
 
+/**
+ * Rail labels. The tile is only 4.75rem wide, so anything that would wrap
+ * gets shortened here rather than truncated at render — a clipped trade
+ * name is worse than a shorter true one.
+ */
+export const TRADE_SHORT_LABELS: Record<Trade, string> = {
+  ...TRADE_LABELS,
+  "solar-installer": "Solar",
+};
+
 /** Price of one contact unlock, in kobo-free naira. */
 export const UNLOCK_PRICE = 500;
 
@@ -115,8 +125,8 @@ export interface Banner {
 export const BANNERS: Banner[] = [
   {
     id: "b-bundle",
-    title: "3 unlocks for ₦1,200",
-    body: "Line up a few artisans before the job starts.",
+    title: "3 for ₦1,200",
+    body: "Line up a few artisans at once.",
     cta: "Get the bundle",
     href: "/account",
     image: scene("1523413555809-0fb1d4da238d"),
@@ -124,15 +134,15 @@ export const BANNERS: Banner[] = [
   {
     id: "b-vetted",
     title: "Visited, then listed",
-    body: "Every artisan on Artiza was met in person in Ilisan.",
+    body: "Every artisan met in person.",
     cta: "See who's vetted",
     href: "/search",
     image: scene("1683115099191-51e617fc5ff1"),
   },
   {
     id: "b-solar",
-    title: "Solar without the guesswork",
-    body: "Installers who size the system before they quote it.",
+    title: "Solar, sized right",
+    body: "Sized before it's quoted.",
     cta: "Browse installers",
     href: "/search",
     image: scene("1660330589257-813305a4a383"),

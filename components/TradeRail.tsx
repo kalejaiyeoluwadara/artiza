@@ -1,35 +1,20 @@
 "use client";
 
+import { TRADE_LABELS, TRADE_SHORT_LABELS, Trade } from "../lib/artisans";
 import {
-  Grid2x2,
-  Hammer,
-  LayoutGrid,
-  PaintRoller,
-  Sun,
-  WashingMachine,
-  Wrench,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
-import { TRADE_LABELS, Trade } from "../lib/artisans";
-
-const TRADE_ICONS: Record<Trade, LucideIcon> = {
-  plumber: Wrench,
-  "solar-installer": Sun,
-  tiler: Grid2x2,
-  carpenter: Hammer,
-  electrician: Zap,
-  painter: PaintRoller,
-  laundry: WashingMachine,
-};
+  AllIllustration,
+  TRADE_TINTS,
+  TradeIllustration,
+} from "./TradeIllustration";
 
 const TRADES = Object.keys(TRADE_LABELS) as Trade[];
 
 /**
  * The trade rail sits directly under the search bar as the fast lane: one
- * tap, no sheet. Icons carry it, because at a glance a shape is quicker to
- * scan than seven words. Active is an underline rather than a filled pill —
- * a filled pill here would compete with the bar above it.
+ * tap, no sheet. Illustrated tiles rather than line icons — seven grey
+ * glyphs in a row read as a toolbar, seven drawings read as a market. The
+ * colour lives entirely inside the art; the tile's own state is still told
+ * in ink, so the rail never competes with the accent.
  */
 export function TradeRail({
   trade,
@@ -42,23 +27,28 @@ export function TradeRail({
     <div
       role="group"
       aria-label="Filter by trade"
-      className="no-scrollbar -mx-4 mt-4 overflow-x-auto px-4 md:mx-0 md:px-0"
+      className="no-scrollbar -mx-4 mt-5 overflow-x-auto px-4 py-1 md:mx-0 md:px-0"
     >
-      <div className="flex w-max gap-1">
+      <div className="flex w-max gap-2.5">
         <RailItem
-          icon={LayoutGrid}
           label="All"
+          tint="var(--fill)"
           active={trade === null}
           onClick={() => onChange(null)}
-        />
+        >
+          <AllIllustration />
+        </RailItem>
+
         {TRADES.map((t) => (
           <RailItem
             key={t}
-            icon={TRADE_ICONS[t]}
-            label={TRADE_LABELS[t]}
+            label={TRADE_SHORT_LABELS[t]}
+            tint={TRADE_TINTS[t]}
             active={trade === t}
             onClick={() => onChange(trade === t ? null : t)}
-          />
+          >
+            <TradeIllustration trade={t} />
+          </RailItem>
         ))}
       </div>
     </div>
@@ -66,35 +56,43 @@ export function TradeRail({
 }
 
 function RailItem({
-  icon: Icon,
   label,
+  tint,
   active,
   onClick,
+  children,
 }: {
-  icon: LucideIcon;
   label: string;
+  tint: string;
   active: boolean;
   onClick: () => void;
+  children: React.ReactNode;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`pressable relative flex shrink-0 flex-col items-center gap-1.5 px-3 pt-2 pb-2.5 ${
-        active ? "text-ink" : "text-sub hover:text-ink"
-      }`}
+      className="pressable flex w-19 shrink-0 flex-col items-center gap-1.5"
     >
-      <Icon size={21} strokeWidth={active ? 2.2 : 1.8} />
-      <span className="caption font-semibold text-current">{label}</span>
-      {/* Underline, not a moving indicator: colour is the only thing the
-          styleguide lets a filter toggle animate. */}
+      {/* Selection is a ring, not a fill: the tint belongs to the trade, so
+          the state has to be told in something the trade doesn't own. Only
+          the ring colour transitions — never size or position. */}
       <span
-        aria-hidden
-        className={`absolute inset-x-2 bottom-0 h-0.5 rounded-full transition-colors duration-200 ${
-          active ? "bg-ink" : "bg-transparent"
+        style={{ background: tint }}
+        className={`flex size-16 items-center justify-center rounded-2xl ring-2 ring-offset-2 ring-offset-canvas transition-[box-shadow] duration-200 ${
+          active ? "ring-ink" : "ring-transparent"
         }`}
-      />
+      >
+        {children}
+      </span>
+      <span
+        className={`caption w-full text-center leading-tight transition-colors duration-200 ${
+          active ? "font-semibold text-ink" : "text-sub"
+        }`}
+      >
+        {label}
+      </span>
     </button>
   );
 }

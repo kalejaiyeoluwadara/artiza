@@ -18,6 +18,55 @@
   --accent-soft: rgba(13, 122, 95, 0.1);
   --danger: #e5484d;
   --chrome: rgba(242, 242, 247, 0.78); /* translucent bars */
+
+  /* -------------------------------------------------------------
+     Illustration palette — imagery, not UI.
+     The one-accent rule governs interface colour: buttons, money and
+     verification stay emerald. These are the trade illustrations, and
+     they work the way photography does — a picture of a job is allowed
+     to be the colour that job actually is. They are never used to
+     style a control, a label, or a state.
+     Each trade gets four steps: base, deep (shadow/detail), light
+     (highlight), soft (the tile wash behind the art).
+     ------------------------------------------------------------- */
+  --t-plumber: #2f6fe4;
+  --t-plumber-deep: #1e4ea8;
+  --t-plumber-light: #9fc2ff;
+  --t-plumber-soft: #e7effe;
+
+  --t-solar: #f2a50c;
+  --t-solar-deep: #a76400;
+  --t-solar-light: #ffd98a;
+  --t-solar-soft: #fdf1da;
+
+  --t-tiler: #12a08f;
+  --t-tiler-deep: #0a6e62;
+  --t-tiler-light: #7fd8cc;
+  --t-tiler-soft: #e1f5f2;
+
+  --t-carpenter: #c0793c;
+  --t-carpenter-deep: #8a4f1e;
+  --t-carpenter-light: #ebc49a;
+  --t-carpenter-soft: #f8ede2;
+
+  --t-electrician: #6d5bd0;
+  --t-electrician-deep: #43349c;
+  --t-electrician-light: #b9aff0;
+  --t-electrician-soft: #edeafb;
+
+  --t-painter: #e4635a;
+  --t-painter-deep: #a93a33;
+  --t-painter-light: #f6b3ac;
+  --t-painter-soft: #fceae8;
+
+  --t-laundry: #2fa3c7;
+  --t-laundry-deep: #16708d;
+  --t-laundry-light: #a9e0f0;
+  --t-laundry-soft: #e4f4fa;
+
+  /* Tools are steel across every trade, so it is shared. */
+  --t-steel: #9aa3af;
+  --t-steel-deep: #6b7280;
 }
 
 @theme inline {
