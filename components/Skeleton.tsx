@@ -122,6 +122,34 @@ export function DiscoveryRailSkeleton({ kind }: { kind: RailKind }) {
   );
 }
 
+/**
+ * Stands in for the search results list — same grouped card, same row
+ * height, same dividers, so results drop into place instead of pushing
+ * the page around.
+ */
+export function ResultRowsSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <section className="mt-6">
+      <Skeleton className="h-3 w-32 rounded-md" />
+      <ul
+        aria-hidden
+        className="mt-3 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+      >
+        {Array.from({ length: count }, (_, i) => (
+          <li key={i} className="flex items-center gap-3 p-3.5">
+            <Skeleton className="size-12 shrink-0 rounded-full" />
+            <span className="min-w-0 flex-1">
+              <Skeleton className="h-4.25 w-36 rounded-md" />
+              <Skeleton className="mt-1.5 h-3 w-28 rounded-md" />
+            </span>
+            <Skeleton className="h-3.5 w-7 rounded-md" />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** Stands in for `BannerRail`, matching its widths and aspect at each step. */
 export function BannerRailSkeleton() {
   return (

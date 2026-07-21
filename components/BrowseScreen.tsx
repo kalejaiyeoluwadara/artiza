@@ -69,12 +69,14 @@ export function BrowseScreen({
     [artisans, filters]
   );
 
-  /* "All artisans" names a database table, not a place you'd want to look.
-     Everyone here works in one town, so the heading says so — and a trade
-     filter just narrows the same sentence. */
+  /* Every rail above this one is a slice someone chose — promoted, busiest,
+     newest, best reviewed. This heading's job is to say that the choosing
+     stops here: "Every" is the claim, and a trade filter narrows the same
+     sentence without breaking it. Singular, so "Every solar installer"
+     works and the awkward plural never appears. */
   const heading = filters.trade
-    ? `${TRADE_LABELS[filters.trade]}s in Ilisan`
-    : "Hands in Ilisan";
+    ? `Every ${TRADE_LABELS[filters.trade].toLowerCase()} in Ilisan`
+    : "Every artisan in Ilisan";
 
   /* The register is a browse surface, not an index: the first page is what
      anyone actually reads, and the rails above already made the case for the
@@ -197,7 +199,7 @@ export function BrowseScreen({
               onClick={() => setExpandedFor(filters)}
               className="pressable shrink-0 text-[0.8125rem] font-semibold text-accent"
             >
-              View all {results.length}
+              View all {">"}
             </button>
           ) : expanded && results.length > PAGE ? (
             <button
