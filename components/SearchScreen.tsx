@@ -9,7 +9,7 @@ import { useRecentSearches } from "../lib/useRecentSearches";
 import { useUnlocks } from "../lib/useUnlocks";
 import { Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
-import { LoadingLabel, ResultRowsSkeleton } from "./Skeleton";
+
 
 /**
  * The typed way in. Browse answers "show me tilers"; this answers "who
@@ -119,10 +119,7 @@ export function SearchScreen() {
           onAction={retry}
         />
       ) : loading ? (
-        <>
-          <LoadingLabel>Searching</LoadingLabel>
-          <ResultRowsSkeleton />
-        </>
+        <p className="caption mt-8 text-center text-sub">Searching…</p>
       ) : hits.length === 0 ? (
         <Notice
           body={`Nobody matches “${term}”. Try a trade, a job — marble, burst pipe, ironing — or an area like Babcock Road.`}
