@@ -142,21 +142,21 @@ export function UnlockedScreen() {
             </div>
           </div>
 
-          {/* Mobile stacks full-width rows; from sm it becomes the
-              edge-bleeding horizontal scroller. */}
-          <div className="no-scrollbar mt-4 flex flex-col gap-2.5 sm:-mx-4 sm:flex-row sm:overflow-x-auto sm:px-4 sm:pb-0.5">
+          {/* Edge-bleeding horizontal scroller, except on phones, where the
+              rows stack full-width instead. */}
+          <div className="no-scrollbar -mx-4 mt-4 flex gap-2.5 overflow-x-auto px-4 pb-0.5 max-sm:mx-0 max-sm:flex-col max-sm:overflow-x-visible max-sm:px-0">
             {unratedArtisans.map((artisan) => (
               <button
                 key={artisan.id}
                 onClick={() => setRatingArtisan(artisan)}
-                className="pressable flex w-full items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:w-auto sm:shrink-0"
+                className="pressable flex shrink-0 items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] max-sm:w-full"
               >
                 <Avatar name={artisan.name} src={artisan.photo} size="size-10 text-sm" />
-                <div className="min-w-0 text-left">
-                  <h4 className="truncate text-sm font-bold text-ink">{artisan.name}</h4>
-                  <p className="caption truncate text-[11px]">{TRADE_LABELS[artisan.trade]}</p>
+                <div className="text-left max-sm:min-w-0">
+                  <h4 className="text-sm font-bold text-ink max-sm:truncate">{artisan.name}</h4>
+                  <p className="caption text-[11px] max-sm:truncate">{TRADE_LABELS[artisan.trade]}</p>
                 </div>
-                <div className="ml-auto flex shrink-0 items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white sm:ml-1">
+                <div className="ml-1 flex shrink-0 items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white max-sm:ml-auto">
                   <Star size={11} fill="currentColor" />
                   Rate
                 </div>
