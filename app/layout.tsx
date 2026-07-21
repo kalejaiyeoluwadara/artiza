@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import ToastContainer from "../components/ui/Toast";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,10 +38,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <AppProvider>
-          <Navbar />
           <main id="main-content" className="flex-1 flex flex-col">{children}</main>
-          <Footer />
-          <ToastContainer />
         </AppProvider>
       </body>
     </html>

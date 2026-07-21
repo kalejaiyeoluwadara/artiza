@@ -70,7 +70,7 @@ interface AppContextType {
   deleteWorker: (workerId: string) => void;
   toggleWorkerStatus: (workerId: string) => void;
   // Review actions
-  addReview: (workerId: string, review: Omit<Review, "id" | "date" | "reviewerId" | "reviewerName">) => void;
+  addReview: (workerId: string, review: Omit<Review, "id" | "date" | "reviewerId" | "reviewerName" | "workerId">) => boolean;
   // Banner actions
   addBanner: (banner: Omit<Banner, "id">) => void;
   toggleBannerStatus: (bannerId: string) => void;
@@ -399,7 +399,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Review Actions
   const addReview = (
     workerId: string,
-    reviewData: Omit<Review, "id" | "date" | "reviewerId" | "reviewerName">
+    reviewData: Omit<Review, "id" | "date" | "reviewerId" | "reviewerName" | "workerId">
   ): boolean => {
     const alreadyReviewed = reviews.some(
       (r) => r.workerId === workerId && r.reviewerId === currentUser.id
