@@ -90,8 +90,8 @@ The apple-design skill governs. House rules:
 
 ## Components
 
-- **Search bar** — the home screen's query, always readable back. Mobile is one full-round `bg-card` pill: search glyph, the trade as a semibold line, area and rating as a caption under it, and a `bg-fill` circle carrying an accent count badge when filters are on. From `sm` the same query opens out into three segments — **Trade · Area · Rating**, each a `.caption` label over a semibold value, split by `w-px bg-line` hairlines — closed by an accent circle button. Every part opens the same filter sheet; nothing here is a text input.
-- **Filter sheet** — grouped option chips (trade, area, rating floor) that apply on tap, with a pinned `.chrome` footer button that carries the live count ("Show 6 artisans") and only closes. Reset sits top-right, disabled at zero.
+- **Search bar** — the home screen's query, always readable back. Mobile is one full-round `bg-card` pill: search glyph, the trade as a semibold line, "Ilisan · rating" as a caption under it, and a `bg-fill` circle carrying an accent count badge when filters are on. From `sm` the same query opens out into segments — **Trade · Rating**, each a `.caption` label over a semibold value, split by `w-px bg-line` hairlines — closed by an accent circle button. Every part opens the same filter sheet; nothing here is a text input.
+- **Filter sheet** — grouped option chips (trade, rating floor) that apply on tap, with a pinned `.chrome` footer button that carries the live count ("Show 6 artisans") and only closes. Reset sits top-right, disabled at zero.
 - **Trade rail** — the fast lane under the search bar: horizontally scrolling icon-over-label items, active is `text-ink` plus a 2px ink underline. Underline rather than a filled chip, so it doesn't compete with the bar above it. Tapping the active trade clears it.
 - **Promotion yields to intent.** The featured carousel and the banner rail only render on an unfiltered screen. Once someone has said what they want, a paid slot that ignores it is noise.
 - **Buttons** — pills. Primary: `bg-accent text-white`, semibold, only for the paid action or the screen's single main action. Quiet actions are `bg-fill text-ink` or plain text.
@@ -102,6 +102,7 @@ The apple-design skill governs. House rules:
 - **Bottom tab bar** — solid `bg-card`, hairline top border, soft upward shadow, safe-area padding. The active tab is an `accent-soft` pill behind the icon plus an accent semibold label; colour is the only thing that transitions (200ms), never size or position.
 - **Chips** — full-round; active is `bg-ink text-canvas` (inverted, not accent — accent stays reserved for actions/money). They live inside the filter sheet now; the home screen filters through the search bar and trade rail.
 - **Artisan detail sheet** — the list is for choosing, the sheet is for buying. Cards open it; unlocking only happens inside it, with the contact module pinned to a translucent footer so the paid action is never scrolled away.
+- **Icons** — tab bar uses Artiza's own set in `components/TabIcons.tsx`: 24-unit grid, ~16-unit live box, 1.75 stroke, 2.4 minimum corner radius, outline when inactive and solid when active, cross-faded with no movement. Metaphors stay familiar; the character is in the drawing. Brand marks (WhatsApp, Instagram) live in `components/BrandIcons.tsx`. Lucide covers the rest — extend `TabIcons` before adding a custom one-off.
 - **Empty states** — say what to do next, never just that nothing is here. No illustrations.
 
 ## Photography

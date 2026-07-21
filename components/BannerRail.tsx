@@ -37,11 +37,14 @@ export function BannerRail() {
         {BANNERS.map((banner, i) => (
           <li
             key={banner.id}
-            className="w-[85%] shrink-0 snap-center sm:w-[60%] lg:w-[46%]"
+            className="flex w-[85%] shrink-0 snap-center sm:w-[60%] lg:w-[46%]"
           >
             <Link
               href={banner.href}
-              className="pressable group relative flex aspect-2/1 flex-col justify-end overflow-hidden rounded-2xl bg-fill p-4 sm:aspect-5/2"
+              // min-h-fit keeps the 2:1 picture shape as a floor, not a
+              // ceiling — a title that wraps to two lines grows the card
+              // instead of being clipped off the top by justify-end.
+              className="pressable group relative flex aspect-2/1 h-full min-h-fit w-full flex-col justify-end overflow-hidden rounded-2xl bg-fill p-4 sm:aspect-5/2"
             >
               <Image
                 src={banner.image}

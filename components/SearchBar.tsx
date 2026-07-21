@@ -52,7 +52,7 @@ export function SearchBar({
               {tradeLabel}
             </span>
             <span className="caption block truncate">
-              Ilisan · {ratingLabel}
+              Trade · {ratingLabel}
             </span>
           </span>
           <FilterGlyph count={count} />

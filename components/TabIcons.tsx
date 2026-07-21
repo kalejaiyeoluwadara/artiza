@@ -5,20 +5,21 @@
  * make people guess, and a search that isn't a magnifier costs more than
  * it earns. The character comes from the drawing, not from novelty:
  *
- *   Grid        24 units, live area 3.25–20.75, so every icon fills the
- *               same optical box and none looks larger than its neighbour.
- *   Stroke      1.75 with round caps and joins. Lucide's default is 2 at
- *               a squarer geometry, which is exactly what reads as stock.
- *   Radius      2.5 minimum on any corner — the same softness as the
- *               app's rounded-2xl cards, so the icons belong to the UI.
+ *   Grid        24 units. Every icon is drawn to roughly a 16-unit box so
+ *               none looks larger than its neighbour, with the solid
+ *               shapes sized down slightly — weight reads as size.
+ *   Stroke      1.75 with round caps and joins. Lucide's default is 2 on
+ *               a squarer geometry, which is what reads as stock.
+ *   Radius      2.4 minimum on any corner, matching the rounded-2xl
+ *               cards, so the icons belong to the interface around them.
  *   States      Outline when inactive, solid when active, both drawn in
- *               one SVG and cross-faded. Nothing moves or resizes: the
- *               tab bar is the most-tapped thing in the app and movement
- *               there would make every navigation feel slower.
+ *               one SVG and cross-faded. Nothing moves or resizes: this
+ *               is the most-tapped surface in the app, and movement here
+ *               would make every navigation feel slower than it is.
  *
- * The set's signature is the knockout — the keyhole, the lens, the gap at
- * the shoulders survive into the solid state instead of filling in, so an
- * active icon still reads as a drawing rather than a blob.
+ * The set's signature is the knockout — the lens, the keyhole, the gap
+ * under the open shackle survive into the solid state instead of filling
+ * in, so an active icon still reads as a drawing rather than a blob.
  */
 
 type TabIconProps = {
@@ -49,46 +50,50 @@ function layer(visible: boolean) {
 }
 
 /**
- * Browse — the bento of one tall tile and two stacked, which is literally
- * the layout underneath it: a featured rail beside the list.
+ * Browse — the bento of one tall tile and two stacked is literally the
+ * layout underneath it: a featured rail beside the list.
  */
 export function BrowseIcon({ active = false, size = 20 }: TabIconProps) {
+  const tiles = (
+    <>
+      <rect x="4" y="4" width="6.5" height="16" rx="2.4" />
+      <rect x="13.5" y="4" width="6.5" height="6.5" rx="2.4" />
+      <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2.4" />
+    </>
+  );
+
   return (
     <svg width={size} height={size} {...SVG_PROPS}>
       <g style={layer(!active)} {...OUTLINE_PROPS}>
-        <rect x="3.5" y="3.5" width="7" height="17" rx="2.5" />
-        <rect x="13.5" y="3.5" width="7" height="7" rx="2.5" />
-        <rect x="13.5" y="13.5" width="7" height="7" rx="2.5" />
+        {tiles}
       </g>
       <g style={layer(active)} fill="currentColor">
-        <rect x="3.5" y="3.5" width="7" height="17" rx="2.5" />
-        <rect x="13.5" y="3.5" width="7" height="7" rx="2.5" />
-        <rect x="13.5" y="13.5" width="7" height="7" rx="2.5" />
+        {tiles}
       </g>
     </svg>
   );
 }
 
 /**
- * Search — a magnifier, but stubbier than the stock one: a larger lens
- * and a shorter handle, so it holds its weight next to the solid tiles.
+ * Search — a magnifier, but with a bigger lens and a shorter handle than
+ * the stock one, so it holds its weight beside the solid tiles.
  */
 export function SearchIcon({ active = false, size = 20 }: TabIconProps) {
   return (
     <svg width={size} height={size} {...SVG_PROPS}>
       <g style={layer(!active)} {...OUTLINE_PROPS}>
-        <circle cx="10.75" cy="10.75" r="7" />
-        <path d="M15.9 15.9 20.5 20.5" />
+        <circle cx="10.9" cy="10.9" r="6.75" />
+        <path d="M15.7 15.7 20.25 20.25" />
       </g>
       <g style={layer(active)} fill="currentColor">
         {/* Even-odd keeps the lens open at full weight. */}
         <path
           fillRule="evenodd"
           clipRule="evenodd"
-          d="M10.75 3.25a7.5 7.5 0 1 0 0 15 7.5 7.5 0 0 0 0-15Zm0 2.6a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8Z"
+          d="M10.9 3.75a7.15 7.15 0 1 0 0 14.3 7.15 7.15 0 0 0 0-14.3Zm0 2.45a4.7 4.7 0 1 1 0 9.4 4.7 4.7 0 0 1 0-9.4Z"
         />
         <path
-          d="M15.9 15.9 20.5 20.5"
+          d="M15.7 15.7 20.25 20.25"
           stroke="currentColor"
           strokeWidth={2.6}
           strokeLinecap="round"
@@ -99,35 +104,46 @@ export function SearchIcon({ active = false, size = 20 }: TabIconProps) {
 }
 
 /**
- * Unlocked — a key rather than an open padlock. The app's verb is
- * "unlock contact", and a key is the thing you are actually buying.
+ * Unlocked — an open padlock, not a key. The contact panel already uses a
+ * lock to say "Locked", so this is the same object with the shackle swung
+ * open: the tab is where those locks ended up. A key would also have been
+ * apt, but a key is long and flat and reads as a runt beside three
+ * upright icons.
+ *
+ * The shackle's left leg is absent entirely rather than shortened — a
+ * stub is ambiguous at 21px, an open arc is not.
  */
 export function UnlockedIcon({ active = false, size = 20 }: TabIconProps) {
+  const shackle = "M15.75 10.5V8a3.75 3.75 0 0 0-7.5 0";
+
   return (
     <svg width={size} height={size} {...SVG_PROPS}>
       <g style={layer(!active)} {...OUTLINE_PROPS}>
-        <circle cx="8" cy="12" r="4.75" />
-        <circle cx="8" cy="12" r="1.6" />
-        <path d="M12.75 12h7.75" />
-        <path d="M17.25 12v3.25" />
+        <rect x="4.75" y="10.5" width="14.5" height="10" rx="2.75" />
+        <path d={shackle} />
       </g>
-      <g style={layer(active)} fill="currentColor">
+      <g style={layer(active)}>
         <path
+          fill="currentColor"
           fillRule="evenodd"
           clipRule="evenodd"
-          d="M8 6.75a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5Zm0 3.4a1.85 1.85 0 1 1 0 3.7 1.85 1.85 0 0 1 0-3.7Z"
+          d="M7.5 10.5h9a2.75 2.75 0 0 1 2.75 2.75v4.5A2.75 2.75 0 0 1 16.5 20.5h-9a2.75 2.75 0 0 1-2.75-2.75v-4.5A2.75 2.75 0 0 1 7.5 10.5Zm4.5 3.25a1.55 1.55 0 1 0 0 3.1 1.55 1.55 0 0 0 0-3.1Z"
         />
-        <rect x="12.25" y="10.75" width="8.25" height="2.5" rx="1.25" />
-        <rect x="16" y="12.25" width="2.5" height="4" rx="1.25" />
+        <path
+          d={shackle}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.2}
+          strokeLinecap="round"
+        />
       </g>
     </svg>
   );
 }
 
 /**
- * Account — a flatter, wider shoulder line than the stock silhouette.
- * The stock one is a semicircle, which reads as a bust; this one reads
- * as a person.
+ * Account — a flatter, wider shoulder than the stock silhouette, whose
+ * semicircle reads as a bust. This one reads as a person.
  */
 export function AccountIcon({ active = false, size = 20 }: TabIconProps) {
   return (
@@ -137,7 +153,7 @@ export function AccountIcon({ active = false, size = 20 }: TabIconProps) {
         <path d="M4.75 20.25c0-3.75 3.25-6.35 7.25-6.35s7.25 2.6 7.25 6.35" />
       </g>
       <g style={layer(active)} fill="currentColor">
-        <circle cx="12" cy="8.5" r="4.1" />
+        <circle cx="12" cy="8.4" r="4" />
         <path d="M12 13.9c-4.3 0-7.75 2.85-7.75 6.55 0 .44.36.8.8.8h13.9c.44 0 .8-.36.8-.8 0-3.7-3.45-6.55-7.75-6.55Z" />
       </g>
     </svg>
