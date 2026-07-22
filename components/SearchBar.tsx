@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Search, SlidersHorizontal, Star } from "lucide-react";
 import {
-  ARTISANS,
   Filters,
   NO_FILTERS,
   RATING_FLOORS,
@@ -12,6 +11,7 @@ import {
   activeFilterCount,
   filterArtisans,
 } from "../lib/artisans";
+import { useArtisans } from "../lib/useData";
 import { Sheet } from "./Sheet";
 
 const TRADES = Object.keys(TRADE_LABELS) as Trade[];
@@ -145,7 +145,11 @@ function FilterSheet({
   filters: Filters;
   onChange: (next: Filters) => void;
 }) {
-  const results = filterArtisans(ARTISANS, filters).length;
+  // The same read the register itself renders from. Counting the fixtures
+  // instead would promise "Show 8 artisans" while the list behind the
+  // sheet was still a skeleton, or had failed to load entirely.
+  const { artisans, loading } = useArtisans();
+  const results = filterArtisans(artisans, filters).length;
   const count = activeFilterCount(filters);
 
   return (
@@ -207,9 +211,11 @@ function FilterSheet({
           onClick={onClose}
           className="pressable hover-dim w-full rounded-full bg-accent py-3.5 text-[0.9375rem] font-semibold text-white"
         >
-          {results === 0
-            ? "No artisans match"
-            : `Show ${results} ${results === 1 ? "artisan" : "artisans"}`}
+          {loading
+            ? "Show artisans"
+            : results === 0
+              ? "No artisans match"
+              : `Show ${results} ${results === 1 ? "artisan" : "artisans"}`}
         </button>
       </div>
     </Sheet>

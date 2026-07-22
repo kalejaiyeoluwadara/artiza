@@ -1,4 +1,4 @@
-import { Artisan, TRADE_LABELS } from "./artisans";
+import { Artisan, TRADE_LABELS, Trade } from "./artisans";
 
 /**
  * Free-text search over the register.
@@ -160,16 +160,34 @@ export function highlight(
 }
 
 /**
- * What the register can answer, offered before anything is typed. Trades
- * first because they're the common case, then the services people arrive
- * with the actual words for.
+ * The trades the register can actually answer for, biggest first, each
+ * with its depth. A trade nobody is listed under is left out rather than
+ * offered as a tile that searches to nothing.
+ *
+ * The count is the point: it's the one thing the browse screen's rail
+ * can't tell you, and it's what makes this a way in rather than a
+ * second copy of the filter.
  */
-export function searchSuggestions(list: Artisan[]): string[] {
-  const trades = [...new Set(list.map((a) => TRADE_LABELS[a.trade]))];
+export function tradeCounts(list: Artisan[]): { trade: Trade; count: number }[] {
+  const counts = new Map<Trade, number>();
+  for (const artisan of list) {
+    counts.set(artisan.trade, (counts.get(artisan.trade) ?? 0) + 1);
+  }
+
+  return [...counts]
+    .map(([trade, count]) => ({ trade, count }))
+    .sort((a, b) => b.count - a.count || TRADE_LABELS[a.trade].localeCompare(TRADE_LABELS[b.trade]));
+}
+
+/**
+ * The jobs people arrive with the words for — "marble", "burst pipes",
+ * "inverter sizing". Trades are covered by their own tiles, so offering
+ * them here as well would just be the same list twice.
+ */
+export function serviceSuggestions(list: Artisan[]): string[] {
   const services = [...new Set(list.flatMap((a) => a.services))];
 
-  // A handful of services, spread across the register rather than all
-  // taken off whoever happens to be listed first.
-  const spread = services.filter((_, i) => i % 3 === 0).slice(0, 5);
-  return [...trades, ...spread];
+  // Spread across the register rather than all taken off whoever happens
+  // to be listed first.
+  return services.filter((_, i) => i % 3 === 0).slice(0, 8);
 }

@@ -2,13 +2,21 @@
 
 import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { BadgeCheck, ChevronRight, Clock, Search, Star, X } from "lucide-react";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
-import { MatchField, highlight, searchArtisans, searchSuggestions } from "../lib/search";
+import { Artisan, TRADE_LABELS, Trade } from "../lib/artisans";
+import {
+  MatchField,
+  highlight,
+  searchArtisans,
+  serviceSuggestions,
+  tradeCounts,
+} from "../lib/search";
 import { useArtisans } from "../lib/useData";
 import { useRecentSearches } from "../lib/useRecentSearches";
 import { useUnlocks } from "../lib/useUnlocks";
 import { Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
+import { Skeleton } from "./Skeleton";
+import { TRADE_TINTS, TradeIllustration } from "./TradeIllustration";
 
 
 /**
@@ -39,7 +47,8 @@ export function SearchScreen() {
     () => searchArtisans(artisans, term),
     [artisans, term]
   );
-  const suggestions = useMemo(() => searchSuggestions(artisans), [artisans]);
+  const trades = useMemo(() => tradeCounts(artisans), [artisans]);
+  const suggestions = useMemo(() => serviceSuggestions(artisans), [artisans]);
 
   /* A query is only worth remembering once it has taken someone somewhere.
      Opening a result is the strongest signal; pressing enter is the
@@ -107,7 +116,9 @@ export function SearchScreen() {
       {!term ? (
         <Idle
           recents={recents}
+          trades={trades}
           suggestions={suggestions}
+          loading={loading}
           onPick={run}
           onForget={forget}
           onClear={clear}
@@ -166,16 +177,25 @@ export function SearchScreen() {
  * Before anything is typed. An empty search screen is the one place a
  * blank slate is inexcusable — the field can't tell you what the register
  * knows, so these do.
+ *
+ * Three ways in, narrowing as they go down: what you asked before, the
+ * trade you already know you need, and the job you have the words for but
+ * not the trade name. The trade tiles carry a count because depth is the
+ * thing a search screen can tell you that a filter chip can't.
  */
 function Idle({
   recents,
+  trades,
   suggestions,
+  loading,
   onPick,
   onForget,
   onClear,
 }: {
   recents: string[];
+  trades: { trade: Trade; count: number }[];
   suggestions: string[];
+  loading: boolean;
   onPick: (query: string) => void;
   onForget: (query: string) => void;
   onClear: () => void;
@@ -183,9 +203,9 @@ function Idle({
   return (
     <>
       {recents.length > 0 && (
-        <section aria-labelledby="recent-heading" className="mt-6">
+        <section aria-labelledby="recent-heading" className="mt-7">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 id="recent-heading" className="headline text-ink">
+            <h2 id="recent-heading" className="title text-ink">
               Recent
             </h2>
             <button

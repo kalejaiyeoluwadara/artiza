@@ -1,53 +1,42 @@
 "use client";
 
+import { ViewTransition } from "react";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
- * Tab-bar page transition.
+ * Tab-bar page transition, built on React's native <ViewTransition>.
  *
- * The previous approach used `mode="wait"` which serialises exit → enter,
- * creating a dead gap between pages. Tab switching needs to feel instant,
- * so this version cross-fades both pages simultaneously:
+ * The previous framer-motion version (AnimatePresence keyed by pathname)
+ * doesn't work in the App Router: the exiting subtree re-renders with the
+ * *new* page's children (the layout owns a single `children` slot), and the
+ * per-route `loading.tsx` boundaries commit the pathname change while only
+ * the skeleton is on screen — so the fade ran against the wrong content or
+ * not at all.
  *
- * - The old page fades out (opacity only, no movement — movement on exit
- *   causes a layout repaint that stutters).
- * - The new page fades in with a very subtle upward drift (6px, spring,
- *   critically damped). Both run concurrently so total transition time
- *   is ~200ms, not 2× that.
- * - Only `opacity` and `transform` are animated — both are compositor-
- *   friendly and won't trigger layout/paint.
+ * <ViewTransition> snapshots the real pixels of the outgoing page before
+ * the commit, so neither problem exists. Re-keying by pathname unmounts the
+ * old page (exit) and mounts the new one (enter); both animations run
+ * concurrently as a cross-fade with a 6px rise on the incoming page. The
+ * animation CSS lives in globals.css under `.page-enter` / `.page-exit`.
  *
- * `popLayout` removes the exiting element from flow immediately so the
- * entering element takes its natural position without waiting.
+ * `default="none"` keeps Suspense reveals inside the page (loading.tsx →
+ * content) from re-triggering the transition — skeletons carry their own
+ * entrance animation.
  *
- * Reduced-motion: drops the vertical shift entirely, keeps a 120ms
- * opacity crossfade for spatial continuity.
+ * Reduced-motion handling (drop the rise, keep a 120ms fade) is done in
+ * the same CSS via `prefers-reduced-motion`.
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const reduced = useReducedMotion();
 
   return (
-    <AnimatePresence mode="popLayout" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: reduced ? 0 : 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0 }}
-        transition={{
-          duration: reduced ? 0.12 : 0.18,
-          ease: [0.25, 0.1, 0.25, 1],
-        }}
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          willChange: "opacity, transform",
-        }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <ViewTransition
+      key={pathname}
+      enter="page-enter"
+      exit="page-exit"
+      default="none"
+    >
+      <div className="flex flex-1 flex-col">{children}</div>
+    </ViewTransition>
   );
 }

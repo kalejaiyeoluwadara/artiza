@@ -263,6 +263,51 @@
   }
 }
 
+/* Page transitions — driven by <ViewTransition> in components/PageTransition.tsx.
+   The old page fades out while the new one fades in with a subtle 6px rise;
+   both run concurrently (~180ms total). Only opacity and transform animate. */
+::view-transition-old(.page-exit) {
+  animation: 180ms cubic-bezier(0.25, 0.1, 0.25, 1) both page-fade reverse;
+}
+
+::view-transition-new(.page-enter) {
+  animation:
+    180ms cubic-bezier(0.25, 0.1, 0.25, 1) both page-fade,
+    180ms cubic-bezier(0.25, 0.1, 0.25, 1) both page-rise;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes page-rise {
+  from {
+    transform: translateY(6px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Reduced motion: drop the vertical rise, keep a quick opacity crossfade
+   for spatial continuity. (The global kill-switch below doesn't reach
+   ::view-transition pseudo-elements, so they're handled here.) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.page-exit),
+  ::view-transition-new(.page-enter) {
+    animation: 120ms linear both page-fade;
+  }
+
+  ::view-transition-old(.page-exit) {
+    animation-direction: reverse;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
