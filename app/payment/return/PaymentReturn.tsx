@@ -1,23 +1,34 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { PaymentVerification } from "../../../components/PaymentVerification";
 import { usePaymentVerification } from "../../../lib/usePaymentVerification";
+import { useUnlocks } from "../../../context/UnlocksContext";
 import { toast } from "../../../lib/toast";
 
 export function PaymentReturn() {
   const router = useRouter();
   const params = useSearchParams();
   const { update } = useSession();
+  const { refresh } = useUnlocks();
 
   // Paystack sends `reference`; `trxref` is the same value under its older name.
   const reference = params.get("reference") ?? params.get("trxref");
 
   const { state, retry } = usePaymentVerification(reference);
 
+  // The unlock list was read when this page mounted — which is before the
+  // webhook granted anything. Without a re-read, /unlocked renders the empty
+  // state for a contact that was just paid for. Refetching the moment it
+  // settles means the list is already warm when the customer taps through.
+  const settled = state.phase === "settled";
+  useEffect(() => {
+    if (settled) refresh();
+  }, [settled, refresh]);
+
   async function handleDone() {
-    const settled = state.phase === "settled";
     const isBundle = state.payment?.purpose === "bundle";
 
     if (settled) {

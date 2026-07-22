@@ -1,9 +1,21 @@
 import type { AuthOptions, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { publicApi } from "../api";
 import { authSecret } from "./secret";
 import { ApiError } from "../api/error";
+
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+/**
+ * Google sign-in is opt-in: with no credentials configured the provider is
+ * simply absent, so the button hides itself and password sign-in is unaffected.
+ * Registering it with empty strings would instead fail at the redirect, which
+ * is a worse way to find out.
+ */
+const googleEnabled = Boolean(googleClientId && googleClientSecret);
 
 /**
  * Refresh this far before the access token actually expires. The window
@@ -84,6 +96,20 @@ export const authOptions: AuthOptions = {
         }
       },
     }),
+
+    ...(googleEnabled
+      ? [
+          GoogleProvider({
+            clientId: googleClientId!,
+            clientSecret: googleClientSecret!,
+            // `prompt: select_account` so a shared device does not silently
+            // sign in whichever Google account happens to be active.
+            authorization: {
+              params: { prompt: "select_account", scope: "openid email profile" },
+            },
+          }),
+        ]
+      : []),
   ],
 
   // Credentials sign-in requires JWT sessions: there is no adapter, so the
@@ -97,6 +123,46 @@ export const authOptions: AuthOptions = {
   },
 
   callbacks: {
+    /**
+     * Google lands here first. NextAuth has verified the OAuth exchange with
+     * Google, but the Nest API is what actually owns accounts — so the ID
+     * token is handed to it, and what comes back is a real Artiza token pair.
+     *
+     * Doing it here rather than in `jwt` is deliberate: returning false aborts
+     * the sign-in, so a failed exchange leaves no session at all. The `jwt`
+     * callback has no way to refuse, and would leave a cookie with a user in
+     * it and no backend token behind it.
+     */
+    async signIn({ user, account }) {
+      if (account?.provider !== "google") return true;
+
+      if (!account.id_token) return false;
+
+      try {
+        const result = await publicApi.auth.google(account.id_token);
+
+        // Mutating `user` is how this reaches the `jwt` callback — it receives
+        // this same object on the sign-in pass.
+        Object.assign(user, {
+          id: result.user.id,
+          name: result.user.name,
+          email: result.user.email,
+          phone: result.user.phone,
+          role: result.user.role,
+          credits: result.user.credits,
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+          accessTokenExpires: Date.now() + result.expiresIn * 1000,
+        } satisfies User);
+
+        return true;
+      } catch {
+        // Sends them back to /sign-in rather than into a session that cannot
+        // call the API.
+        return false;
+      }
+    },
+
     /**
      * Runs on sign-in and on every session read. Three branches: seed the
      * token, hand back a still-valid one, or refresh.

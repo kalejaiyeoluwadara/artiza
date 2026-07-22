@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { AuthField } from "../../components/AuthField";
+import { GoogleButton } from "../../components/GoogleButton";
 
 export function SignInForm() {
   const router = useRouter();
@@ -13,10 +14,13 @@ export function SignInForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(
+  const [error, setError] = useState<string | null>(() => {
     // The session watcher signs an expired session out and lands here.
-    params.get("expired") ? "Your session expired. Sign in to carry on." : null,
-  );
+    if (params.get("expired")) return "Your session expired. Sign in to carry on.";
+    // The Google exchange with the API failed, so no session was created.
+    if (params.get("error")) return "We couldn't complete that sign-in. Please try again.";
+    return null;
+  });
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -92,6 +96,8 @@ export function SignInForm() {
           {submitting ? "Signing in…" : "Sign in"}
         </button>
       </form>
+
+      <GoogleButton callbackUrl={callbackUrl} disabled={submitting} />
 
       <p className="mt-6 text-center text-[0.9375rem] text-sub">
         New to Artiza?{" "}

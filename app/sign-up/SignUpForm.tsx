@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { AuthField } from "../../components/AuthField";
+import { GoogleButton } from "../../components/GoogleButton";
 import { publicApi } from "../../lib/api";
 import { ApiError } from "../../lib/api/error";
 
@@ -154,6 +155,12 @@ export function SignUpForm() {
           {submitting ? "Creating account…" : "Create account"}
         </button>
       </form>
+
+      <GoogleButton
+        callbackUrl={callbackUrl}
+        label="Sign up with Google"
+        disabled={submitting}
+      />
 
       <p className="mt-6 text-center text-[0.9375rem] text-sub">
         Already have an account?{" "}

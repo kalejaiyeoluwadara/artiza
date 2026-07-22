@@ -25,6 +25,21 @@ export const authResource = (token?: string) => ({
     return request<AuthResult>("/auth/register", { method: "POST", body: input });
   },
 
+  /**
+   * Trades Google's ID token for an Artiza token pair.
+   *
+   * The ID token goes over as-is: the API verifies its signature against
+   * Google before it will believe the email inside it. That is the only reason
+   * this is safe — sending a name and email instead would let anyone mint a
+   * session for any address.
+   */
+  google(idToken: string): Promise<AuthResult> {
+    return request<AuthResult>("/auth/google", {
+      method: "POST",
+      body: { idToken },
+    });
+  },
+
   /** Exchanges a refresh token for a new pair. The old one stops working. */
   refresh(refreshToken: string): Promise<AuthResult> {
     return request<AuthResult>("/auth/refresh", {
