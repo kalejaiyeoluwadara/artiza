@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { ChevronDown, Search, Sparkle, Star, TrendingUp, X } from "lucide-react";
@@ -110,12 +110,10 @@ export function NetflixHome() {
           <BillboardSkeleton />
         ) : browsing ? (
           <>
-            {billboard && (
-              <HomeBillboard
-                artisan={billboard}
-                onOpen={() => setSelected(billboard)}
-              />
-            )}
+            <HomeBillboard
+              artisan={billboard}
+              onOpen={() => billboard && setSelected(billboard)}
+            />
 
             {/* Netflix's "Continue watching" sits above everything the
                 algorithm picked, because a thing you already chose beats a
@@ -132,7 +130,7 @@ export function NetflixHome() {
               artisans={trending}
               signal={(a) => (
                 <>
-                  <TrendingUp size={11} strokeWidth={2.4} aria-hidden />
+                  <TrendingUp size={13} strokeWidth={2.4} aria-hidden />
                   {a.recentUnlocks}
                   <span className="font-normal text-white/60">this month</span>
                 </>
@@ -157,7 +155,7 @@ export function NetflixHome() {
               signal={(a) => (
                 <>
                   <Sparkle
-                    size={11}
+                    size={13}
                     strokeWidth={2.4}
                     fill="currentColor"
                     aria-hidden
@@ -232,24 +230,18 @@ function TopBar({
 }) {
   const { data: session } = useSession();
   const { count } = useFavorites();
-  const scrolled = useScrolled();
 
   const firstName = session?.user?.name?.trim().split(/\s+/)[0];
 
   return (
-    // Desktop already has the shared header pinned at top-0 floating over the
-    // same art, so only the mobile bar sticks — two sticky bars at top-0 would
-    // stack on each other.
-    <div
-      className={`sticky top-0 z-40 transition-colors duration-300 ease-out md:static ${
-        scrolled ? "chrome md:bg-transparent md:backdrop-filter-none" : ""
-      }`}
-    >
+    // Desktop already has the shared site header pinned at top-0, so only the
+    // mobile bar sticks — two sticky bars at top-0 would stack on each other.
+    <div className="chrome sticky top-0 z-40 md:static md:bg-transparent">
       <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-3 px-4 md:hidden">
-        <p className="title truncate text-ink">
+        <h1 className="title truncate text-ink">
           {firstName ? `For ${firstName}` : "Artiza"}
           <span className="text-accent">.</span>
-        </p>
+        </h1>
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
           <Link
@@ -385,7 +377,7 @@ function Results({
           </button>
         </div>
       ) : (
-        <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+        <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
           {results.map((artisan) => (
             <li key={artisan.id}>
               <Poster
@@ -409,7 +401,7 @@ function BillboardSkeleton() {
       <div className="skeleton -mx-4 h-[26rem] md:mx-0 md:h-[30rem] md:rounded-lg" />
       <div className="mt-6 flex gap-2 overflow-hidden">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton aspect-2/3 w-32 shrink-0 rounded-lg" />
+          <div key={i} className="skeleton aspect-2/3 w-40 shrink-0 rounded-lg sm:w-48" />
         ))}
       </div>
     </div>
@@ -434,23 +426,6 @@ function Failed({ onRetry }: { onRetry: () => void }) {
       </div>
     </div>
   );
-}
-
-/**
- * True once the page has moved off the top. Passive listener — this runs on
- * every scroll frame and has no business being able to block one.
- */
-function useScrolled(): boolean {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return scrolled;
 }
 
 function Heart() {

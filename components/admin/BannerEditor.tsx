@@ -255,7 +255,7 @@ export function BannerPreview({
             {draft.body || "And the line that goes under it."}
           </p>
         </div>
-        <span className="shrink-0 rounded-full bg-white px-3.5 py-1.5 text-sm font-semibold text-ink">
+        <span className="shrink-0 rounded-full bg-white px-3.5 py-1.5 text-sm font-semibold text-canvas">
           {draft.cta || "Button"}
         </span>
       </div>

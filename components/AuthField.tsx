@@ -1,6 +1,7 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface AuthFieldProps {
   label: string;
@@ -37,28 +38,52 @@ export function AuthField({
   const id = useId();
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
 
+  // Only password fields get a reveal toggle, and revealing is never sticky —
+  // the field re-seals itself on the next mount.
+  const [revealed, setRevealed] = useState(false);
+  const isPassword = type === "password";
+
   return (
     <div>
       <label htmlFor={id} className="caption block px-1 font-semibold">
         {label}
       </label>
 
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        autoComplete={autoComplete}
-        placeholder={placeholder}
-        required={required}
-        disabled={disabled}
-        inputMode={inputMode}
-        aria-invalid={Boolean(error)}
-        aria-describedby={describedBy}
-        className={`mt-1.5 w-full rounded-2xl bg-fill px-4 py-3 text-[1.0625rem] text-ink placeholder:text-faint disabled:opacity-60 ${
-          error ? "ring-1 ring-danger" : ""
-        }`}
-      />
+      <div className="relative mt-1.5">
+        <input
+          id={id}
+          type={isPassword && revealed ? "text" : type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          required={required}
+          disabled={disabled}
+          inputMode={inputMode}
+          aria-invalid={Boolean(error)}
+          aria-describedby={describedBy}
+          className={`w-full rounded-2xl bg-fill py-3 pl-4 text-[1.0625rem] text-ink placeholder:text-faint disabled:opacity-60 ${
+            isPassword ? "pr-12" : "pr-4"
+          } ${error ? "ring-1 ring-danger" : ""}`}
+        />
+
+        {isPassword ? (
+          <button
+            type="button"
+            onClick={() => setRevealed((current) => !current)}
+            disabled={disabled}
+            aria-label={revealed ? "Hide password" : "Show password"}
+            aria-pressed={revealed}
+            className="pressable absolute inset-y-0 right-0 grid w-12 place-items-center text-sub disabled:opacity-60"
+          >
+            {revealed ? (
+              <EyeOff className="h-5 w-5" strokeWidth={1.75} />
+            ) : (
+              <Eye className="h-5 w-5" strokeWidth={1.75} />
+            )}
+          </button>
+        ) : null}
+      </div>
 
       {error ? (
         <p id={`${id}-error`} className="caption mt-1.5 px-1 text-danger">

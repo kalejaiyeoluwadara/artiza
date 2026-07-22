@@ -90,6 +90,14 @@
   --font-sans: var(--font-satoshi), -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
 
+  /* Clash Display: same foundry as Satoshi, sharper terminals, narrower
+     set width — display sizes only (.display, .title-lg). */
+  --font-display: var(--font-clash), var(--font-sans);
+
+  /* Instrument Serif italic: the accent voice. One word inside a display
+     headline, wrapped in `.display-accent` — never running text. */
+  --font-accent: var(--font-instrument), Georgia, serif;
+
   /* Springs approximated as strong ease-outs for CSS-only motion. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -129,11 +137,32 @@
 @layer components {
   /* Tracking is size-specific: tight when large, slightly open when
      small. One fixed letter-spacing would be wrong at both ends. */
+  /* Billboard / banner voice. Clash at 600 carries more drama at less
+     weight than Satoshi at 800 — the letterforms do the work, not the ink. */
+  .display {
+    font-family: var(--font-display);
+    font-size: clamp(2.375rem, 8vw, 3.25rem); /* 38 → 52 */
+    line-height: 0.98;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* The serif italic word inside a .display headline. Instrument's italic
+     sits smaller on the same baseline, so it gets a slight optical bump. */
+  .display-accent {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.04em;
+    letter-spacing: 0;
+  }
+
   .title-lg {
+    font-family: var(--font-display);
     font-size: clamp(2.125rem, 7vw, 2.5rem); /* 34 → 40 */
     line-height: 1.05;
-    font-weight: 800;
-    letter-spacing: -0.038em;
+    font-weight: 600;
+    letter-spacing: -0.024em;
   }
 
   .title {

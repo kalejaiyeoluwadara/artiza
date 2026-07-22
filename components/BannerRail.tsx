@@ -74,7 +74,7 @@ export function BannerRail() {
                 <p className="mt-1 max-w-[28ch] text-sm text-white/80">
                   {banner.body}
                 </p>
-                <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-sm font-semibold text-ink">
+                <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-sm font-semibold text-canvas">
                   {banner.cta}
                   <ArrowRight size={14} strokeWidth={2.4} aria-hidden />
                 </span>

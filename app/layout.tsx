@@ -33,6 +33,38 @@ const satoshi = localFont({
   ],
 });
 
+/**
+ * Clash Display (Fontshare, ITF Free Font License) — Satoshi's sibling from
+ * the same foundry, cut for headlines only. Three static weights (~45KB total)
+ * rather than the variable file, since display type only ever renders at
+ * 500/600/700.
+ */
+const clash = localFont({
+  src: [
+    { path: "./fonts/ClashDisplay-500.woff2", weight: "500" },
+    { path: "./fonts/ClashDisplay-600.woff2", weight: "600" },
+    { path: "./fonts/ClashDisplay-700.woff2", weight: "700" },
+  ],
+  variable: "--font-clash",
+  display: "swap",
+  adjustFontFallback: "Arial",
+  fallback: ["-apple-system", "BlinkMacSystemFont", "sans-serif"],
+});
+
+/**
+ * Instrument Serif italic (Google Fonts, OFL) — a single 8KB italic cut used
+ * as an accent voice inside display headlines, never for running text.
+ */
+const instrument = localFont({
+  src: "./fonts/InstrumentSerif-Italic.woff2",
+  variable: "--font-instrument",
+  weight: "400",
+  style: "italic",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+  fallback: ["Georgia", "serif"],
+});
+
 export const metadata: Metadata = {
   title: "Artiza — Vetted artisans in Ilisan, Ogun State",
   description:
@@ -75,7 +107,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${satoshi.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${satoshi.variable} ${clash.variable} ${instrument.variable} h-full`}
+    >
       <body className="flex min-h-full flex-col bg-canvas text-ink">
         <a
           href="#main-content"

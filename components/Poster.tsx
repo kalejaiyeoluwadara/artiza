@@ -19,7 +19,7 @@ import { FavoriteButton } from "./FavoriteButton";
 export function Poster({
   artisan,
   signal,
-  width = "w-32 sm:w-36",
+  width = "w-40 sm:w-48",
   onOpen,
 }: {
   artisan: Artisan;
@@ -44,7 +44,7 @@ export function Poster({
             src={cover}
             alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
             fill
-            sizes="144px"
+            sizes="192px"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           />
           {/* Scrim, not a tint — the type has to read without draining the
@@ -56,26 +56,26 @@ export function Poster({
         </div>
 
         {artisan.featured && (
-          <span className="absolute left-1.5 top-1.5 rounded-sm bg-accent px-1.5 py-0.5 text-[0.625rem] font-bold uppercase tracking-wide text-white">
+          <span className="absolute left-2 top-2 rounded-sm bg-accent px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-wide text-white">
             Featured
           </span>
         )}
 
-        <div className="absolute inset-x-0 bottom-0 p-2.5">
-          <p className="flex items-center gap-1 text-[0.8125rem] font-bold leading-tight text-white">
+        <div className="absolute inset-x-0 bottom-0 p-3">
+          <p className="flex items-center gap-1.5 text-[0.9375rem] font-bold leading-tight text-white">
             <span className="truncate">{artisan.name}</span>
             <BadgeCheck
-              size={12}
+              size={14}
               strokeWidth={2.4}
               className="shrink-0"
               aria-label="Verified"
             />
           </p>
-          <p className="mt-0.5 truncate text-[0.6875rem] font-medium text-white/70">
+          <p className="mt-1 truncate text-[0.8125rem] font-medium text-white/70">
             {TRADE_LABELS[artisan.trade]} · {artisan.location}
           </p>
           {signal ? (
-            <p className="figure mt-1 flex items-center gap-1 text-[0.6875rem] text-white">
+            <p className="figure mt-1.5 flex items-center gap-1 text-[0.8125rem] text-white">
               {signal}
             </p>
           ) : null}
@@ -85,7 +85,7 @@ export function Poster({
       <FavoriteButton
         artisanId={artisan.id}
         name={artisan.name}
-        className="absolute right-1.5 top-1.5 !size-7"
+        className="absolute right-2 top-2"
       />
     </div>
   );
@@ -95,7 +95,7 @@ export function Poster({
 export function RatingSignal({ artisan }: { artisan: Artisan }) {
   return (
     <>
-      <Star size={11} strokeWidth={2.4} fill="currentColor" aria-hidden />
+      <Star size={13} strokeWidth={2.4} fill="currentColor" aria-hidden />
       {artisan.rating.toFixed(1)}
       <span className="font-normal text-white/60">({artisan.reviewCount})</span>
     </>
@@ -128,7 +128,7 @@ export function PosterRail({
   return (
     <section aria-labelledby={headingId} className="mt-6">
       <div className="flex items-center justify-between gap-3 px-4 md:px-0">
-        <h2 id={headingId} className="text-base font-bold text-ink">
+        <h2 id={headingId} className="title text-ink">
           {heading}
         </h2>
         {action && (
@@ -144,7 +144,7 @@ export function PosterRail({
       </div>
 
       <div className="no-scrollbar mt-2 overflow-x-auto scroll-px-4 px-4 md:scroll-px-0 md:px-0">
-        <ul className="flex w-max gap-2">
+        <ul className="flex w-max gap-2.5">
           {artisans.map((artisan) => (
             <li key={artisan.id}>
               <Poster
