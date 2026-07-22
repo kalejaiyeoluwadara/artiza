@@ -2,6 +2,7 @@ import type { AuthOptions, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { publicApi } from "../api";
+import { authSecret } from "./secret";
 import { ApiError } from "../api/error";
 
 /**
@@ -145,6 +146,7 @@ export const authOptions: AuthOptions = {
 
   // The cookie is the credential — it must never be readable from JavaScript.
   useSecureCookies: process.env.NODE_ENV === "production",
-  secret: process.env.NEXTAUTH_SECRET,
+  // Shared with proxy.ts — see lib/auth/secret.ts for why that matters.
+  secret: authSecret,
   debug: false,
 };

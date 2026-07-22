@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
+import { authSecret } from "./lib/auth/secret";
 
 /**
  * Next 16 renamed Middleware to Proxy. Same file-convention slot, same job:
@@ -31,7 +32,9 @@ export async function proxy(request: NextRequest) {
 
   const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET,
+    // Must be the exact value NextAuth encrypted the cookie with, or every
+    // signed-in visitor reads as signed out.
+    secret: authSecret,
     secureCookie: process.env.NODE_ENV === "production",
   });
 
