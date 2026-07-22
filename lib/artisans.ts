@@ -103,10 +103,6 @@ export const UNLOCK_PRICE = 500;
  */
 const PHOTO_HOST = "https://images.unsplash.com/photo-";
 
-function portrait(id: string): string {
-  return `${PHOTO_HOST}${id}?w=400&h=400&fit=crop&crop=faces&auto=format&q=70`;
-}
-
 function scene(id: string): string {
   return `${PHOTO_HOST}${id}?w=1200&h=800&fit=crop&auto=format&q=70`;
 }

@@ -1,6 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+  useSyncExternalStore,
+} from "react";
+import { toast } from "../lib/toast";
+import { readStored } from "../lib/useStoredValue";
+
+/** False through SSR and hydration, true once on the client. */
+const NEVER_CHANGES = () => () => {};
+const onClient = () => true;
+const onServer = () => false;
 
 // Types
 export interface Worker {
@@ -48,19 +62,11 @@ export interface Banner {
   ctaLink?: string;
 }
 
-export interface Toast {
-  id: string;
-  message: string;
-  type: 'success' | 'error' | 'info';
-  duration?: number;
-}
-
 interface AppContextType {
   currentUser: User;
   workers: Worker[];
   reviews: Review[];
   banners: Banner[];
-  toasts: Toast[];
   isLoaded: boolean;
   currentRole: 'seeker' | 'worker' | 'admin';
   setRole: (role: 'seeker' | 'worker' | 'admin') => void;
@@ -75,9 +81,8 @@ interface AppContextType {
   addBanner: (banner: Omit<Banner, "id">) => void;
   toggleBannerStatus: (bannerId: string) => void;
   deleteBanner: (bannerId: string) => void;
-  // Toast actions
+  /** Raises an app-level toast. Delegates to the shared store in `lib/toast`. */
   addToast: (message: string, type: 'success' | 'error' | 'info', duration?: number) => void;
-  removeToast: (id: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -246,12 +251,29 @@ const INITIAL_BANNERS: Banner[] = [
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Roles toggling simulation state
-  const [currentRole, setCurrentRole] = useState<'seeker' | 'worker' | 'admin'>("seeker");
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  /**
+   * Seeded straight from storage by the lazy initialiser rather than loaded by
+   * an effect afterwards. The effect version rendered once with empty arrays,
+   * set state, and rendered again — a cascade React now warns about, and a
+   * visible flash of "nothing here" on every mount.
+   *
+   * On the server `readStored` returns the fallback, so the first paint still
+   * matches the HTML; `isLoaded` flips once hydration confirms the real values
+   * are in play.
+   */
+  const [currentRole, setCurrentRole] = useState<'seeker' | 'worker' | 'admin'>(
+    () => readStored<'seeker' | 'worker' | 'admin'>("ilisan_current_role", "seeker"),
+  );
+  const [workers, setWorkers] = useState<Worker[]>(() =>
+    readStored("ilisan_workers", INITIAL_WORKERS),
+  );
+  const [reviews, setReviews] = useState<Review[]>(() =>
+    readStored("ilisan_reviews", INITIAL_REVIEWS),
+  );
+  const [banners, setBanners] = useState<Banner[]>(() =>
+    readStored("ilisan_banners", INITIAL_BANNERS),
+  );
+  const isLoaded = useSyncExternalStore(NEVER_CHANGES, onClient, onServer);
 
   // Mock User Account simulation depending on selected role
   const getMockUser = (role: 'seeker' | 'worker' | 'admin'): User => {
@@ -284,32 +306,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const currentUser = getMockUser(currentRole);
 
-  const safeParse = <T,>(value: string | null, fallback: T): T => {
-    if (!value) return fallback;
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return fallback;
-    }
-  };
-
-  // Load from local storage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedWorkers = localStorage.getItem("ilisan_workers");
-      const storedReviews = localStorage.getItem("ilisan_reviews");
-      const storedBanners = localStorage.getItem("ilisan_banners");
-      const storedRole = localStorage.getItem("ilisan_current_role");
-
-      setWorkers(safeParse(storedWorkers, INITIAL_WORKERS));
-      setReviews(safeParse(storedReviews, INITIAL_REVIEWS));
-      setBanners(safeParse(storedBanners, INITIAL_BANNERS));
-      if (storedRole === "seeker" || storedRole === "worker" || storedRole === "admin") {
-        setCurrentRole(storedRole);
-      }
-      setIsLoaded(true);
-    }
-  }, []);
 
   // Save changes to local storage
   useEffect(() => {
@@ -338,20 +334,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addToast(`Switched user view to ${role.toUpperCase()}`, "info");
   };
 
-  // Toast Action Helpers
-  const addToast = (message: string, type: 'success' | 'error' | 'info', duration = 3000) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { id, message, type, duration }]);
-    
-    // Auto remove toast
-    setTimeout(() => {
-      removeToast(id);
-    }, duration);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
+  /**
+   * A second toast queue used to live here, with its own timers and its own
+   * card. It now forwards to the one in `lib/toast`, so every message in the
+   * app queues, stacks and dismisses the same way.
+   */
+  const addToast = useCallback(
+    (message: string, type: 'success' | 'error' | 'info', duration = 3000) => {
+      toast[type](message, { duration });
+    },
+    [],
+  );
 
   // Admin and Worker Actions
   const addWorker = (workerData: Omit<Worker, "id" | "rating" | "reviewsCount" | "active">) => {
@@ -484,7 +477,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         workers,
         reviews,
         banners,
-        toasts,
         isLoaded,
         currentRole,
         setRole,
@@ -497,7 +489,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleBannerStatus,
         deleteBanner,
         addToast,
-        removeToast
       }}
     >
       {children}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Share, PlusSquare, X } from "lucide-react";
@@ -14,11 +14,22 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
+const NEVER_CHANGES = () => () => {};
+const onClient = () => true;
+const onServer = () => false;
+
 export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
+  // Which platform this is doesn't change while the page is open, so it is
+  // read rather than stored — but only after hydration, since the server has
+  // no user agent to match against.
+  const hydrated = useSyncExternalStore(NEVER_CHANGES, onClient, onServer);
+  const isIOS =
+    hydrated &&
+    /iPhone|iPad|iPod/i.test(navigator.userAgent) &&
+    !("MSStream" in window);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   useEffect(() => {
@@ -39,12 +50,6 @@ export function PWAInstallPrompt() {
       });
     }
 
-    // 3. Detect iOS platform
-    const ua = navigator.userAgent;
-    const isIOSDevice =
-      /iPhone|iPad|iPod/i.test(ua) && !("MSStream" in window);
-    setIsIOS(isIOSDevice);
-
     // 4. Check dismissal memory (don't show if dismissed within 7 days)
     const dismissedAt = localStorage.getItem("artiza-pwa-dismissed");
     if (dismissedAt) {
@@ -58,27 +63,26 @@ export function PWAInstallPrompt() {
       }
     }
 
+    // Both paths schedule the prompt, so one handle covers both — and it is
+    // declared out here rather than inside the listener, because a cleanup
+    // returned from an event handler is never called by anything.
+    let promptTimer: ReturnType<typeof setTimeout> | undefined;
+
     // 5. Listen for beforeinstallprompt (Android / Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
 
-      // Present prompt after a short initial viewing window (8 seconds)
-      const timer = setTimeout(() => {
-        setShowPrompt(true);
-      }, 8000);
-
-      return () => clearTimeout(timer);
+      // Present prompt after a short initial viewing window.
+      clearTimeout(promptTimer);
+      promptTimer = setTimeout(() => setShowPrompt(true), 8000);
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-    // 6. iOS prompt delay (since iOS doesn't support beforeinstallprompt)
-    let iosTimer: NodeJS.Timeout;
-    if (isIOSDevice) {
-      iosTimer = setTimeout(() => {
-        setShowPrompt(true);
-      }, 10000);
+    // 6. iOS has no beforeinstallprompt, so it gets a plain delay instead.
+    if (isIOS) {
+      promptTimer = setTimeout(() => setShowPrompt(true), 10000);
     }
 
     return () => {
@@ -86,9 +90,9 @@ export function PWAInstallPrompt() {
         "beforeinstallprompt",
         handleBeforeInstallPrompt
       );
-      if (iosTimer) clearTimeout(iosTimer);
+      clearTimeout(promptTimer);
     };
-  }, []);
+  }, [isIOS]);
 
   const handleInstallClick = async () => {
     if (isIOS) {

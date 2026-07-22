@@ -1,68 +1,68 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
+import { useStoredValue, writeStored } from "./useStoredValue";
 
 const KEY = "artiza_recent_searches";
 const LIMIT = 6;
+
+/** Stable identity — it is the server snapshot, so it must not be re-created. */
+const NO_QUERIES: string[] = [];
+
+const NEVER_CHANGES = () => () => {};
+const onClient = () => true;
+const onServer = () => false;
 
 /**
  * The last few queries that went somewhere, newest first.
  *
  * Only a query someone acted on is recorded — every keystroke is a valid
- * search string and none of them are worth offering back. Local storage,
- * like unlocks: it's this device's history, not an account feature.
+ * search string and none of them are worth offering back. Local storage, not
+ * an account feature: it's this device's history.
  */
 export function useRecentSearches() {
-  const [queries, setQueries] = useState<string[]>([]);
-  // Read after mount, so the first paint matches the server's.
-  const [ready, setReady] = useState(false);
+  const queries = useStoredValue<string[]>(KEY, NO_QUERIES);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setQueries(JSON.parse(raw));
-    } catch {
-      // Corrupt or unavailable storage just means no history.
-    }
-    setReady(true);
+  // The server has no history to render, so the first client paint must match
+  // it. This flips true after hydration, which is when the real list appears.
+  const ready = useSyncExternalStore(NEVER_CHANGES, onClient, onServer);
+
+  const remember = useCallback((query: string) => {
+    const value = query.trim();
+    if (!value) return;
+
+    const previous = readCurrent();
+    // Case-insensitive dedupe, keeping the spelling just used.
+    const next = [
+      value,
+      ...previous.filter((q) => q.toLowerCase() !== value.toLowerCase()),
+    ].slice(0, LIMIT);
+
+    writeStored(KEY, next);
   }, []);
 
-  const write = useCallback((next: string[]) => {
-    setQueries(next);
-    try {
-      localStorage.setItem(KEY, JSON.stringify(next));
-    } catch {
-      // Non-fatal: the list still holds for this session.
-    }
+  const forget = useCallback((query: string) => {
+    writeStored(
+      KEY,
+      readCurrent().filter((q) => q !== query),
+    );
   }, []);
 
-  const remember = useCallback(
-    (query: string) => {
-      const value = query.trim();
-      if (!value) return;
-      setQueries((prev) => {
-        // Case-insensitive dedupe, keeping the spelling just used.
-        const next = [
-          value,
-          ...prev.filter((q) => q.toLowerCase() !== value.toLowerCase()),
-        ].slice(0, LIMIT);
-        try {
-          localStorage.setItem(KEY, JSON.stringify(next));
-        } catch {
-          // Non-fatal.
-        }
-        return next;
-      });
-    },
-    []
-  );
+  const clear = useCallback(() => writeStored(KEY, NO_QUERIES), []);
 
-  const forget = useCallback(
-    (query: string) => write(queries.filter((q) => q !== query)),
-    [queries, write]
-  );
+  return { queries: ready ? queries : NO_QUERIES, ready, remember, forget, clear };
+}
 
-  const clear = useCallback(() => write([]), [write]);
-
-  return { queries, ready, remember, forget, clear };
+/**
+ * Read straight from the store rather than closing over the rendered value —
+ * two searches in the same tick would otherwise both build on the same stale
+ * list and the first would be lost.
+ */
+function readCurrent(): string[] {
+  try {
+    const raw = localStorage.getItem(KEY);
+    return raw ? (JSON.parse(raw) as string[]) : NO_QUERIES;
+  } catch {
+    return NO_QUERIES;
+  }
 }

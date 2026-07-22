@@ -6,15 +6,14 @@ import {
   Unlock,
   History,
   Star,
-  Sparkles,
   HelpCircle,
   ShieldCheck,
-  Info,
   PhoneCall,
+  LogOut,
 } from "lucide-react";
-import { useArtisans } from "../../lib/useData";
+import { signOut } from "next-auth/react";
 import { useUnlocks } from "../../context/UnlocksContext";
-import { TRADE_LABELS } from "../../lib/artisans";
+import { confirm } from "../../lib/confirm";
 
 export default function AccountPage() {
   const {
@@ -26,6 +25,19 @@ export default function AccountPage() {
     buyBundle,
     signedIn,
   } = useUnlocks();
+
+  async function handleSignOut() {
+    const confirmed = await confirm({
+      title: "Sign out?",
+      body: "Your unlocked contacts and credits stay on your account — you'll find them again next time you sign in.",
+      confirmLabel: "Sign out",
+      tone: "danger",
+    });
+
+    if (!confirmed) return;
+
+    await signOut({ callbackUrl: "/" });
+  }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
@@ -154,6 +166,20 @@ export default function AccountPage() {
         <Row icon={ShieldCheck} label="Privacy and terms" last />
       </ul>
 
+      {/* ── Session ────────────────────────────────────── */}
+      {signedIn ? (
+        <ul className="mt-8 overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <Row icon={LogOut} label="Sign out" onClick={handleSignOut} last />
+        </ul>
+      ) : (
+        <Link
+          href="/sign-in?callbackUrl=%2Faccount"
+          className="pressable mt-8 flex w-full items-center justify-center rounded-full bg-accent py-3.5 text-[0.9375rem] font-semibold text-white"
+        >
+          Sign in
+        </Link>
+      )}
+
       {/* ── Footer ─────────────────────────────────────── */}
       <p className="caption mt-10 mb-4 text-center text-faint">
         Artiza v0.1 · made for Ilisan
@@ -171,6 +197,7 @@ function Row({
   detail,
   href,
   external,
+  onClick,
   last = false,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
@@ -178,6 +205,7 @@ function Row({
   detail?: React.ReactNode;
   href?: string;
   external?: string;
+  onClick?: () => void;
   last?: boolean;
 }) {
   const inner = (
@@ -226,7 +254,7 @@ function Row({
 
   return (
     <li>
-      <button type="button" className={`${cls} w-full text-left`}>
+      <button type="button" onClick={onClick} className={`${cls} w-full text-left`}>
         {inner}
       </button>
     </li>

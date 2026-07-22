@@ -125,4 +125,58 @@ export async function requestPaginated<T>(
   };
 }
 
+/**
+ * The multipart variant, for `POST /uploads`.
+ *
+ * It goes around `send` rather than through it because the two disagree on one
+ * thing: `Content-Type`. JSON requests set it; a multipart request must *not* —
+ * only the browser knows the boundary it generated, and naming the type by hand
+ * produces a body the server cannot split.
+ */
+export async function upload<T>(
+  path: string,
+  form: FormData,
+  options: Pick<RequestOptions, "token" | "query" | "signal"> = {},
+): Promise<T> {
+  const { token, query, signal } = options;
+
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(path, query), {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: form,
+      ...(signal ? { signal } : {}),
+    });
+  } catch (cause) {
+    if (cause instanceof DOMException && cause.name === "AbortError") {
+      throw new ApiError("Upload cancelled.", 0, "Aborted");
+    }
+    throw new ApiError(
+      "The upload didn't reach Artiza. Check your connection and try again.",
+      0,
+      "NetworkError",
+    );
+  }
+
+  const payload: unknown = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    if (payload && typeof payload === "object" && "message" in payload) {
+      throw ApiError.fromBody(payload as ApiErrorBody, response.status);
+    }
+    throw new ApiError(
+      `Upload failed (${response.status}).`,
+      response.status,
+      response.statusText || "Error",
+    );
+  }
+
+  return (payload as ApiEnvelope<T>).data;
+}
+
 export { BASE_URL };

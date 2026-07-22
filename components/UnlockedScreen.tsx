@@ -198,7 +198,7 @@ export function UnlockedScreen() {
         artisan={selected}
         onClose={() => setSelected(null)}
         unlocked={selected ? isUnlocked(selected.id) : false}
-        onUnlock={() => selected && unlock(selected.id, selected.name)}
+        onUnlock={() => selected && void unlock(selected.id, selected.name)}
       />
 
       <RatingModal

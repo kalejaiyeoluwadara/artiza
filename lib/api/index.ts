@@ -1,3 +1,4 @@
+import { adminResource } from "./resources/admin";
 import { artisansResource } from "./resources/artisans";
 import { authResource } from "./resources/auth";
 import { bannersResource } from "./resources/banners";
@@ -19,6 +20,8 @@ export function createApi(token?: string) {
     banners: bannersResource(),
     unlocks: unlocksResource(token),
     reviews: reviewsResource(token),
+    /** Management routes. Every one of them 403s without an admin token. */
+    admin: adminResource(token),
   };
 }
 

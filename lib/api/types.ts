@@ -190,3 +190,98 @@ export interface PendingReviews {
   pending: PendingReview[];
   count: number;
 }
+
+// ── Admin ──────────────────────────────────────────────────────────────────
+
+/**
+ * The whole record, as only `/admin/artisans` returns it. The public shape
+ * plus the sealed half, the soft-delete flag and the timestamps — everything
+ * the console needs to correct a wrong number or bring a listing back.
+ */
+export interface AdminArtisan extends ArtisanSummary {
+  phone: string;
+  whatsapp?: string;
+  instagram?: string;
+  email?: string;
+  altPhone?: string;
+  /** False once retired: the record survives, the listing does not. */
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Which half of the register to read. Retired artisans are opt-in. */
+export type RegisterStatus = "active" | "retired" | "all";
+
+/**
+ * The sealed half as the admin writes it. Customers read this shape through
+ * `ArtisanContact`, which flattens it — here it stays nested, because that is
+ * how `POST /admin/artisans` takes it.
+ */
+export interface ContactInput {
+  whatsapp?: string;
+  instagram?: string;
+  email?: string;
+  altPhone?: string;
+  respondsIn: string;
+  availability: string;
+}
+
+/**
+ * Everything the team fills in for a new listing. Mirrors `CreateArtisanDto`
+ * on the API, limits included — the form validates against the same numbers so
+ * a 422 is the exception rather than the way you find out.
+ */
+export interface ArtisanInput {
+  name: string;
+  trade: Trade;
+  location: string;
+  yearsExperience: number;
+  /** MSISDN, no + or spaces: 2348031234567. */
+  phone: string;
+  contact: ContactInput;
+  /** Cloudinary URL from `POST /uploads`. Upload first, create second. */
+  photo: string;
+  work?: string[];
+  featured?: boolean;
+  /** `Mmm YYYY`, e.g. "Mar 2026". */
+  verifiedSince: string;
+  note: string;
+  services?: string[];
+  /** Imports only — an ordinary listing starts at zero and earns the number. */
+  jobsCompleted?: number;
+}
+
+/** A partial write. `isActive: true` is how a retired artisan comes back. */
+export type ArtisanPatch = Partial<ArtisanInput> & { isActive?: boolean };
+
+/** The banner as admin sees it — ordering and the active flag included. */
+export interface AdminBannerItem extends BannerItem {
+  position: number;
+  isActive: boolean;
+}
+
+export interface BannerInput {
+  title: string;
+  body: string;
+  cta: string;
+  /** A path beginning with "/", never an absolute URL. */
+  href: string;
+  image: string;
+  position?: number;
+  isActive?: boolean;
+}
+
+/** Where an upload landed, and the crop it was given. */
+export interface UploadResult {
+  url: string;
+  /** Contains slashes — URL-encode it before a DELETE. */
+  publicId: string;
+  width: number;
+  height: number;
+  format: string;
+  bytes: number;
+}
+
+/** The crop the API applies. Pick the one that matches the slot. */
+export type UploadFolder = "portraits" | "work" | "banners";

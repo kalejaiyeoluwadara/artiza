@@ -250,7 +250,7 @@ export function BrowseScreen({
         artisan={selected}
         onClose={() => setSelected(null)}
         unlocked={selected ? isUnlocked(selected.id) : false}
-        onUnlock={() => selected && unlock(selected.id)}
+        onUnlock={() => selected && void unlock(selected.id, selected.name)}
       />
     </>
   );

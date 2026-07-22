@@ -24,6 +24,15 @@ function useIsActive() {
 }
 
 /**
+ * The admin console brings its own chrome and is not one of these four
+ * destinations, so both bars stand down inside it. Rendering the customer tab
+ * bar there would offer a "you are here" that is never true.
+ */
+function useIsConsole(): boolean {
+  return usePathname().startsWith("/admin");
+}
+
+/**
  * Mobile only. A solid card-coloured floor, not a translucent film:
  * photography scrolling underneath a blurred bar muddied both. Depth comes
  * from a hairline and one soft upward shadow instead.
@@ -33,6 +42,9 @@ function useIsActive() {
  */
 export function BottomNav() {
   const isActive = useIsActive();
+  const inConsole = useIsConsole();
+
+  if (inConsole) return null;
 
   return (
     <nav
@@ -78,6 +90,9 @@ export function BottomNav() {
 /** Desktop counterpart. Same destinations, same names. */
 export function SiteHeader() {
   const isActive = useIsActive();
+  const inConsole = useIsConsole();
+
+  if (inConsole) return null;
 
   return (
     <header className="chrome sticky top-0 z-50 hidden border-b border-line md:block">
