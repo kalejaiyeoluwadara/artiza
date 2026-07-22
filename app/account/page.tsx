@@ -10,12 +10,18 @@ import {
   ShieldCheck,
   PhoneCall,
   LogOut,
+  SlidersHorizontal,
 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useUnlocks } from "../../context/UnlocksContext";
 import { confirm } from "../../lib/confirm";
 
 export default function AccountPage() {
+  const { data: session } = useSession();
+  // The console has no link anywhere else in the app, and a customer who
+  // guesses the URL is turned round by the proxy. This row is the door.
+  const isAdmin = session?.user?.role === "admin";
+
   const {
     unlockedIds,
     credits,
@@ -148,6 +154,26 @@ export default function AccountPage() {
                 </span>
               </li>
             ))}
+          </ul>
+        </>
+      )}
+
+      {/* ── The console, for the Artiza team only ──────── */}
+      {isAdmin && (
+        <>
+          <p className="caption mt-8 mb-2 px-1 uppercase tracking-wider font-semibold">
+            Artiza team
+          </p>
+          <ul className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <Row
+              href="/admin"
+              icon={SlidersHorizontal}
+              label="Admin console"
+              detail={
+                <span className="caption text-sub">Register and promotions</span>
+              }
+              last
+            />
           </ul>
         </>
       )}

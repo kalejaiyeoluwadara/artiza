@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { AppProvider } from "../context/AppContext";
 import { AuthProvider } from "../components/AuthProvider";
 import { Toaster } from "../components/Toaster";
 import { ConfirmHost } from "../components/ConfirmHost";
@@ -86,7 +85,6 @@ export default function RootLayout({
         </a>
         <AuthProvider>
           <UnlocksProvider>
-            <AppProvider>
             <SiteHeader />
             <main id="main-content" className="flex flex-1 flex-col">
               <PageTransition>{children}</PageTransition>
@@ -95,9 +93,8 @@ export default function RootLayout({
             <PWAInstallPrompt />
             {/* Both portal to <body>, so they sit above every surface —
                 including the sheet — and outside any transformed ancestor. */}
-              <Toaster />
-              <ConfirmHost />
-            </AppProvider>
+            <Toaster />
+            <ConfirmHost />
           </UnlocksProvider>
         </AuthProvider>
       </body>

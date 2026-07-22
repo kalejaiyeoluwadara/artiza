@@ -7,14 +7,6 @@ export type Trade =
   | "painter"
   | "laundry";
 
-export interface Review {
-  author: string;
-  rating: number;
-  /** Relative, e.g. "2 weeks ago" — set by the team on import. */
-  when: string;
-  text: string;
-}
-
 /**
  * Everything the ₦500 buys. Phone is the spine — call, WhatsApp and SMS all
  * hang off it — so only the handles that vary are stored per artisan.

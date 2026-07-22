@@ -47,7 +47,7 @@ export function BrowseScreen({
   const [selected, setSelected] = useState<Artisan | null>(null);
   const { isUnlocked, unlock } = useUnlocks();
 
-  /* The register arrives asynchronously — the fixtures resolve immediately
+  /* The register arrives asynchronously — a fast API resolves immediately
      today, a query won't. Every cut below derives from what the read
      returned, so nothing here has to change when the database lands. */
   const { artisans, loading, error, retry } = useArtisans();

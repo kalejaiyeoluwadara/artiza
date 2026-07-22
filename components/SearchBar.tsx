@@ -145,7 +145,7 @@ function FilterSheet({
   filters: Filters;
   onChange: (next: Filters) => void;
 }) {
-  // The same read the register itself renders from. Counting the fixtures
+  // The same read the register itself renders from. Counting the register
   // instead would promise "Show 8 artisans" while the list behind the
   // sheet was still a skeleton, or had failed to load entirely.
   const { artisans, loading } = useArtisans();
