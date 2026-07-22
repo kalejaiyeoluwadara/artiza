@@ -2,7 +2,12 @@
 
 import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { BadgeCheck, ChevronRight, Clock, Search, Star, X } from "lucide-react";
-import { Artisan, TRADE_LABELS, Trade } from "../lib/artisans";
+import {
+  Artisan,
+  TRADE_LABELS,
+  TRADE_SHORT_LABELS,
+  Trade,
+} from "../lib/artisans";
 import {
   MatchField,
   highlight,
@@ -252,24 +257,79 @@ function Idle({
         </section>
       )}
 
-      <section aria-labelledby="try-heading" className="mt-6">
-        <h2 id="try-heading" className="headline text-ink">
-          Try searching for
+      <section aria-labelledby="trades-heading" className="mt-7">
+        <h2 id="trades-heading" className="title text-ink">
+          Browse by trade
         </h2>
-        <ul className="mt-2.5 flex flex-wrap gap-2">
-          {suggestions.map((suggestion) => (
-            <li key={suggestion}>
-              <button
-                type="button"
-                onClick={() => onPick(suggestion)}
-                className="pressable hover-fill rounded-full bg-card px-4 py-2 text-sm font-medium text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-              >
-                {suggestion}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <p className="caption mt-1">
+          Every artisan in Ilisan, grouped by what they do.
+        </p>
+
+        {loading ? (
+          <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {Array.from({ length: 6 }, (_, i) => (
+              <li key={i}>
+                <Skeleton className="h-[4.75rem] rounded-2xl" />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {trades.map(({ trade, count }) => (
+              <li key={trade}>
+                <button
+                  type="button"
+                  onClick={() => onPick(TRADE_LABELS[trade])}
+                  className="pressable hover-fill flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                >
+                  <span
+                    style={{ background: TRADE_TINTS[trade] }}
+                    className="flex size-12 shrink-0 items-center justify-center rounded-xl"
+                  >
+                    <TradeIllustration trade={trade} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-[0.9375rem] font-semibold text-ink">
+                      {TRADE_SHORT_LABELS[trade]}
+                    </span>
+                    {/* The count is the whole reason these are tiles and not
+                        chips: how deep the register goes is something a filter
+                        can't tell you until after you've tapped it. */}
+                    <span className="caption figure mt-0.5 block">
+                      {count} {count === 1 ? "artisan" : "artisans"}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
+
+      {suggestions.length > 0 && (
+        <section aria-labelledby="try-heading" className="mt-7">
+          <h2 id="try-heading" className="title text-ink">
+            Or search by job
+          </h2>
+          <p className="caption mt-1">
+            The words you already have, when the trade name isn&rsquo;t one of them.
+          </p>
+
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {suggestions.map((suggestion) => (
+              <li key={suggestion}>
+                <button
+                  type="button"
+                  onClick={() => onPick(suggestion)}
+                  className="pressable hover-fill rounded-full bg-card px-4 py-2 text-sm font-medium text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                >
+                  {suggestion}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </>
   );
 }
