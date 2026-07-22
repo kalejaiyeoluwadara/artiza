@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
+import { AuthProvider } from "../components/AuthProvider";
 import { BottomNav, SiteHeader } from "../components/BottomNav";
 import { PWAInstallPrompt } from "../components/PWAInstallPrompt";
 
@@ -80,14 +81,16 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <AppProvider>
-          <SiteHeader />
-          <main id="main-content" className="flex flex-1 flex-col">
-            <PageTransition>{children}</PageTransition>
-          </main>
-          <BottomNav />
-          <PWAInstallPrompt />
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <SiteHeader />
+            <main id="main-content" className="flex flex-1 flex-col">
+              <PageTransition>{children}</PageTransition>
+            </main>
+            <BottomNav />
+            <PWAInstallPrompt />
+          </AppProvider>
+        </AuthProvider>
       </body>
     </html>
   );
