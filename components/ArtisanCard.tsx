@@ -8,6 +8,7 @@ import {
   TRADE_LABELS,
   UNLOCK_PRICE,
 } from "../lib/artisans";
+import { FavoriteButton } from "./FavoriteButton";
 
 /**
  * A row in the list, not a self-contained page. The whole card is the
@@ -27,76 +28,93 @@ export function ArtisanCard({
   onOpen: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="pressable group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-    >
-      <CoverPhoto artisan={artisan} />
+    // The heart is a control in its own right, so it cannot live inside the
+    // card's button — nested buttons are invalid, and the outer one would
+    // swallow the tap. It sits alongside it and floats over the cover instead.
+    <div className="relative h-full">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="pressable group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+      >
+        <CoverPhoto artisan={artisan} />
 
-      <div className="flex w-full flex-1 flex-col p-4">
-        {/* The portrait is the only thing that laps the cover — it needs its
+        <div className="flex w-full flex-1 flex-col p-4">
+          {/* The portrait is the only thing that laps the cover — it needs its
             own stacking context or the positioned cover paints over it. The
             name sits clear of the photo, on the card surface where it reads. */}
-        <Avatar
-          name={artisan.name}
-          src={artisan.photo}
-          size="size-14"
-          className="relative z-10 -mt-12 ring-4 ring-card"
-        />
-
-        <h3 className="headline mt-2.5 flex items-center gap-1.5 text-ink">
-          <span className="truncate">{artisan.name}</span>
-          <BadgeCheck
-            size={16}
-            strokeWidth={2.2}
-            className="shrink-0 text-accent"
-            aria-label="Verified"
+          <Avatar
+            name={artisan.name}
+            src={artisan.photo}
+            size="size-14"
+            className="relative z-10 -mt-12 ring-4 ring-card"
           />
-        </h3>
-        <p className="caption mt-0.5 flex items-center gap-0.5">
-          <MapPin size={11} strokeWidth={2} />
-          {artisan.location}
-        </p>
 
-        <p className="mt-3 line-clamp-2 text-sm text-sub">{artisan.note}</p>
-
-        <div className="figure mt-3 flex items-center gap-4 text-sm text-ink">
-          <span className="flex items-center gap-1">
-            <Star
-              size={13}
+          <h3 className="headline mt-2.5 flex items-center gap-1.5 text-ink">
+            <span className="truncate">{artisan.name}</span>
+            <BadgeCheck
+              size={16}
               strokeWidth={2.2}
-              fill="currentColor"
-              className="text-accent"
+              className="shrink-0 text-accent"
+              aria-label="Verified"
             />
-            {artisan.rating.toFixed(1)}
-            <span className="font-normal text-sub">({artisan.reviewCount})</span>
-          </span>
-          <span>
-            {artisan.yearsExperience}
-            <span className="ml-1 font-normal text-sub">yrs exp</span>
-          </span>
-          <span>
-            {artisan.jobsCompleted}
-            <span className="ml-1 font-normal text-sub">jobs</span>
-          </span>
-        </div>
+          </h3>
+          <p className="caption mt-0.5 flex items-center gap-0.5">
+            <MapPin size={11} strokeWidth={2} />
+            {artisan.location}
+          </p>
 
-        <div className="mt-3 flex-1" />
+          <p className="mt-3 line-clamp-2 text-sm text-sub">{artisan.note}</p>
 
-        <div className="flex w-full items-center justify-between border-t border-line pt-3">
-          <span className="text-sm font-medium text-accent">
-            {unlocked ? "Contact unlocked" : `₦${UNLOCK_PRICE} to unlock contact`}
-          </span>
-          <ChevronRight
-            size={16}
-            strokeWidth={2.2}
-            aria-hidden
-            className="text-faint"
-          />
+          <div className="figure mt-3 flex items-center gap-4 text-sm text-ink">
+            <span className="flex items-center gap-1">
+              <Star
+                size={13}
+                strokeWidth={2.2}
+                fill="currentColor"
+                className="text-accent"
+              />
+              {artisan.rating.toFixed(1)}
+              <span className="font-normal text-sub">
+                ({artisan.reviewCount})
+              </span>
+            </span>
+            <span>
+              {artisan.yearsExperience}
+              <span className="ml-1 font-normal text-sub">yrs exp</span>
+            </span>
+            <span>
+              {artisan.jobsCompleted}
+              <span className="ml-1 font-normal text-sub">jobs</span>
+            </span>
+          </div>
+
+          <div className="mt-3 flex-1" />
+
+          <div className="flex w-full items-center justify-between border-t border-line pt-3">
+            <span className="text-sm font-medium text-accent">
+              {unlocked
+                ? "Contact unlocked"
+                : `₦${UNLOCK_PRICE} to unlock contact`}
+            </span>
+            <ChevronRight
+              size={16}
+              strokeWidth={2.2}
+              aria-hidden
+              className="text-faint"
+            />
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
+
+      {/* Top-right of the cover, on the scrim — the corner a hand reaches
+          first. Featured moved in beside the trade chip to clear it. */}
+      <FavoriteButton
+        artisanId={artisan.id}
+        name={artisan.name}
+        className="absolute right-3 top-3"
+      />
+    </div>
   );
 }
 
@@ -122,14 +140,16 @@ function CoverPhoto({ artisan }: { artisan: Artisan }) {
         aria-hidden
         className="absolute inset-0 bg-linear-to-b from-black/30 via-black/0 to-black/20"
       />
-      <span className="chrome absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
-        {TRADE_LABELS[artisan.trade]}
-      </span>
-      {artisan.featured && (
-        <span className="absolute right-3 top-3 rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">
-          Featured
+      <div className="absolute left-3 top-3 flex items-center gap-1.5">
+        <span className="chrome rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
+          {TRADE_LABELS[artisan.trade]}
         </span>
-      )}
+        {artisan.featured && (
+          <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">
+            Featured
+          </span>
+        )}
+      </div>
     </div>
   );
 }
