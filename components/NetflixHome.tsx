@@ -269,36 +269,41 @@ function TopBar({
       {/* Netflix's Tv Series / Movies / Categories row. Every pill here is a
           real filter — an outlined pill that only says a word would be
           decoration sitting in the most prominent control slot on the page. */}
-      <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-8 lg:px-12">
-        <div className="flex w-max items-center gap-2">
-          {filters.trade ? (
+      {/* Same centred column as the billboard and the rails below — without it
+          the pills stay pinned to the viewport edge past the 96rem cap while
+          everything else centres, and the page loses its left edge. */}
+      <div className="mx-auto w-full max-w-[96rem]">
+        <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-8 md:pt-1 lg:px-12">
+          <div className="flex w-max items-center gap-2">
+            {filters.trade ? (
+              <Pill
+                active
+                onClick={() => onChange({ ...filters, trade: null })}
+                label={`${TRADE_LABELS[filters.trade]}s`}
+                trailing={<X size={13} strokeWidth={2.6} aria-hidden />}
+              />
+            ) : null}
+
             <Pill
-              active
-              onClick={() => onChange({ ...filters, trade: null })}
-              label={`${TRADE_LABELS[filters.trade]}s`}
-              trailing={<X size={13} strokeWidth={2.6} aria-hidden />}
+              active={filters.minRating !== null}
+              onClick={() =>
+                onChange({
+                  ...filters,
+                  minRating: filters.minRating === null ? 4.5 : null,
+                })
+              }
+              label="Top rated"
+              leading={
+                <Star size={12} strokeWidth={2.4} fill="currentColor" aria-hidden />
+              }
             />
-          ) : null}
 
-          <Pill
-            active={filters.minRating !== null}
-            onClick={() =>
-              onChange({
-                ...filters,
-                minRating: filters.minRating === null ? 4.5 : null,
-              })
-            }
-            label="Top rated"
-            leading={
-              <Star size={12} strokeWidth={2.4} fill="currentColor" aria-hidden />
-            }
-          />
-
-          <Pill
-            onClick={onOpenFilters}
-            label="Categories"
-            trailing={<ChevronDown size={14} strokeWidth={2.4} aria-hidden />}
-          />
+            <Pill
+              onClick={onOpenFilters}
+              label="Categories"
+              trailing={<ChevronDown size={14} strokeWidth={2.4} aria-hidden />}
+            />
+          </div>
         </div>
       </div>
     </div>

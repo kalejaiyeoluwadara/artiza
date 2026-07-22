@@ -114,6 +114,16 @@ export interface BannerItem {
   image: string;
 }
 
+/**
+ * `GET /home` — the register and the promo rail in one envelope, so the
+ * landing page costs one round trip instead of two. The API composes it from
+ * the same cached reads `/artisans` and `/banners` serve.
+ */
+export interface HomePayload {
+  artisans: ArtisanSummary[];
+  banners: BannerItem[];
+}
+
 // ── Unlocks, payments, receipts ────────────────────────────────────────────
 
 export interface PaymentInitialization {

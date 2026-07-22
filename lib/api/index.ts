@@ -2,6 +2,7 @@ import { adminResource } from "./resources/admin";
 import { artisansResource } from "./resources/artisans";
 import { authResource } from "./resources/auth";
 import { bannersResource } from "./resources/banners";
+import { homeResource } from "./resources/home";
 import { reviewsResource } from "./resources/reviews";
 import { unlocksResource } from "./resources/unlocks";
 
