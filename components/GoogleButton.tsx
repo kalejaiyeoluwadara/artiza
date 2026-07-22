@@ -40,12 +40,6 @@ export function GoogleButton({
 
   return (
     <>
-      <div className="my-6 flex items-center gap-4" aria-hidden>
-        <span className="h-px flex-1 bg-line" />
-        <span className="caption text-faint">or</span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
-
       <button
         type="button"
         disabled={disabled || pending}
@@ -55,11 +49,20 @@ export function GoogleButton({
           // trip leaves the site, so there is no state here worth preserving.
           void signIn("google", { callbackUrl });
         }}
-        className="pressable hover-dim flex w-full items-center justify-center gap-3 rounded-full border border-line bg-card py-3.5 text-[1.0625rem] font-semibold text-ink disabled:opacity-50"
+        className="pressable hover-dim mt-8 flex w-full items-center justify-center gap-3 rounded-full border border-line bg-card py-3.5 text-[1.0625rem] font-semibold text-ink disabled:opacity-50"
       >
         <GoogleMark />
         {pending ? "Taking you to Google…" : label}
       </button>
+
+      {/* Sits below the button, so the divider separates it from the form that
+          follows. The form keeps its own top margin, which is what spaces the
+          two apart when this whole block is absent. */}
+      <div className="mt-6 flex items-center gap-4" aria-hidden>
+        <span className="h-px flex-1 bg-line" />
+        <span className="caption text-faint">or</span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
     </>
   );
 }

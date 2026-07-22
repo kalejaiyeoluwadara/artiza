@@ -90,6 +90,12 @@ export function SignUpForm() {
         Browsing is free. An account is only needed to unlock a contact.
       </p>
 
+      <GoogleButton
+        callbackUrl={callbackUrl}
+        label="Sign up with Google"
+        disabled={submitting}
+      />
+
       <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
         <AuthField
           label="Name"
@@ -155,12 +161,6 @@ export function SignUpForm() {
           {submitting ? "Creating account…" : "Create account"}
         </button>
       </form>
-
-      <GoogleButton
-        callbackUrl={callbackUrl}
-        label="Sign up with Google"
-        disabled={submitting}
-      />
 
       <p className="mt-6 text-center text-[0.9375rem] text-sub">
         Already have an account?{" "}

@@ -59,6 +59,8 @@ export function SignInForm() {
         Unlocked contacts and credits stay on your account.
       </p>
 
+      <GoogleButton callbackUrl={callbackUrl} disabled={submitting} />
+
       <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
         <AuthField
           label="Email"
@@ -96,8 +98,6 @@ export function SignInForm() {
           {submitting ? "Signing in…" : "Sign in"}
         </button>
       </form>
-
-      <GoogleButton callbackUrl={callbackUrl} disabled={submitting} />
 
       <p className="mt-6 text-center text-[0.9375rem] text-sub">
         New to Artiza?{" "}
