@@ -7,6 +7,16 @@ import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
 import { FavoriteButton } from "./FavoriteButton";
 
 /**
+ * How wide a poster sits in a rail, per breakpoint.
+ *
+ * Exported because the rail's loading skeleton has to draw the same box — if
+ * the two drift, the swap from grey to artwork jumps the row sideways. The
+ * `sizes` attribute below is the third face of this number and has to be kept
+ * in step by hand, since `next/image` needs it in pixels at build time.
+ */
+export const POSTER_WIDTH = "w-48 sm:w-60 lg:w-72";
+
+/**
  * The Netflix home experiment's unit of browse: a 2:3 poster.
  *
  * Netflix can print the title into the artwork; Artiza's art is an artisan's
@@ -20,7 +30,7 @@ import { FavoriteButton } from "./FavoriteButton";
 export function Poster({
   artisan,
   signal,
-  width = "w-40 sm:w-48 lg:w-56",
+  width = POSTER_WIDTH,
   onOpen,
 }: {
   artisan: Artisan;
@@ -45,7 +55,7 @@ export function Poster({
             src={cover}
             alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
             fill
-            sizes="(min-width: 1024px) 224px, (min-width: 640px) 192px, 160px"
+            sizes="(min-width: 1024px) 288px, (min-width: 640px) 240px, 192px"
             className="object-cover"
           />
           {/* Scrim, not a tint — the type has to read without draining the

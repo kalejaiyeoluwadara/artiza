@@ -69,3 +69,19 @@ export async function fetchBanners(signal?: AbortSignal): Promise<Banner[]> {
   const banners = await publicApi.banners.list(signal);
   return banners.map(toBanner);
 }
+
+/**
+ * The landing page's whole payload in one call.
+ *
+ * It exists separately from `fetchArtisans` + `fetchBanners` because home is
+ * the one screen that needs both, and two sequential browser round trips is
+ * the difference between a rendered page and a skeleton. Called from the
+ * server component, so the response is cached by the framework rather than
+ * re-fetched per visitor.
+ */
+export async function fetchHome(
+  signal?: AbortSignal,
+): Promise<{ artisans: Artisan[]; banners: Banner[] }> {
+  const { artisans, banners } = await publicApi.home.get(signal);
+  return { artisans: artisans.map(toArtisan), banners: banners.map(toBanner) };
+}

@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { ChevronDown, Search, Sparkle, Star, TrendingUp, X } from "lucide-react";
 import {
   Artisan,
+  Banner,
   Filters,
   NO_FILTERS,
   TRADE_LABELS,
@@ -23,7 +24,7 @@ import { useUnlocks } from "../context/UnlocksContext";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { FilterSheet } from "./SearchBar";
 import { HomeBillboard } from "./HomeBillboard";
-import { Poster, PosterRail, RatingSignal } from "./Poster";
+import { POSTER_WIDTH, Poster, PosterRail, RatingSignal } from "./Poster";
 
 /** How many artisans a trade needs before it earns a row of its own. */
 const TRADE_RAIL_MIN = 3;
@@ -40,11 +41,20 @@ const TRADE_RAIL_MIN = 3;
  * Netflix's endless catalogue — Ilisan has one town's worth of artisans, so
  * the rails run out, and every one of them hides itself rather than padding.
  */
-export function NetflixHome() {
+export function NetflixHome({
+  artisans: initialArtisans,
+  banners: initialBanners,
+}: {
+  /* Read on the server by app/page.tsx. Both are optional: if the API was
+     unreachable there, the hooks below fall back to fetching from the browser
+     and the screen behaves as it always did. */
+  artisans?: Artisan[];
+  banners?: Banner[];
+}) {
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [selected, setSelected] = useState<Artisan | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const { artisans, loading, error, retry } = useArtisans();
+  const { artisans, loading, error, retry } = useArtisans(initialArtisans);
   const { isUnlocked, unlock } = useUnlocks();
   const { ids: favoriteIds, ready: favoritesReady } = useFavorites();
 
@@ -112,6 +122,7 @@ export function NetflixHome() {
           <>
             <HomeBillboard
               artisan={billboard}
+              banners={initialBanners}
               onOpen={() => billboard && setSelected(billboard)}
             />
 
@@ -399,14 +410,24 @@ function Results({
   );
 }
 
-/** Mirrors the billboard's geometry so the swap to real art is a fade. */
-function BillboardSkeleton() {
+/**
+ * Mirrors the billboard's geometry so the swap to real art is a fade.
+ *
+ * Exported because `app/page.tsx` now awaits the register on the server, so
+ * there are two moments home has nothing to draw: that await (covered by
+ * `app/loading.tsx`) and the client re-fetch when the server read failed
+ * (covered here). Both render this, so home has exactly one loading shape.
+ */
+export function BillboardSkeleton() {
   return (
     <div className="md:px-0">
       <div className="skeleton mx-4 h-112 rounded-2xl md:mx-0 md:h-128 lg:h-[38rem]" />
       <div className="mt-6 flex gap-2.5 overflow-hidden px-4 md:px-0">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton aspect-2/3 w-40 shrink-0 rounded-lg sm:w-48 lg:w-56" />
+          <div
+            key={i}
+            className={`skeleton aspect-2/3 shrink-0 rounded-lg ${POSTER_WIDTH}`}
+          />
         ))}
       </div>
     </div>

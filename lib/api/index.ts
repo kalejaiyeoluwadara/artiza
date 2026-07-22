@@ -19,6 +19,8 @@ export function createApi(token?: string) {
     auth: authResource(token),
     artisans: artisansResource(token),
     banners: bannersResource(),
+    /** The landing page's single read. Public, and prerendered on the server. */
+    home: homeResource(),
     unlocks: unlocksResource(token),
     reviews: reviewsResource(token),
     /** Management routes. Every one of them 403s without an admin token. */

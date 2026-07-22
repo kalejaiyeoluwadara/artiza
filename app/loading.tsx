@@ -1,19 +1,24 @@
+import { BillboardSkeleton } from "../components/NetflixHome";
+
 /**
- * Home draws its own placeholder.
+ * The fallback Next streams while `app/page.tsx` awaits the register.
  *
- * This file used to render a page-frame skeleton — large title, search field,
- * trade rail, card grid — which was the shape of the old `BrowseScreen` home.
- * Home is `NetflixHome` now: full bleed, a billboard and poster rails, with
- * its own `BillboardSkeleton` that matches that geometry. Keeping both meant a
- * cold load painted the old layout in grey, then threw it away and painted a
- * different grey layout, then filled in — two skeletons for one page.
+ * This used to draw a page-frame skeleton — large title, search field, trade
+ * rail, card grid — which was the shape of the old `BrowseScreen` home. Home is
+ * `NetflixHome` now, so that placeholder promised a layout the page no longer
+ * has: a cold load painted the old shape in grey, threw it away, then painted
+ * the billboard. Two skeletons of different shapes for one page.
  *
- * `NetflixHome` renders on the server with its read still pending, so its
- * skeleton is already in the first HTML. Returning null here costs nothing and
- * removes the wrong-shaped frame in front of it. Every other route reached the
- * same conclusion — see the sibling `loading.tsx` files under account, search,
- * unlocked and admin.
+ * It renders the billboard skeleton itself rather than a copy of its geometry,
+ * so the two can't drift apart again. Poster widths live in `POSTER_WIDTH`
+ * for the same reason.
  */
 export default function Loading() {
-  return null;
+  return (
+    <div className="min-h-screen pb-28 md:pb-16">
+      <div className="mx-auto w-full max-w-[96rem] md:px-8 lg:px-12">
+        <BillboardSkeleton />
+      </div>
+    </div>
+  );
 }

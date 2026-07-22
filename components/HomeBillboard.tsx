@@ -29,12 +29,17 @@ const RESUME = 4000;
  */
 export function HomeBillboard({
   artisan,
+  banners: initialBanners,
   onOpen,
 }: {
   artisan: Artisan | null;
+  /* Read on the server alongside the register, so the carousel is in the HTML
+     rather than appearing a round trip after it. Absent means the server read
+     failed and the hook fetches from the browser, as it used to. */
+  banners?: Banner[];
   onOpen: () => void;
 }) {
-  const { banners, error } = useBanners();
+  const { banners, error } = useBanners(initialBanners);
   const slides = error ? [] : banners;
 
   // One slide either way, so the frame, the scrim and the geometry below are
