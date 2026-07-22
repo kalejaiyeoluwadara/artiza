@@ -67,15 +67,5 @@ export function PaymentReturn() {
     );
   }
 
-  return (
-    <>
-      {/* Something has to occupy the page behind the dialog — a bare scrim
-          over nothing reads as a broken screen. */}
-      <div className="mx-auto w-full max-w-md px-4 py-20 text-center">
-        <p className="caption">Artiza</p>
-      </div>
-
-      <PaymentVerification state={state} onRetry={retry} onDone={handleDone} />
-    </>
-  );
+  return <PaymentVerification state={state} onRetry={retry} onDone={handleDone} />;
 }
