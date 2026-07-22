@@ -88,28 +88,6 @@ export const TRADE_SHORT_LABELS: Record<Trade, string> = {
 /** Price of one contact unlock, in kobo-free naira. */
 export const UNLOCK_PRICE = 500;
 
-/**
- * Photography lives on Unsplash until the team's own shoots land. Sources are
- * requested pre-sized so next/image has a sane original to work from — the
- * portrait crop is face-aware, work photos crop on the subject.
- */
-const PHOTO_HOST = "https://images.unsplash.com/photo-";
-
-function scene(id: string): string {
-  return `${PHOTO_HOST}${id}?w=1200&h=800&fit=crop&auto=format&q=70`;
-}
-
-/** Fallback cover when an artisan has no portfolio photos yet. */
-export const TRADE_COVERS: Record<Trade, string> = {
-  plumber: scene("1676210134188-4c05dd172f89"),
-  "solar-installer": scene("1660330589257-813305a4a383"),
-  tiler: scene("1523413555809-0fb1d4da238d"),
-  carpenter: scene("1590880795696-20c7dfadacde"),
-  electrician: scene("1621905252472-943afaa20e20"),
-  painter: scene("1567113463300-102a7eb3cb26"),
-  laundry: scene("1548768041-2fceab4c0b85"),
-};
-
 export interface Banner {
   id: string;
   /** Two or three words. The banner is a picture with a label, not a poster. */

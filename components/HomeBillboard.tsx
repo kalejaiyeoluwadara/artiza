@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, ChevronRight, Plus } from "lucide-react";
-import { Artisan, Banner, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
+import { ArrowRight } from "lucide-react";
+import { Banner } from "../lib/artisans";
 import { useBanners } from "../lib/useData";
-import { useFavorites } from "../lib/useFavorites";
 
 /** How long a slide holds before the rail advances itself. */
 const DWELL = 6000;
@@ -22,29 +21,24 @@ const RESUME = 4000;
  * only thing on this screen with a price on it, and the rails below already
  * do the work of arguing for individual artisans.
  *
- * Promotion is still the thing the page can do without: if the offers read
- * fails or comes back empty, the frame doesn't apologise or collapse, it falls
- * back to a spotlight on the top-ranked artisan. Home always opens on
- * something.
+ * Promotion is the one thing the page can genuinely do without, so there is no
+ * stand-in: while the offers read is in flight, and if it comes back empty or
+ * fails, the billboard is simply absent and the rails move up. It used to fall
+ * back to a spotlight on the top-ranked artisan, which meant that on a slow
+ * connection a placeholder appeared first and the real offer replaced it a
+ * moment later — the page appearing to change its mind about what it sells.
+ * Nothing, briefly, is better than something untrue.
  */
 export function HomeBillboard({
-  artisan,
   banners: initialBanners,
-  onOpen,
 }: {
-  artisan: Artisan | null;
   /* Read on the server alongside the register, so the carousel is in the HTML
      rather than appearing a round trip after it. Absent means the server read
      failed and the hook fetches from the browser, as it used to. */
   banners?: Banner[];
-  onOpen: () => void;
 }) {
   const { banners, error } = useBanners(initialBanners);
-  const slides = error ? [] : banners;
-
-  // One slide either way, so the frame, the scrim and the geometry below are
-  // written once and never branch.
-  const count = slides.length > 0 ? slides.length : artisan ? 1 : 0;
+  const count = error ? 0 : banners.length;
 
   const railRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
@@ -87,12 +81,10 @@ export function HomeBillboard({
 
   if (count === 0) return null;
 
-  const promoting = slides.length > 0;
-
   return (
     <section
-      aria-label={promoting ? "Offers" : "Featured artisan"}
-      aria-roledescription={promoting ? "carousel" : undefined}
+      aria-label="Offers"
+      aria-roledescription="carousel"
       className="relative pt-2"
       onPointerDown={hold}
       onPointerUp={release}
@@ -106,20 +98,11 @@ export function HomeBillboard({
         ref={railRef}
         className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto"
       >
-        {promoting
-          ? slides.map((banner, i) => (
-              <Slide key={banner.id} image={banner.image} priority={i === 0}>
-                <BannerContent banner={banner} />
-              </Slide>
-            ))
-          : artisan && (
-              <Slide
-                image={artisan.work[0] ?? TRADE_COVERS[artisan.trade]}
-                priority
-              >
-                <ArtisanContent artisan={artisan} onOpen={onOpen} />
-              </Slide>
-            )}
+        {banners.map((banner, i) => (
+          <Slide key={banner.id} image={banner.image} priority={i === 0}>
+            <BannerContent banner={banner} />
+          </Slide>
+        ))}
       </div>
 
     </section>
@@ -224,76 +207,3 @@ function BannerContent({ banner }: { banner: Banner }) {
   );
 }
 
-/**
- * The fallback slide. Same frame, but the subject is a person rather than a
- * price, so the credentials row stands in for the offer body and the primary
- * action is View profile — the catalogue is still for choosing, and the sheet
- * is still where buying happens.
- */
-function ArtisanContent({
-  artisan,
-  onOpen,
-}: {
-  artisan: Artisan;
-  onOpen: () => void;
-}) {
-  const { isFavorite, toggle, ready } = useFavorites();
-  const saved = ready && isFavorite(artisan.id);
-
-  return (
-    <>
-      <p className="text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-sub">
-        <span className="text-accent">Verified</span> · Ilisan
-      </p>
-
-      <h2 className="display mt-1.5 text-ink">
-        {artisan.name}
-      </h2>
-
-      {/* Netflix's genre row, read as credentials. The middots are decoration,
-          so they're hidden rather than announced between every item. */}
-      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.8125rem] font-medium text-ink md:justify-start md:text-[0.9375rem]">
-        {[
-          TRADE_LABELS[artisan.trade],
-          `${artisan.yearsExperience} yrs`,
-          `${artisan.jobsCompleted} jobs`,
-          `${artisan.rating.toFixed(1)} rating`,
-        ].map((item, index) => (
-          <span key={item} className="flex items-center gap-2">
-            {index > 0 && (
-              <span aria-hidden className="text-faint">
-                ·
-              </span>
-            )}
-            {item}
-          </span>
-        ))}
-      </p>
-
-      <div className="mt-4 flex w-full max-w-sm items-center gap-2.5 md:mt-6 md:w-auto">
-        <button
-          type="button"
-          onClick={onOpen}
-          className="pressable flex flex-1 items-center justify-center gap-1 rounded-md bg-card px-5 py-2.5 text-[0.9375rem] font-bold text-ink"
-        >
-          View profile
-          <ChevronRight size={17} strokeWidth={2.6} aria-hidden />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => toggle(artisan.id)}
-          aria-pressed={saved}
-          className="pressable flex flex-1 items-center justify-center gap-1.5 rounded-md bg-fill px-5 py-2.5 text-[0.9375rem] font-bold text-ink"
-        >
-          {saved ? (
-            <Check size={17} strokeWidth={2.6} aria-hidden />
-          ) : (
-            <Plus size={17} strokeWidth={2.6} aria-hidden />
-          )}
-          {saved ? "Saved" : "Save"}
-        </button>
-      </div>
-    </>
-  );
-}

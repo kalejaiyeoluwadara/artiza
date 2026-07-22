@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { BadgeCheck, Sparkle, Star, TrendingUp } from "lucide-react";
-import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
+import { Artisan, TRADE_LABELS } from "../lib/artisans";
 import { Avatar } from "./ArtisanCard";
+import { ArtisanCover } from "./ArtisanCover";
 
 export type RailKind = "trending" | "new" | "top-rated";
 
@@ -73,8 +73,6 @@ function RailCard({
   kind: RailKind;
   onOpen: () => void;
 }) {
-  const cover = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
-
   return (
     <button
       type="button"
@@ -82,10 +80,8 @@ function RailCard({
       className="pressable group flex h-full w-44 flex-col overflow-hidden rounded-2xl bg-card text-left"
     >
       <div className="relative aspect-4/3 w-full overflow-hidden bg-fill">
-        <Image
-          src={cover}
-          alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
-          fill
+        <ArtisanCover
+          artisan={artisan}
           sizes="176px"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
         />

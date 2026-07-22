@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
+import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import { ArtisanCover } from "./ArtisanCover";
 import { FavoriteButton } from "./FavoriteButton";
 
 /**
@@ -39,8 +39,6 @@ export function Poster({
   width?: string;
   onOpen: () => void;
 }) {
-  const cover = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
-
   return (
     // The heart is its own control, so it sits beside the card's button rather
     // than inside it — nested buttons are invalid and the outer would eat the tap.
@@ -51,10 +49,8 @@ export function Poster({
         className="pressable group relative block w-full overflow-hidden rounded-lg bg-fill text-left"
       >
         <div className="relative aspect-2/3 w-full">
-          <Image
-            src={cover}
-            alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
-            fill
+          <ArtisanCover
+            artisan={artisan}
             sizes="(min-width: 1024px) 288px, (min-width: 640px) 240px, 192px"
             className="object-cover"
           />

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Phone,
@@ -19,11 +18,12 @@ import {
 } from "lucide-react";
 import { CreditCoinIcon } from "./CreditCoinIcon";
 import { PageHeader } from "./PageHeader";
-import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
+import { Artisan, TRADE_LABELS } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
 import { useArtisanContact } from "../lib/useArtisanContact";
 import { useUnlocks } from "../context/UnlocksContext";
 import { Avatar } from "./ArtisanCard";
+import { ArtisanCover } from "./ArtisanCover";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { RatingModal } from "./RatingModal";
 export function UnlockedScreen() {
@@ -241,7 +241,6 @@ function UnlockedCard({
   onOpen: () => void;
 }) {
   const { details, loading } = useArtisanContact(artisan.id, true);
-  const coverSrc = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
   const phone = details?.phone;
 
   return (
@@ -252,10 +251,8 @@ function UnlockedCard({
         onClick={onOpen}
         className="pressable group relative w-full overflow-hidden bg-fill md:aspect-[16/10]"
       >
-        <Image
-          src={coverSrc}
-          alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
-          fill
+        <ArtisanCover
+          artisan={artisan}
           sizes="(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
         />

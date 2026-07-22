@@ -1,13 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import { BadgeCheck, Star } from "lucide-react";
 import {
   Artisan,
   Filters,
   NO_FILTERS,
-  TRADE_COVERS,
   TRADE_LABELS,
   activeFilterCount,
   filterArtisans,
@@ -19,6 +17,7 @@ import {
 import { useArtisans } from "../lib/useData";
 import { useUnlocks } from "../context/UnlocksContext";
 import { ArtisanCard, Avatar } from "./ArtisanCard";
+import { ArtisanCover } from "./ArtisanCover";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { DiscoveryRail } from "./DiscoveryRail";
 import {
@@ -267,18 +266,14 @@ function FeaturedCard({
   artisan: Artisan;
   onOpen: () => void;
 }) {
-  const cover = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
-
   return (
     <button
       type="button"
       onClick={onOpen}
       className="pressable group relative flex h-56 w-64 flex-col justify-end overflow-hidden rounded-2xl bg-fill p-4 text-left"
     >
-      <Image
-        src={cover}
-        alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
-        fill
+      <ArtisanCover
+        artisan={artisan}
         sizes="256px"
         className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
       />

@@ -2,12 +2,8 @@
 
 import Image from "next/image";
 import { BadgeCheck, ChevronRight, MapPin, Star } from "lucide-react";
-import {
-  Artisan,
-  TRADE_COVERS,
-  TRADE_LABELS,
-  UNLOCK_PRICE,
-} from "../lib/artisans";
+import { Artisan, TRADE_LABELS, UNLOCK_PRICE } from "../lib/artisans";
+import { ArtisanCover } from "./ArtisanCover";
 import { FavoriteButton } from "./FavoriteButton";
 
 /**
@@ -119,18 +115,14 @@ export function ArtisanCard({
 }
 
 /**
- * The artisan's own work when we have it, the trade's stock scene when we
- * don't — the card is never a blank slab.
+ * The artisan's own work when we have it, the trade's illustration when we
+ * don't — the card is never a blank slab, and never someone else's job.
  */
 function CoverPhoto({ artisan }: { artisan: Artisan }) {
-  const src = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
-
   return (
     <div className="relative aspect-16/10 w-full overflow-hidden bg-fill">
-      <Image
-        src={src}
-        alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
-        fill
+      <ArtisanCover
+        artisan={artisan}
         sizes="(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw"
         className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
       />
