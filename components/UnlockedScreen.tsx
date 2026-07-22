@@ -20,12 +20,14 @@ import {
 import { CreditCoinIcon } from "./CreditCoinIcon";
 import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
-import { useUnlocks } from "../lib/useUnlocks";
+import { useArtisanContact } from "../lib/useArtisanContact";
+import { useUnlocks } from "../context/UnlocksContext";
 import { Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { RatingModal } from "./RatingModal";
 export function UnlockedScreen() {
-  const { isUnlocked, unlock, unlockedIds, credits, ready, submitRating, userRatings } = useUnlocks();
+  const { isUnlocked, unlock, unlockedIds, credits, ready, submitRating, hasReviewed } =
+    useUnlocks();
   const { artisans, loading } = useArtisans();
   const [selected, setSelected] = useState<Artisan | null>(null);
   const [ratingArtisan, setRatingArtisan] = useState<Artisan | null>(null);
@@ -84,7 +86,7 @@ export function UnlockedScreen() {
     );
   }
 
-  const unratedArtisans = unlocked.filter((a) => !userRatings[a.id]);
+  const unratedArtisans = unlocked.filter((a) => !hasReviewed(a.id));
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
@@ -179,129 +181,16 @@ export function UnlockedScreen() {
         )}
 
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((artisan) => {
-            const ratingObj = userRatings[artisan.id];
-            const cleanPhone = artisan.phone.replace(/[^0-9+]/g, "");
-            const coverSrc = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
-
-            return (
-              <li key={artisan.id} className="flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-                {/* Work photo cover */}
-                <button
-                  type="button"
-                  onClick={() => setSelected(artisan)}
-                  className="pressable group relative w-full md:aspect-[16/10] w-full overflow-hidden bg-fill"
-                >
-                  <Image
-                    src={coverSrc}
-                    alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
-                    fill
-                    sizes="(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                  />
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/30"
-                  />
-                  <span className="chrome absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
-                    {TRADE_LABELS[artisan.trade]}
-                  </span>
-                  {ratingObj && (
-                    <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm">
-                      <Star size={11} fill="currentColor" className="text-accent" />
-                      You rated {ratingObj.rating}★
-                    </span>
-                  )}
-                </button>
-
-                {/* Profile info */}
-                <div className="flex flex-col p-4">
-                  <button
-                    type="button"
-                    onClick={() => setSelected(artisan)}
-                    className="pressable flex items-start gap-3 text-left"
-                  >
-                    <Avatar
-                      name={artisan.name}
-                      src={artisan.photo}
-                      size="size-12 text-base"
-                      className="relative z-10  ring-[3px] ring-card"
-                    />
-                    <div className="min-w-0 flex-1 pt-0.5">
-                      <h3 className="headline flex items-center gap-1.5 text-ink">
-                        <span className="truncate">{artisan.name}</span>
-                        <BadgeCheck
-                          size={15}
-                          strokeWidth={2.2}
-                          className="shrink-0 text-accent"
-                          aria-label="Verified"
-                        />
-                      </h3>
-                      <p className="caption mt-0.5 flex items-center gap-1">
-                        <MapPin size={11} strokeWidth={2} />
-                        {artisan.location}
-                      </p>
-                    </div>
-                  </button>
-
-                  {/* Stats row */}
-                  <div className="figure mt-3 flex items-center gap-3 border-t border-line pt-3 text-[13px] text-ink">
-                    <span className="flex items-center gap-1">
-                      <Star size={12} strokeWidth={2.2} fill="currentColor" className="text-accent" />
-                      {artisan.rating.toFixed(1)}
-                      <span className="font-normal text-sub">({artisan.reviewCount})</span>
-                    </span>
-                    <span className="h-3 w-px bg-line" aria-hidden />
-                    <span className="flex items-center gap-1">
-                      <Clock size={11} strokeWidth={2.2} className="text-sub" />
-                      {artisan.yearsExperience} yrs
-                    </span>
-                    <span className="h-3 w-px bg-line" aria-hidden />
-                    <span className="flex items-center gap-1">
-                      <Briefcase size={11} strokeWidth={2.2} className="text-sub" />
-                      {artisan.jobsCompleted} jobs
-                    </span>
-                  </div>
-
-                  {/* Contact actions */}
-                  <div className="mt-3 flex items-center gap-2">
-                    <a
-                      href={`tel:+${cleanPhone}`}
-                      className="pressable flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-sm font-semibold text-white shadow-[0_1px_3px_rgba(13,122,95,0.25)]"
-                    >
-                      <Phone size={14} />
-                      Call
-                    </a>
-                    <a
-                      href={`https://wa.me/${cleanPhone}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="pressable flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366]/10 py-2.5 text-sm font-semibold text-[#25D366]"
-                    >
-                      <MessageCircle size={14} />
-                      WhatsApp
-                    </a>
-                    <button
-                      onClick={() => handleCopyPhone(artisan.phone, artisan.id)}
-                      title="Copy phone number"
-                      className="pressable flex size-10 shrink-0 items-center justify-center rounded-full bg-fill text-sub hover:text-ink"
-                    >
-                      {copiedId === artisan.id ? (
-                        <Check size={15} className="text-accent" />
-                      ) : (
-                        <Copy size={15} />
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Response time */}
-                  <p className="caption mt-2.5 text-center text-[11px] text-faint">
-                    {artisan.contact.respondsIn}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
+          {filtered.map((artisan) => (
+            <UnlockedCard
+              key={artisan.id}
+              artisan={artisan}
+              rated={hasReviewed(artisan.id)}
+              copiedId={copiedId}
+              onCopy={handleCopyPhone}
+              onOpen={() => setSelected(artisan)}
+            />
+          ))}
         </ul>
       </div>
 
@@ -309,7 +198,7 @@ export function UnlockedScreen() {
         artisan={selected}
         onClose={() => setSelected(null)}
         unlocked={selected ? isUnlocked(selected.id) : false}
-        onUnlock={() => selected && unlock(selected.id, selected.name, TRADE_LABELS[selected.trade])}
+        onUnlock={() => selected && unlock(selected.id, selected.name)}
       />
 
       <RatingModal
@@ -318,5 +207,157 @@ export function UnlockedScreen() {
         onSubmit={submitRating}
       />
     </div>
+  );
+}
+
+/**
+ * One unlocked contact.
+ *
+ * Its own component because each row loads its own sealed details, and a hook
+ * per row is what gives each one an independent request that cancels cleanly
+ * when the list re-filters or the screen unmounts.
+ */
+function UnlockedCard({
+  artisan,
+  rated,
+  copiedId,
+  onCopy,
+  onOpen,
+}: {
+  artisan: Artisan;
+  rated: boolean;
+  copiedId: string | null;
+  onCopy: (phone: string, id: string) => void;
+  onOpen: () => void;
+}) {
+  const { details, loading } = useArtisanContact(artisan.id, true);
+  const coverSrc = artisan.work[0] ?? TRADE_COVERS[artisan.trade];
+  const phone = details?.phone;
+
+  return (
+    <li className="flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      {/* Work photo cover */}
+      <button
+        type="button"
+        onClick={onOpen}
+        className="pressable group relative w-full overflow-hidden bg-fill md:aspect-[16/10]"
+      >
+        <Image
+          src={coverSrc}
+          alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
+          fill
+          sizes="(min-width: 1024px) 340px, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/30"
+        />
+        <span className="chrome absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
+          {TRADE_LABELS[artisan.trade]}
+        </span>
+        {rated && (
+          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm">
+            <Star size={11} fill="currentColor" className="text-accent" />
+            Rated
+          </span>
+        )}
+      </button>
+
+      {/* Profile info */}
+      <div className="flex flex-col p-4">
+        <button
+          type="button"
+          onClick={onOpen}
+          className="pressable flex items-start gap-3 text-left"
+        >
+          <Avatar
+            name={artisan.name}
+            src={artisan.photo}
+            size="size-12 text-base"
+            className="relative z-10 ring-[3px] ring-card"
+          />
+          <div className="min-w-0 flex-1 pt-0.5">
+            <h3 className="headline flex items-center gap-1.5 text-ink">
+              <span className="truncate">{artisan.name}</span>
+              <BadgeCheck
+                size={15}
+                strokeWidth={2.2}
+                className="shrink-0 text-accent"
+                aria-label="Verified"
+              />
+            </h3>
+            <p className="caption mt-0.5 flex items-center gap-1">
+              <MapPin size={11} strokeWidth={2} />
+              {artisan.location}
+            </p>
+          </div>
+        </button>
+
+        {/* Stats row */}
+        <div className="figure mt-3 flex items-center gap-3 border-t border-line pt-3 text-[13px] text-ink">
+          <span className="flex items-center gap-1">
+            <Star size={12} strokeWidth={2.2} fill="currentColor" className="text-accent" />
+            {artisan.rating.toFixed(1)}
+            <span className="font-normal text-sub">({artisan.reviewCount})</span>
+          </span>
+          <span className="h-3 w-px bg-line" aria-hidden />
+          <span className="flex items-center gap-1">
+            <Clock size={11} strokeWidth={2.2} className="text-sub" />
+            {artisan.yearsExperience} yrs
+          </span>
+          <span className="h-3 w-px bg-line" aria-hidden />
+          <span className="flex items-center gap-1">
+            <Briefcase size={11} strokeWidth={2.2} className="text-sub" />
+            {artisan.jobsCompleted} jobs
+          </span>
+        </div>
+
+        {/* Contact actions. Held back until the number is actually in hand —
+            a Call button that dials nothing is worse than one that waits. */}
+        {phone ? (
+          <div className="mt-3 flex items-center gap-2">
+            <a
+              href={`tel:+${phone}`}
+              className="pressable flex flex-1 items-center justify-center gap-2 rounded-full bg-accent py-2.5 text-sm font-semibold text-white shadow-[0_1px_3px_rgba(13,122,95,0.25)]"
+            >
+              <Phone size={14} />
+              Call
+            </a>
+            <a
+              href={`https://wa.me/${details?.contact.whatsapp ?? phone}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pressable flex flex-1 items-center justify-center gap-2 rounded-full bg-accent-soft py-2.5 text-sm font-semibold text-accent"
+            >
+              <MessageCircle size={14} />
+              WhatsApp
+            </a>
+            <button
+              type="button"
+              onClick={() => onCopy(phone, artisan.id)}
+              aria-label={`Copy ${artisan.name}'s phone number`}
+              className="pressable flex size-10 shrink-0 items-center justify-center rounded-full bg-fill text-sub hover:text-ink"
+            >
+              {copiedId === artisan.id ? (
+                <Check size={15} className="text-accent" />
+              ) : (
+                <Copy size={15} />
+              )}
+            </button>
+          </div>
+        ) : (
+          <div className="mt-3 flex items-center gap-2" aria-hidden>
+            <span className="skeleton h-10 flex-1 rounded-full" />
+            <span className="skeleton h-10 flex-1 rounded-full" />
+            <span className="skeleton size-10 shrink-0 rounded-full" />
+          </div>
+        )}
+
+        <p className="caption mt-2.5 text-center text-[11px] text-faint">
+          {loading && !details ? "Opening contact…" : artisan.respondsIn}
+        </p>
+      </div>
+    </li>
   );
 }

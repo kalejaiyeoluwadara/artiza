@@ -1,30 +1,71 @@
-import { ARTISANS, Artisan, BANNERS, Banner } from "./artisans";
+import { publicApi } from "./api";
+import type { Artisan, Banner } from "./artisans";
+import type { ArtisanSummary, BannerItem } from "./api/types";
 
 /**
- * Where the register comes from. One function, so the database swap is one
- * edit: replace the body with the fetch and every screen upstream already
- * renders the loading, error and empty branches it needs.
+ * Where the register comes from — now the Artiza API rather than a fixture.
  *
- * It returns the whole register rather than a filtered slice on purpose.
- * Ilisan is one town — the list is small enough to hold in memory, and
- * filtering client-side keeps a chip tap instant instead of dropping the
- * list back into skeletons on every trade change. When a second city
- * lands, this grows a query argument and the callers pass their filters.
+ * The mapping below is nearly an identity, and that is deliberate: the API's
+ * public artisan shape was defined to match what these screens already
+ * rendered. It stays as an explicit function anyway, so the day the two
+ * diverge there is one obvious place to reconcile them rather than a cast
+ * that silently lies.
  */
-export async function fetchArtisans(): Promise<Artisan[]> {
-  return ARTISANS;
+function toArtisan(summary: ArtisanSummary): Artisan {
+  return {
+    id: summary.id,
+    name: summary.name,
+    trade: summary.trade,
+    location: summary.location,
+    yearsExperience: summary.yearsExperience,
+    jobsCompleted: summary.jobsCompleted,
+    recentUnlocks: summary.recentUnlocks,
+    rating: summary.rating,
+    reviewCount: summary.reviewCount,
+    photo: summary.photo,
+    work: summary.work,
+    featured: summary.featured,
+    verifiedSince: summary.verifiedSince,
+    note: summary.note,
+    services: summary.services,
+    respondsIn: summary.respondsIn,
+    availability: summary.availability,
+  };
+}
+
+function toBanner(item: BannerItem): Banner {
+  return {
+    id: item.id,
+    title: item.title,
+    body: item.body,
+    cta: item.cta,
+    href: item.href,
+    image: item.image,
+  };
 }
 
 /**
- * A single profile, for the detail sheet and any future deep link. Today
- * the register is already in memory so callers rarely need it; with a
- * database it becomes the row read.
+ * The whole active register. It stays unfiltered on purpose — Ilisan is one
+ * town, the list fits in memory, and filtering client-side keeps a chip tap
+ * instant instead of dropping the list back into skeletons on every change.
+ * When a second city lands, this grows a query argument.
  */
-export async function fetchArtisan(id: string): Promise<Artisan | null> {
-  return ARTISANS.find((a) => a.id === id) ?? null;
+export async function fetchArtisans(signal?: AbortSignal): Promise<Artisan[]> {
+  const artisans = await publicApi.artisans.list({}, signal);
+  return artisans.map(toArtisan);
+}
+
+/** A single profile, for a deep link or a shared card. */
+export async function fetchArtisan(
+  id: string,
+  signal?: AbortSignal,
+): Promise<Artisan | null> {
+  const artisan = await publicApi.artisans.get(id, signal);
+  return toArtisan(artisan);
 }
 
 /** The promotional rail. Admin-managed too, so it reads the same way. */
-export async function fetchBanners(): Promise<Banner[]> {
-  return BANNERS;
+export async function fetchBanners(signal?: AbortSignal): Promise<Banner[]> {
+  const banners = await publicApi.banners.list(signal);
+  return banners.map(toBanner);
 }

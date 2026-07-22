@@ -10,8 +10,8 @@ import type {
 
 export const unlocksResource = (token?: string) => ({
   /** Artisan ids this customer has already paid for. */
-  list(): Promise<UnlockedIds> {
-    return request<UnlockedIds>("/unlocks", { token, cache: "no-store" });
+  list(signal?: AbortSignal): Promise<UnlockedIds> {
+    return request<UnlockedIds>("/unlocks", { token, cache: "no-store", signal });
   },
 
   /**
@@ -36,11 +36,16 @@ export const unlocksResource = (token?: string) => ({
     });
   },
 
-  transactions(page = 1, limit = 20): Promise<Paginated<TransactionItem>> {
+  transactions(
+    page = 1,
+    limit = 20,
+    signal?: AbortSignal,
+  ): Promise<Paginated<TransactionItem>> {
     return requestPaginated<TransactionItem>("/transactions", {
       query: { page, limit },
       token,
       cache: "no-store",
+      signal,
     });
   },
 

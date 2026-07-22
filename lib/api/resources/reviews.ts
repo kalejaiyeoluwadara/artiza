@@ -20,10 +20,11 @@ export const reviewsResource = (token?: string) => ({
   },
 
   /** Unlocked but not yet reviewed — what the rating prompts are built from. */
-  pending(): Promise<PendingReviews> {
+  pending(signal?: AbortSignal): Promise<PendingReviews> {
     return request<PendingReviews>("/reviews/pending", {
       token,
       cache: "no-store",
+      signal,
     });
   },
 });

@@ -24,16 +24,18 @@ export const artisansResource = (token?: string) => ({
    * rails still happen client-side — Ilisan is one town, and a chip tap that
    * re-renders from memory beats one that drops back into skeletons.
    */
-  list(query: ArtisanQuery = {}): Promise<ArtisanSummary[]> {
+  list(query: ArtisanQuery = {}, signal?: AbortSignal): Promise<ArtisanSummary[]> {
     return request<ArtisanSummary[]>("/artisans", {
       query: { ...query },
       next: { revalidate: REGISTER_REVALIDATE, tags: ["artisans"] },
+      signal,
     });
   },
 
-  get(id: string): Promise<ArtisanSummary> {
+  get(id: string, signal?: AbortSignal): Promise<ArtisanSummary> {
     return request<ArtisanSummary>(`/artisans/${id}`, {
       next: { revalidate: REGISTER_REVALIDATE, tags: ["artisans", `artisan:${id}`] },
+      signal,
     });
   },
 
@@ -41,17 +43,24 @@ export const artisansResource = (token?: string) => ({
    * The sealed half. 403 until this customer has unlocked them — catch
    * `ApiError.isForbidden` and show the unlock prompt rather than an error.
    */
-  contact(id: string): Promise<ArtisanContact> {
+  contact(id: string, signal?: AbortSignal): Promise<ArtisanContact> {
     return request<ArtisanContact>(`/artisans/${id}/contact`, {
       token,
       cache: "no-store",
+      signal,
     });
   },
 
-  reviews(id: string, page = 1, limit = 20): Promise<Paginated<ReviewItem>> {
+  reviews(
+    id: string,
+    page = 1,
+    limit = 20,
+    signal?: AbortSignal,
+  ): Promise<Paginated<ReviewItem>> {
     return requestPaginated<ReviewItem>(`/artisans/${id}/reviews`, {
       query: { page, limit },
       next: { revalidate: REGISTER_REVALIDATE, tags: [`artisan:${id}:reviews`] },
+      signal,
     });
   },
 });

@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import { useArtisanContact } from "../lib/useArtisanContact";
+import { useArtisanReviews } from "../lib/useArtisanReviews";
 import { Avatar } from "./ArtisanCard";
 import { ContactPanel } from "./ContactPanel";
 import { SealedContact } from "./SealedContact";
@@ -19,6 +21,14 @@ export function ArtisanSheet({
   unlocked: boolean;
   onUnlock: () => void;
 }) {
+  // Both halves load on open and are dropped on close — the sealed one only
+  // once the customer has actually paid for it.
+  const { details, loading: loadingDetails } = useArtisanContact(
+    artisan?.id ?? null,
+    unlocked,
+  );
+  const { reviews, loading: loadingReviews } = useArtisanReviews(artisan?.id ?? null);
+
   return (
     <Sheet
       open={artisan !== null}
@@ -85,7 +95,11 @@ export function ArtisanSheet({
               Visited and verified by the Artiza team · {artisan.verifiedSince}
             </p>
 
-            <ContactPanel artisan={artisan} unlocked={unlocked} />
+            <ContactPanel
+              artisan={artisan}
+              unlocked={unlocked}
+              details={details}
+            />
 
             {artisan.work.length > 0 && (
               <Section title="Past work">
@@ -128,14 +142,25 @@ export function ArtisanSheet({
             <Section
               title={`Reviews (${artisan.reviewCount})`}
               note={
-                artisan.reviews.length < artisan.reviewCount
-                  ? `Showing ${artisan.reviews.length} most recent`
+                reviews.length > 0 && reviews.length < artisan.reviewCount
+                  ? `Showing ${reviews.length} most recent`
                   : undefined
               }
             >
+              {loadingReviews ? (
+                <ul className="space-y-2.5" aria-hidden>
+                  {[0, 1].map((n) => (
+                    <li key={n} className="skeleton h-28 rounded-2xl" />
+                  ))}
+                </ul>
+              ) : reviews.length === 0 ? (
+                <p className="caption">
+                  No reviews yet — the first one after a job goes here.
+                </p>
+              ) : (
               <ul className="space-y-2.5">
-                {artisan.reviews.map((review, i) => (
-                  <li key={i} className="rounded-2xl bg-card p-4">
+                {reviews.map((review) => (
+                  <li key={review.id} className="rounded-2xl bg-card p-4">
                     <div className="flex items-center justify-between gap-3">
                       <p className="headline text-ink">{review.author}</p>
                       <span className="caption shrink-0">{review.when}</span>
@@ -163,6 +188,7 @@ export function ArtisanSheet({
                   </li>
                 ))}
               </ul>
+              )}
             </Section>
           </div>
 
@@ -177,6 +203,8 @@ export function ArtisanSheet({
             <SealedContact
               artisan={artisan}
               unlocked={unlocked}
+              details={details}
+              loadingDetails={loadingDetails}
               onUnlock={onUnlock}
             />
           </div>

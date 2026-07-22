@@ -17,7 +17,7 @@ import {
   trendingArtisans,
 } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
-import { useUnlocks } from "../lib/useUnlocks";
+import { useUnlocks } from "../context/UnlocksContext";
 import { ArtisanCard, Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { DiscoveryRail } from "./DiscoveryRail";

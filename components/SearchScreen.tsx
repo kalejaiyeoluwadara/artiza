@@ -12,7 +12,7 @@ import {
 } from "../lib/search";
 import { useArtisans } from "../lib/useData";
 import { useRecentSearches } from "../lib/useRecentSearches";
-import { useUnlocks } from "../lib/useUnlocks";
+import { useUnlocks } from "../context/UnlocksContext";
 import { Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { Skeleton } from "./Skeleton";

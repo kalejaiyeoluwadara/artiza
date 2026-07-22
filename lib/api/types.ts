@@ -87,6 +87,9 @@ export interface ArtisanSummary {
   verifiedSince: string;
   note: string;
   services: string[];
+  /** Public: deciding whether to pay needs to know when they work. */
+  respondsIn: string;
+  availability: string;
 }
 
 /** Everything the ₦500 buys. */

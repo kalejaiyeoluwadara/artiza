@@ -22,7 +22,19 @@ import {
   channelsFor,
   vCardFor,
 } from "../lib/artisans";
+import type { SealedDetails } from "../lib/artisans";
 import { InstagramIcon, WhatsAppIcon } from "./BrandIcons";
+
+/**
+ * What every artisan has, shown masked before payment. The extras — Instagram,
+ * email, a second line — are not listed while locked, because naming them
+ * would leak which ones this particular artisan happens to carry.
+ */
+const LOCKED_CHANNELS: Channel[] = [
+  { kind: "whatsapp", label: "WhatsApp", value: "+234 ••• ••• ••••", href: "#" },
+  { kind: "call", label: "Call", value: "+234 ••• ••• ••••", href: "#" },
+  { kind: "sms", label: "Text", value: "+234 ••• ••• ••••", href: "#" },
+];
 
 /**
  * The full ledger of what ₦500 buys, shown in both states. Locked, the rows
@@ -33,11 +45,18 @@ import { InstagramIcon, WhatsAppIcon } from "./BrandIcons";
 export function ContactPanel({
   artisan,
   unlocked,
+  details,
 }: {
   artisan: Artisan;
   unlocked: boolean;
+  /** The sealed half, once paid for. Absent means the rows stay masked. */
+  details?: SealedDetails | null;
 }) {
-  const channels = channelsFor(artisan);
+  // Locked, the exact channel list isn't known — it lives with the number.
+  // The three every artisan has are shown masked, so the shape of what's for
+  // sale is still visible without leaking which extras this one happens to
+  // have. Once paid, the real list replaces it.
+  const channels = details ? channelsFor(artisan, details) : LOCKED_CHANNELS;
 
   return (
     <section className="mt-6">
@@ -46,7 +65,7 @@ export function ContactPanel({
         <span className="caption shrink-0">
           {unlocked
             ? `${channels.length} ways to reach them`
-            : `${channels.length} channels · sealed`}
+            : "sealed until unlocked"}
         </span>
       </div>
 
@@ -62,19 +81,19 @@ export function ContactPanel({
           part of deciding whether to pay for their number at all. */}
       <dl className="mt-2.5 overflow-hidden rounded-2xl bg-card">
         <Detail icon={<Clock3 size={15} strokeWidth={2} />} label="Response">
-          {artisan.contact.respondsIn}
+          {artisan.respondsIn}
         </Detail>
         <Detail
           icon={<CalendarDays size={15} strokeWidth={2} />}
           label="Available"
           divider
         >
-          {artisan.contact.availability}
+          {artisan.availability}
         </Detail>
       </dl>
 
       {unlocked ? (
-        <SaveToContacts artisan={artisan} />
+        details && <SaveToContacts artisan={artisan} details={details} />
       ) : (
         <p className="caption mt-2.5 flex items-start gap-1.5">
           <ShieldCheck
@@ -222,14 +241,20 @@ function Detail({
  * A vCard, so the contact survives the browser. Built on click rather than
  * held in a data URL, so the file is only made when someone wants it.
  */
-function SaveToContacts({ artisan }: { artisan: Artisan }) {
+function SaveToContacts({
+  artisan,
+  details,
+}: {
+  artisan: Artisan;
+  details: SealedDetails;
+}) {
   const [saved, setSaved] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
   function save() {
-    const blob = new Blob([vCardFor(artisan)], {
+    const blob = new Blob([vCardFor(artisan, details)], {
       type: "text/vcard;charset=utf-8",
     });
     const url = URL.createObjectURL(blob);

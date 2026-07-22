@@ -46,10 +46,6 @@ export interface Artisan {
   recentUnlocks: number;
   rating: number;
   reviewCount: number;
-  /** Stored bare, formatted at render. */
-  phone: string;
-  /** The rest of the sealed detail — handles, hours, second line. */
-  contact: Contact;
   /** Square portrait. Shot by the team on the verification visit. */
   photo: string;
   /** Past work. First one is the card cover, the rest are thumbnails. */
@@ -61,7 +57,20 @@ export interface Artisan {
   note: string;
   /** What this artisan actually takes on. Shown in the detail sheet. */
   services: string[];
-  reviews: Review[];
+  /** Typical reply window. Public — it informs the decision to pay. */
+  respondsIn: string;
+  /** Working days and hours, in the artisan's own words. Public. */
+  availability: string;
+}
+
+/**
+ * The half the ₦500 buys. Deliberately a separate type fetched from a separate
+ * endpoint: the browser is never sent an artisan's number until it has been
+ * paid for, so there is nothing in the page source to read past the paywall.
+ */
+export interface SealedDetails {
+  phone: string;
+  contact: Contact;
 }
 
 export const TRADE_LABELS: Record<Trade, string> = {
@@ -123,379 +132,6 @@ export interface Banner {
   image: string;
 }
 
-/** Promo rail on the home screen. Ordered — first one leads. */
-export const BANNERS: Banner[] = [
-  {
-    id: "b-bundle",
-    title: "3 for ₦1,200",
-    body: "Line up a few artisans at once.",
-    cta: "Get the bundle",
-    href: "/account",
-    image: scene("1523413555809-0fb1d4da238d"),
-  },
-  {
-    id: "b-vetted",
-    title: "Visited, then listed",
-    body: "Every artisan met in person.",
-    cta: "See who's vetted",
-    href: "/search",
-    image: scene("1683115099191-51e617fc5ff1"),
-  },
-  {
-    id: "b-solar",
-    title: "Solar, sized right",
-    body: "Sized before it's quoted.",
-    cta: "Browse installers",
-    href: "/search",
-    image: scene("1660330589257-813305a4a383"),
-  },
-];
-
-export const ARTISANS: Artisan[] = [
-  {
-    id: "a-01",
-    name: "Tunde Bakare",
-    trade: "tiler",
-    location: "Babcock Road",
-    yearsExperience: 8,
-    jobsCompleted: 34,
-    recentUnlocks: 9,
-    rating: 4.8,
-    reviewCount: 21,
-    phone: "2348031234567",
-    contact: {
-      instagram: "tundetiles_ilisan",
-      email: "tunde.bakare@artiza.ng",
-      respondsIn: "Usually replies within an hour",
-      availability: "Mon–Sat, 8am–6pm",
-    },
-    photo: portrait("1522529599102-193c0d76b5b6"),
-    work: [
-      scene("1523413555809-0fb1d4da238d"),
-      scene("1547414857-c9f61632b250"),
-      scene("1595814432848-830b880ecf0e"),
-    ],
-    featured: true,
-    verifiedSince: "Mar 2026",
-    note: "Floor, wall and marble. Works clean and clears the site after.",
-    services: ["Floor tiling", "Wall tiling", "Marble", "Grout repair"],
-    reviews: [
-      {
-        author: "Boluwatife A.",
-        rating: 5,
-        when: "2 weeks ago",
-        text: "Did my living room floor in two days. Lines are dead straight and he swept up before leaving.",
-      },
-      {
-        author: "Emeka N.",
-        rating: 4,
-        when: "1 month ago",
-        text: "Good work overall. Finished a day later than he said, but the finish is solid.",
-      },
-      {
-        author: "Prof. Adesina",
-        rating: 5,
-        when: "2 months ago",
-        text: "Third job I've given him. Consistent every time.",
-      },
-    ],
-  },
-  {
-    id: "a-02",
-    name: "Victor Umeh",
-    trade: "solar-installer",
-    location: "Expressway Junction",
-    yearsExperience: 6,
-    jobsCompleted: 41,
-    recentUnlocks: 14,
-    rating: 4.9,
-    reviewCount: 28,
-    phone: "2348084445556",
-    contact: {
-      whatsapp: "2348084445557",
-      instagram: "umehsolar",
-      email: "victor@umehsolar.ng",
-      altPhone: "2348084445558",
-      respondsIn: "Usually replies same day",
-      availability: "Mon–Sat, 7:30am–7pm",
-    },
-    photo: portrait("1645395375692-502558949baa"),
-    work: [
-      scene("1660330589257-813305a4a383"),
-      scene("1624397640148-949b1732bb0a"),
-      scene("1663321508309-4ceb96a3c791"),
-    ],
-    featured: true,
-    verifiedSince: "Feb 2026",
-    note: "Inverter sizing, panel mounting and battery swaps. Certified.",
-    services: ["Inverter sizing", "Panel mounting", "Battery swap", "Fault diagnosis"],
-    reviews: [
-      {
-        author: "Mrs. Bankole",
-        rating: 5,
-        when: "3 weeks ago",
-        text: "Found the fault in our inverter in about half an hour after two other people failed.",
-      },
-      {
-        author: "Engr. Davies",
-        rating: 5,
-        when: "1 month ago",
-        text: "Sized and mounted a 3.5kVA system. Explained the load maths clearly before quoting.",
-      },
-    ],
-  },
-  {
-    id: "a-03",
-    name: "Segun Alao",
-    trade: "carpenter",
-    location: "Irolu Road",
-    yearsExperience: 12,
-    jobsCompleted: 57,
-    recentUnlocks: 6,
-    rating: 4.7,
-    reviewCount: 39,
-    phone: "2348062223334",
-    contact: {
-      instagram: "alaowoodworks",
-      email: "segunalao.works@gmail.com",
-      respondsIn: "Usually replies within 2 hours",
-      availability: "Mon–Fri, 8am–5pm",
-    },
-    photo: portrait("1688240817677-d28b8e232dd4"),
-    work: [
-      scene("1590880795696-20c7dfadacde"),
-      scene("1683115099191-51e617fc5ff1"),
-      scene("1683115098516-9b8d5c643b5b"),
-    ],
-    featured: false,
-    verifiedSince: "Jan 2026",
-    note: "Wardrobes, roof trusses and door hanging. Quotes before starting.",
-    services: ["Wardrobes", "Roof trusses", "Door hanging", "Furniture repair"],
-    reviews: [
-      {
-        author: "Mide F.",
-        rating: 5,
-        when: "1 month ago",
-        text: "Rebuilt our kitchen cabinet doors. Looks better than the original.",
-      },
-      {
-        author: "Deji O.",
-        rating: 4,
-        when: "2 months ago",
-        text: "Quality woodwork. Slightly pricier than others but you can see where it goes.",
-      },
-    ],
-  },
-  {
-    id: "a-04",
-    name: "Kehinde Salami",
-    trade: "plumber",
-    location: "Town Centre",
-    yearsExperience: 9,
-    jobsCompleted: 46,
-    recentUnlocks: 17,
-    rating: 4.6,
-    reviewCount: 30,
-    phone: "2348027771234",
-    contact: {
-      altPhone: "2348027771235",
-      respondsIn: "Usually picks up first try",
-      availability: "Daily, 7am–8pm · emergencies any time",
-    },
-    photo: portrait("1562173650-f61426fbe683"),
-    work: [
-      scene("1676210134188-4c05dd172f89"),
-      scene("1620653713380-7a34b773fef8"),
-      scene("1517646287270-a5a9ca602e5c"),
-    ],
-    featured: false,
-    verifiedSince: "Feb 2026",
-    note: "Burst pipes, pumps and soakaway. Answers late calls.",
-    services: ["Burst pipes", "Pump install", "Soakaway", "Tap and cistern"],
-    reviews: [
-      {
-        author: "Yinka S.",
-        rating: 5,
-        when: "1 week ago",
-        text: "Called him at 9pm for a burst pipe and he came. Fixed it same night.",
-      },
-      {
-        author: "Simi L.",
-        rating: 4,
-        when: "3 weeks ago",
-        text: "Sorted our pump. Neat work, fair price.",
-      },
-    ],
-  },
-  {
-    id: "a-05",
-    name: "Funmi Adebayo",
-    trade: "painter",
-    location: "Palace Area",
-    yearsExperience: 7,
-    jobsCompleted: 23,
-    recentUnlocks: 5,
-    rating: 4.6,
-    reviewCount: 16,
-    phone: "2348073334445",
-    contact: {
-      instagram: "funmi.finishes",
-      email: "funmi.adebayo@artiza.ng",
-      respondsIn: "Usually replies within an hour",
-      availability: "Mon–Sat, 8am–6pm",
-    },
-    photo: portrait("1620424037570-15137a4a562d"),
-    work: [
-      scene("1567113463300-102a7eb3cb26"),
-      scene("1562259949-e8e7689d7828"),
-      scene("1572627614522-1c56af1d9d72"),
-    ],
-    featured: false,
-    verifiedSince: "Apr 2026",
-    note: "Screeding and exterior work. Covers floors before she starts.",
-    services: ["Screeding", "Interior painting", "Exterior painting", "Wallpaper"],
-    reviews: [
-      {
-        author: "Chief Osoba",
-        rating: 5,
-        when: "1 month ago",
-        text: "Painted the whole duplex. Covered every floor before starting, not a single stain.",
-      },
-      {
-        author: "Damilola A.",
-        rating: 4,
-        when: "2 months ago",
-        text: "Good finish and helpful with colour choices.",
-      },
-    ],
-  },
-  {
-    id: "a-06",
-    name: "Bisi Ogunleye",
-    trade: "laundry",
-    location: "Toll Gate",
-    yearsExperience: 5,
-    jobsCompleted: 62,
-    recentUnlocks: 21,
-    rating: 4.9,
-    reviewCount: 44,
-    phone: "2348091112223",
-    contact: {
-      instagram: "bisilaundry_ilisan",
-      email: "bisilaundry@gmail.com",
-      respondsIn: "Usually replies within 30 minutes",
-      availability: "Mon–Sun, 7am–7pm · pickup by request",
-    },
-    photo: portrait("1534470717-233b39a41c54"),
-    work: [
-      scene("1548768041-2fceab4c0b85"),
-      scene("1582735689369-4fe89db7114c"),
-      scene("1523212727988-82c430c79c8e"),
-    ],
-    featured: false,
-    verifiedSince: "Jan 2026",
-    note: "Pickup and delivery within Ilisan. Two-day turnaround.",
-    services: ["Wash and fold", "Ironing", "Pickup and delivery", "Duvets"],
-    reviews: [
-      {
-        author: "Sarah K.",
-        rating: 5,
-        when: "5 days ago",
-        text: "Picks up Monday, back Wednesday, folded properly. Never lost an item.",
-      },
-      {
-        author: "Abiola J.",
-        rating: 5,
-        when: "3 weeks ago",
-        text: "Did our duvets and curtains. Came back smelling clean, not chemical.",
-      },
-    ],
-  },
-  {
-    id: "a-07",
-    name: "Musa Danjuma",
-    trade: "electrician",
-    location: "Babcock Road",
-    yearsExperience: 11,
-    jobsCompleted: 38,
-    recentUnlocks: 11,
-    rating: 4.7,
-    reviewCount: 25,
-    phone: "2348055556667",
-    contact: {
-      whatsapp: "2348055556668",
-      email: "musa.danjuma@artiza.ng",
-      respondsIn: "Usually replies within 2 hours",
-      availability: "Daily, 8am–8pm · call-outs after hours",
-    },
-    photo: portrait("1621905252507-b35492cc74b4"),
-    work: [
-      scene("1621905252472-943afaa20e20"),
-      scene("1607472586893-edb57bdc0e39"),
-      scene("1585704032915-c3400ca199e7"),
-    ],
-    featured: false,
-    verifiedSince: "Mar 2026",
-    note: "House wiring and fusebox faults. Tests everything before leaving.",
-    services: ["House wiring", "Fusebox faults", "Socket install", "AC wiring"],
-    reviews: [
-      {
-        author: "Femi O.",
-        rating: 5,
-        when: "2 weeks ago",
-        text: "Traced a fault the last electrician created. Tested every socket before he left.",
-      },
-      {
-        author: "Chinedu E.",
-        rating: 4,
-        when: "1 month ago",
-        text: "Rewired two rooms. Tidy conduit work.",
-      },
-    ],
-  },
-  {
-    id: "a-08",
-    name: "Chuka Nwosu",
-    trade: "tiler",
-    location: "Irolu Road",
-    yearsExperience: 4,
-    jobsCompleted: 12,
-    recentUnlocks: 4,
-    rating: 4.4,
-    reviewCount: 9,
-    phone: "2348038889990",
-    contact: {
-      instagram: "chukatiles",
-      respondsIn: "Usually replies within an hour",
-      availability: "Mon–Sat, 9am–6pm",
-    },
-    photo: portrait("1684916929613-2a93a0173e8e"),
-    work: [
-      scene("1547414857-c9f61632b250"),
-      scene("1523413555809-0fb1d4da238d"),
-      scene("1594471190088-bcf3898f56ba"),
-    ],
-    featured: false,
-    verifiedSince: "May 2026",
-    note: "Bathroom and kitchen tiling. Newer to the register, priced lower.",
-    services: ["Bathroom tiling", "Kitchen splashback", "Small repairs"],
-    reviews: [
-      {
-        author: "Mama Titi",
-        rating: 5,
-        when: "1 week ago",
-        text: "Did our bathroom for a good price. Young but careful.",
-      },
-      {
-        author: "Kunle A.",
-        rating: 4,
-        when: "3 weeks ago",
-        text: "Neat job on the kitchen splashback. Asked questions rather than guessing.",
-      },
-    ],
-  },
-];
-
 /** Rating floors offered in the filter sheet. `null` is "any". */
 export const RATING_FLOORS = [4, 4.5, 4.8] as const;
 
@@ -555,7 +191,7 @@ const RAIL_SIZE = 6;
  * Most unlocked in the last 30 days. Demand, not reputation — a good artisan
  * with a quiet month drops out, which is the whole point of the rail.
  */
-export function trendingArtisans(list: Artisan[] = ARTISANS): Artisan[] {
+export function trendingArtisans(list: Artisan[]): Artisan[] {
   return [...list]
     .sort((a, b) => b.recentUnlocks - a.recentUnlocks)
     .slice(0, RAIL_SIZE);
@@ -565,7 +201,7 @@ export function trendingArtisans(list: Artisan[] = ARTISANS): Artisan[] {
  * Newest to the register. Cut by an age window rather than a fixed count, so
  * the rail empties out in a quiet month instead of calling a January listing new.
  */
-export function newArtisans(list: Artisan[] = ARTISANS): Artisan[] {
+export function newArtisans(list: Artisan[]): Artisan[] {
   if (list.length === 0) return [];
   const newest = Math.max(...list.map(verifiedMonth));
   return [...list]
@@ -581,7 +217,7 @@ const RATED_THRESHOLD = 15;
  * Highest rated, but only among artisans with enough reviews to mean it —
  * a 5.0 off three jobs isn't a top rating, it's a small sample.
  */
-export function topRatedArtisans(list: Artisan[] = ARTISANS): Artisan[] {
+export function topRatedArtisans(list: Artisan[]): Artisan[] {
   return [...list]
     .filter((a) => a.reviewCount >= RATED_THRESHOLD)
     .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
@@ -631,9 +267,12 @@ export interface Channel {
  * make first contact: WhatsApp, then a call, then everything else. Channels
  * the artisan doesn't have simply don't appear — no dead buttons.
  */
-export function channelsFor(artisan: Artisan): Channel[] {
-  const { contact } = artisan;
-  const whatsapp = contact.whatsapp ?? artisan.phone;
+export function channelsFor(
+  artisan: Pick<Artisan, "name">,
+  details: SealedDetails,
+): Channel[] {
+  const { contact, phone } = details;
+  const whatsapp = contact.whatsapp ?? phone;
 
   const channels: Channel[] = [
     {
@@ -648,14 +287,14 @@ export function channelsFor(artisan: Artisan): Channel[] {
     {
       kind: "call",
       label: "Call",
-      value: formatPhone(artisan.phone),
-      href: `tel:${phoneE164(artisan.phone)}`,
+      value: formatPhone(phone),
+      href: `tel:${phoneE164(phone)}`,
     },
     {
       kind: "sms",
       label: "Text",
-      value: formatPhone(artisan.phone),
-      href: `sms:${phoneE164(artisan.phone)}`,
+      value: formatPhone(phone),
+      href: `sms:${phoneE164(phone)}`,
     },
   ];
 
@@ -694,7 +333,7 @@ export function channelsFor(artisan: Artisan): Channel[] {
  * A vCard so the contact lands in the phone's address book, not just the
  * browser. Escapes per RFC 6350 and keeps CRLF line endings — iOS is strict.
  */
-export function vCardFor(artisan: Artisan): string {
+export function vCardFor(artisan: Artisan, details: SealedDetails): string {
   const esc = (value: string) =>
     value.replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;");
   const [first, ...rest] = artisan.name.split(" ");
@@ -707,15 +346,15 @@ export function vCardFor(artisan: Artisan): string {
     `FN:${esc(artisan.name)}`,
     `ORG:${esc(TRADE_LABELS[artisan.trade])} · Ilisan`,
     `TITLE:${esc(TRADE_LABELS[artisan.trade])}`,
-    `TEL;TYPE=CELL:${phoneE164(artisan.phone)}`,
+    `TEL;TYPE=CELL:${phoneE164(details.phone)}`,
   ];
 
-  if (artisan.contact.altPhone) {
-    lines.push(`TEL;TYPE=WORK:${phoneE164(artisan.contact.altPhone)}`);
+  if (details.contact.altPhone) {
+    lines.push(`TEL;TYPE=WORK:${phoneE164(details.contact.altPhone)}`);
   }
-  if (artisan.contact.email) lines.push(`EMAIL:${esc(artisan.contact.email)}`);
-  if (artisan.contact.instagram) {
-    lines.push(`URL:https://instagram.com/${artisan.contact.instagram}`);
+  if (details.contact.email) lines.push(`EMAIL:${esc(details.contact.email)}`);
+  if (details.contact.instagram) {
+    lines.push(`URL:https://instagram.com/${details.contact.instagram}`);
   }
 
   lines.push(

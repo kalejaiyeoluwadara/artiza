@@ -56,7 +56,14 @@ async function send<T>(path: string, options: RequestOptions): Promise<ApiEnvelo
       ...(cache ? { cache } : {}),
       ...(signal ? { signal } : {}),
     });
-  } catch {
+  } catch (cause) {
+    // A cancelled request is not a failure — the component moved on. It gets
+    // its own code so callers can drop it instead of showing an error a user
+    // never caused and can do nothing about.
+    if (cause instanceof DOMException && cause.name === "AbortError") {
+      throw new ApiError("Request cancelled.", 0, "Aborted");
+    }
+
     // Nothing came back at all — the API is down, or the device is offline.
     throw new ApiError(
       "Can't reach Artiza right now. Check your connection and try again.",

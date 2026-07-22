@@ -13,16 +13,19 @@ import {
   PhoneCall,
 } from "lucide-react";
 import { useArtisans } from "../../lib/useData";
-import { useUnlocks } from "../../lib/useUnlocks";
+import { useUnlocks } from "../../context/UnlocksContext";
 import { TRADE_LABELS } from "../../lib/artisans";
 
 export default function AccountPage() {
-  const { unlockedIds, credits, transactions, userRatings, ready } =
-    useUnlocks();
-  const { artisans } = useArtisans();
-
-  const unlocked = artisans.filter((a) => unlockedIds.includes(a.id));
-  const unrated = unlocked.filter((a) => !userRatings[a.id]);
+  const {
+    unlockedIds,
+    credits,
+    transactions,
+    pendingReviewIds,
+    ready,
+    buyBundle,
+    signedIn,
+  } = useUnlocks();
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
@@ -37,6 +40,7 @@ export default function AccountPage() {
           </div>
           <button
             type="button"
+            onClick={() => void buyBundle()}
             className="pressable rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
           >
             Buy 3 for ₦1,200
@@ -69,9 +73,9 @@ export default function AccountPage() {
           icon={Star}
           label="Pending ratings"
           detail={
-            unrated.length > 0 ? (
+            pendingReviewIds.length > 0 ? (
               <span className="figure rounded-full bg-accent-soft px-2 py-0.5 text-xs text-accent">
-                {unrated.length}
+                {pendingReviewIds.length}
               </span>
             ) : (
               <span className="text-sm text-faint">None</span>

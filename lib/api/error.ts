@@ -37,6 +37,16 @@ export class ApiError extends Error {
     );
   }
 
+  /** The caller cancelled it. Not a failure — never report one to the user. */
+  get isAborted(): boolean {
+    return this.code === "Aborted";
+  }
+
+  /** The device is offline or the API is unreachable. Worth a retry. */
+  get isOffline(): boolean {
+    return this.code === "NetworkError";
+  }
+
   /** The session is gone or expired — the caller should send them to sign in. */
   get isUnauthorized(): boolean {
     return this.status === 401;
