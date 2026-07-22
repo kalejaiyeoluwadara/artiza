@@ -25,7 +25,7 @@ export function HomeGreeting() {
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
         <h1 className="
-        text-2xl font-bold mt-1 leading-[1.28] text-ink">
+ text-2xl font-bold mt-1 leading-[1.28] text-ink">
           {greeting()}
           {firstName ? (
             <>
@@ -43,7 +43,7 @@ export function HomeGreeting() {
       <Link
         href="/favorites"
         aria-label={count > 0 ? `Favourites, ${count} saved` : "Favourites"}
-        className="pressable hover-fill relative grid size-11 shrink-0 place-items-center rounded-full bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+        className="pressable hover-fill relative grid size-11 shrink-0 place-items-center rounded-full bg-card"
       >
         <svg
           viewBox="0 0 22 22"

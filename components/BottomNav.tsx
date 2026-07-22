@@ -33,6 +33,16 @@ function useIsConsole(): boolean {
 }
 
 /**
+ * Home is the billboard screen: it opens on full-bleed art with no gutter, so
+ * the header floats over that art with nothing behind it instead of sitting on
+ * a bar above it. Every other screen starts with content and keeps the
+ * material.
+ */
+function useIsBillboard(): boolean {
+  return usePathname() === "/";
+}
+
+/**
  * Mobile only. A solid card-coloured floor, not a translucent film:
  * photography scrolling underneath a blurred bar muddied both. The bar's
  * top corners are rounded and the shadow is lifted so it reads as a sheet
@@ -52,7 +62,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-50 rounded-t-[1.75rem] bg-card shadow-[0_-10px_36px_-14px_rgba(0,0,0,0.22)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 rounded-t-[1.75rem] bg-card shadow-[0_-10px_36px_-14px_rgba(0,0,0,0.45)] md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1.5">
@@ -94,11 +104,20 @@ export function BottomNav() {
 export function SiteHeader() {
   const isActive = useIsActive();
   const inConsole = useIsConsole();
+  const billboard = useIsBillboard();
 
   if (inConsole) return null;
 
   return (
-    <header className="chrome sticky top-0 z-50 hidden border-b border-line md:block">
+    // On home it keeps every destination but loses its material, floating over
+    // the billboard art the way Netflix's does. Hiding it there instead would
+    // have left desktop with no primary nav at all, since the tab bar is
+    // mobile-only.
+    <header
+      className={`sticky top-0 z-50 hidden md:block ${
+        billboard ? "bg-transparent" : "chrome border-b border-line"
+      }`}
+    >
       <div className="mx-auto flex h-14 max-w-5xl items-center gap-8 px-6">
         <Link
           href="/"

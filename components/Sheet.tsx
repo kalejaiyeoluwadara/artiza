@@ -206,7 +206,7 @@ export function Sheet({
             aria-modal="true"
             aria-label={label}
             tabIndex={-1}
-            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[88svh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-canvas shadow-[0_-8px_40px_rgba(0,0,0,0.18)] outline-none"
+            className="absolute inset-x-0 bottom-0 mx-auto flex max-h-[88svh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-canvas shadow-[0_-8px_40px_rgba(0,0,0,0.6)] outline-none"
             style={{ y }}
             // Kept numeric — a "100%" string here would land in `y` and
             // feed the scrim's transform a value it can't interpolate.

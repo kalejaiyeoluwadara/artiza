@@ -35,7 +35,7 @@ export function ArtisanCard({
       <button
         type="button"
         onClick={onOpen}
-        className="pressable group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+        className="pressable group flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card text-left"
       >
         <CoverPhoto artisan={artisan} />
 

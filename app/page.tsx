@@ -1,17 +1,14 @@
-import { HomeScreen } from "../components/HomeScreen";
-import { HomeGreeting } from "../components/HomeGreeting";
+import { NetflixHome } from "../components/NetflixHome";
 
 /**
- * App-shaped home: no marketing hero. A greeting and the favourites shortcut,
- * the search bar and its trade rail, then the register — content is the
- * interface.
+ * Home is running a Netflix-shaped experiment: a billboard on one promoted
+ * artisan, then stacked poster rails. It brings its own top bar and its own
+ * palette scope, so it owns the full width of the screen — no page gutter and
+ * no shared header above it.
+ *
+ * The rest of the app is unchanged and still light. See the `.netflix` block
+ * in app/globals.css for how the two coexist.
  */
 export default function HomePage() {
-  return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
-      <HomeGreeting />
-
-      <HomeScreen />
-    </div>
-  );
+  return <NetflixHome />;
 }

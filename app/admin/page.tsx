@@ -198,7 +198,7 @@ export default function OverviewPage() {
                   <Skeleton className="h-28 w-full rounded-2xl" />
                 </>
               ) : attention.length === 0 ? (
-                <div className="rounded-2xl bg-card p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                <div className="rounded-2xl bg-card p-6">
                   <p className="headline text-ink">Every listing is complete</p>
                   <p className="caption mt-1">
                     Photos, services and ratings are all in place across the
@@ -209,7 +209,7 @@ export default function OverviewPage() {
                 attention.map(({ key, icon: Icon, title, body, artisans }) => (
                   <section
                     key={key}
-                    className="rounded-2xl bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                    className="rounded-2xl bg-card p-5"
                   >
                     <div className="flex items-start gap-3">
                       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-fill">
@@ -255,7 +255,7 @@ export default function OverviewPage() {
           </section>
 
           {/* ── Trade coverage ───────────────────────────────────────── */}
-          <section className="rounded-2xl bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <section className="rounded-2xl bg-card p-5">
             <h2 className="title text-ink">Trade coverage</h2>
             <p className="caption mt-1">
               A trade with nobody in it is a filter that returns an empty
@@ -293,7 +293,7 @@ export default function OverviewPage() {
 
         {/* ── Recently added ─────────────────────────────────────────── */}
         <aside>
-          <div className="rounded-2xl bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <div className="rounded-2xl bg-card p-5">
             <h2 className="title text-ink">Recently added</h2>
 
             {loading ? (
@@ -375,7 +375,7 @@ function StatTile({
   loading: boolean;
 }) {
   return (
-    <div className="rounded-2xl bg-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+    <div className="rounded-2xl bg-card p-4">
       <div className="flex items-center gap-2">
         <Icon size={14} strokeWidth={2.2} className="text-sub" />
         <p className="caption font-semibold uppercase tracking-wider">{label}</p>

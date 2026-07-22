@@ -368,7 +368,7 @@ export function FormSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl bg-card p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
+    <section className="rounded-2xl bg-card p-5 sm:p-6">
       <h2 className="title text-ink">{title}</h2>
       {note ? <p className="caption mt-1">{note}</p> : null}
       <div className="mt-5 space-y-5">{children}</div>

@@ -62,7 +62,7 @@ export default function AccountPage() {
       />
 
       {/* ── Credits ────────────────────────────────────── */}
-      <section className="mt-6 overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <section className="mt-6 overflow-hidden rounded-2xl bg-card">
         <div className="flex items-center justify-between p-4">
           <div>
             <p className="caption">Unlock credits</p>
@@ -88,7 +88,7 @@ export default function AccountPage() {
       <p className="caption mt-8 mb-2 px-1 uppercase tracking-wider font-semibold">
         Activity
       </p>
-      <ul className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <ul className="overflow-hidden rounded-2xl bg-card">
         <Row
           href="/unlocked"
           icon={Unlock}
@@ -133,7 +133,7 @@ export default function AccountPage() {
           <p className="caption mt-8 mb-2 px-1 uppercase tracking-wider font-semibold">
             Recent Transactions
           </p>
-          <ul className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <ul className="overflow-hidden rounded-2xl bg-card">
             {transactions.slice(0, 5).map((tx, i) => (
               <li
                 key={tx.id}
@@ -176,7 +176,7 @@ export default function AccountPage() {
           <p className="caption mt-8 mb-2 px-1 uppercase tracking-wider font-semibold">
             Artiza team
           </p>
-          <ul className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <ul className="overflow-hidden rounded-2xl bg-card">
             <Row
               href="/admin"
               icon={SlidersHorizontal}
@@ -194,7 +194,7 @@ export default function AccountPage() {
       <p className="caption mt-8 mb-2 px-1 uppercase tracking-wider font-semibold">
         Support
       </p>
-      <ul className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <ul className="overflow-hidden rounded-2xl bg-card">
         <Row
           icon={PhoneCall}
           label="Contact Artiza on WhatsApp"
@@ -206,7 +206,7 @@ export default function AccountPage() {
 
       {/* ── Session ────────────────────────────────────── */}
       {signedIn ? (
-        <ul className="mt-8 overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+        <ul className="mt-8 overflow-hidden rounded-2xl bg-card">
           <Row icon={LogOut} label="Sign out" onClick={handleSignOut} last />
         </ul>
       ) : (

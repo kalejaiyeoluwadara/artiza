@@ -220,7 +220,7 @@ export default function RegisterPage() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Name, area, trade, service or number"
             aria-label="Search the register"
-            className="w-full rounded-full bg-card py-2.5 pl-10 pr-4 text-[0.9375rem] text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)] placeholder:text-faint"
+            className="w-full rounded-full bg-card py-2.5 pl-10 pr-4 text-[0.9375rem] text-ink placeholder:text-faint"
           />
         </div>
 
@@ -228,7 +228,7 @@ export default function RegisterPage() {
           value={trade}
           onChange={(event) => setTrade(event.target.value as Trade | "all")}
           aria-label="Filter by trade"
-          className="rounded-full bg-card px-4 py-2.5 text-[0.9375rem] font-medium text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+          className="rounded-full bg-card px-4 py-2.5 text-[0.9375rem] font-medium text-ink"
         >
           <option value="all">All trades</option>
           {(Object.keys(TRADE_LABELS) as Trade[]).map((value) => (
@@ -242,7 +242,7 @@ export default function RegisterPage() {
           value={sort}
           onChange={(event) => setSort(event.target.value as SortKey)}
           aria-label="Sort the register"
-          className="rounded-full bg-card px-4 py-2.5 text-[0.9375rem] font-medium text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+          className="rounded-full bg-card px-4 py-2.5 text-[0.9375rem] font-medium text-ink"
         >
           {SORTS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -336,7 +336,7 @@ export default function RegisterPage() {
             />
           )
         ) : (
-          <ul className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <ul className="overflow-hidden rounded-2xl bg-card">
             {shown.map((artisan) => (
               <RegisterRow
                 key={artisan.id}

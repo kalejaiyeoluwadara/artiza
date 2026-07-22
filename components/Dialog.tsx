@@ -87,7 +87,7 @@ export function Dialog({
             aria-labelledby={titleId}
             aria-describedby={description ? descriptionId : undefined}
             tabIndex={-1}
-            className="relative w-full max-w-[26rem] overflow-hidden rounded-3xl bg-card p-6 shadow-[0_20px_60px_rgba(0,0,0,0.22)] outline-none"
+            className="relative w-full max-w-[26rem] overflow-hidden rounded-3xl bg-card p-6 shadow-[0_20px_60px_rgba(0,0,0,0.7)] outline-none"
             {...(reduceMotion
               ? {
                   initial: { opacity: 0 },

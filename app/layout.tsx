@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Artiza",
   },
   icons: {
@@ -65,8 +65,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fbfbfd",
-  colorScheme: "light",
+  themeColor: "#0b0b0e",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

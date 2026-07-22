@@ -175,7 +175,7 @@ export default function BannersPage() {
               {banners.map((banner, index) => (
                 <li
                   key={banner.id}
-                  className={`overflow-hidden rounded-2xl bg-card p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)] ${
+                  className={`overflow-hidden rounded-2xl bg-card p-3 ${
                     busyId === banner.id ? "opacity-60" : ""
                   } ${editing?.id === banner.id ? "ring-2 ring-accent" : ""}`}
                 >

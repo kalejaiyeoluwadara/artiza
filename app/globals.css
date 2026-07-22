@@ -7,17 +7,20 @@
    --------------------------------------------------------------- */
 
 :root {
-  --canvas: #fbfbfd; /* grouped background — near-white, cool */
-  --card: #ffffff; /* raised surface */
-  --fill: rgba(120, 120, 128, 0.1); /* quiet fills: search, chips */
-  --line: rgba(60, 60, 67, 0.1); /* separators */
-  --ink: #0e0e11; /* primary label */
-  --sub: #7d7d84; /* secondary label */
-  --faint: #b9b9c0; /* tertiary label, placeholders */
-  --accent: #0d7a5f; /* actions, money, verified */
-  --accent-soft: rgba(13, 122, 95, 0.1);
-  --danger: #e5484d;
-  --chrome: rgba(251, 251, 253, 0.72); /* translucent bars */
+  --canvas: #0b0b0e; /* the black everything sits on */
+  --card: #17171c; /* raised surface: rails, sheets, fields */
+  --fill: rgba(255, 255, 255, 0.11); /* quiet fills: chips, pills */
+  --line: rgba(255, 255, 255, 0.13); /* separators */
+  --ink: #ffffff; /* primary label */
+  --sub: #a1a1aa; /* secondary label */
+  --faint: #6b6b75; /* tertiary label, placeholders */
+  --accent: #e50914; /* actions, money, verified */
+  --accent-soft: rgba(229, 9, 20, 0.18);
+  /* Amber, not red. The accent is now red, so a red error would be the same
+     colour as the button next to it — failure has to be a different hue or it
+     reads as another action. */
+  --danger: #f5a524;
+  --chrome: rgba(11, 11, 14, 0.72); /* translucent bars */
 
   /* -------------------------------------------------------------
      Illustration palette — imagery, not UI.
@@ -93,10 +96,10 @@
 }
 
 @layer base {
-  /* Light only — the app ships a single, deliberate appearance. */
+  /* Dark only — the app ships a single, deliberate appearance. */
   html {
     background: var(--canvas);
-    color-scheme: light;
+    color-scheme: dark;
   }
 
   body {
@@ -194,10 +197,12 @@
     content: "";
     position: absolute;
     inset: 0;
+    /* Low alpha: on a near-black fill a 50% white sweep reads as a flash
+       rather than a shimmer. */
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.5),
+      rgba(255, 255, 255, 0.07),
       transparent
     );
     transform: translateX(-100%);

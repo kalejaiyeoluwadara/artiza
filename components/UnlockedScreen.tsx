@@ -112,14 +112,14 @@ export function UnlockedScreen() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search your unlocked contacts..."
-            className="w-full rounded-2xl border border-line bg-card py-3 pl-11 pr-4 text-[0.9375rem] text-ink placeholder:text-faint focus:border-accent focus:outline-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+            className="w-full rounded-2xl border border-line bg-card py-3 pl-11 pr-4 text-[0.9375rem] text-ink placeholder:text-faint focus:border-accent focus:outline-hidden"
           />
         </div>
       )}
 
       {/* Post-Job Rating Banner */}
       {unratedArtisans.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-accent/15 bg-accent-soft/50 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-accent/15 bg-accent-soft/50 p-4">
           <div className="flex items-start gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/10">
               <Star size={18} strokeWidth={2.2} className="text-accent" fill="currentColor" />
@@ -141,7 +141,7 @@ export function UnlockedScreen() {
               <button
                 key={artisan.id}
                 onClick={() => setRatingArtisan(artisan)}
-                className="pressable flex shrink-0 items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] max-sm:w-full"
+                className="pressable flex shrink-0 items-center gap-3 rounded-2xl bg-card border border-line p-2.5 pr-4 max-sm:w-full"
               >
                 <Avatar name={artisan.name} src={artisan.photo} size="size-10 text-sm" />
                 <div className="text-left max-sm:min-w-0">
@@ -206,7 +206,7 @@ function CreditsLink({ credits }: { credits: number }) {
   return (
     <Link
       href="/account"
-      className="pressable group flex items-center gap-2.5 rounded-full border border-line bg-card px-4 py-2 text-sm font-semibold text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+      className="pressable group flex items-center gap-2.5 rounded-full border border-line bg-card px-4 py-2 text-sm font-semibold text-ink"
     >
       <span className="flex size-7 items-center justify-center rounded-full bg-accent-soft text-accent">
         <CreditCoinIcon size={14} />
@@ -245,7 +245,7 @@ function UnlockedCard({
   const phone = details?.phone;
 
   return (
-    <li className="flex flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+    <li className="flex flex-col overflow-hidden rounded-2xl bg-card">
       {/* Work photo cover */}
       <button
         type="button"
@@ -267,7 +267,7 @@ function UnlockedCard({
           {TRADE_LABELS[artisan.trade]}
         </span>
         {rated && (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-ink backdrop-blur-sm">
+          <span className="chrome absolute right-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
             <Star size={11} fill="currentColor" className="text-accent" />
             Rated
           </span>

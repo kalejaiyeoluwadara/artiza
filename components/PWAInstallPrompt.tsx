@@ -130,7 +130,7 @@ export function PWAInstallPrompt() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
-            className="relative overflow-hidden rounded-2xl border border-line bg-card p-5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+            className="relative overflow-hidden rounded-2xl border border-line bg-card p-5 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl"
           >
             <button
               onClick={handleDismiss}

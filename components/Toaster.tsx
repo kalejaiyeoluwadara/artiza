@@ -111,7 +111,7 @@ function ToastCard({ toast }: { toast: Toast }) {
       // Errors interrupt; everything else waits its turn in the queue.
       role={toast.variant === "error" ? "alert" : "status"}
       aria-live={toast.variant === "error" ? "assertive" : "polite"}
-      className="pointer-events-auto w-full max-w-[26rem] touch-none rounded-2xl bg-card p-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] ring-1 ring-line"
+      className="pointer-events-auto w-full max-w-[26rem] touch-none rounded-2xl bg-card p-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.5)] ring-1 ring-line"
       {...motionProps}
       drag={reduceMotion ? false : "y"}
       dragConstraints={{ top: 0, bottom: 0 }}

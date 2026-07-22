@@ -33,7 +33,7 @@ export function LoadingLabel({ children }: { children: string }) {
  */
 export function ArtisanCardSkeleton() {
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-2xl bg-card">
       <Skeleton className="aspect-16/10 w-full" />
 
       <div className="flex w-full flex-1 flex-col p-4">
@@ -105,7 +105,7 @@ export function DiscoveryRailSkeleton({ kind }: { kind: RailKind }) {
         <ul aria-hidden className="flex w-max gap-3">
           {[0, 1, 2, 3].map((i) => (
             <li key={i}>
-              <div className="flex w-44 flex-col overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div className="flex w-44 flex-col overflow-hidden rounded-2xl bg-card">
                 <Skeleton className="aspect-4/3 w-full" />
                 <div className="flex w-full flex-col p-3">
                   <Skeleton className="relative z-10 -mt-9 size-10 rounded-full ring-4 ring-card" />
@@ -133,7 +133,7 @@ export function ResultRowsSkeleton({ count = 4 }: { count?: number }) {
       <Skeleton className="h-3 w-32 rounded-md" />
       <ul
         aria-hidden
-        className="mt-3 divide-y divide-line overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+        className="mt-3 divide-y divide-line overflow-hidden rounded-2xl bg-card"
       >
         {Array.from({ length: count }, (_, i) => (
           <li key={i} className="flex items-center gap-3 p-3.5">

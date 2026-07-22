@@ -21,7 +21,7 @@ export function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="rounded-2xl bg-card p-8 text-center shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+    <div className="rounded-2xl bg-card p-8 text-center">
       <span className="mx-auto grid size-10 place-items-center rounded-full bg-fill">
         <AlertTriangle size={18} strokeWidth={2} className="text-sub" />
       </span>
@@ -82,7 +82,7 @@ export function RowsSkeleton({ count = 6 }: { count?: number }) {
   return (
     <ul
       aria-hidden
-      className="overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+      className="overflow-hidden rounded-2xl bg-card"
     >
       {Array.from({ length: count }, (_, i) => (
         <RowSkeleton key={i} />
