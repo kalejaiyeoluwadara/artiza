@@ -34,11 +34,14 @@ function useIsConsole(): boolean {
 
 /**
  * Mobile only. A solid card-coloured floor, not a translucent film:
- * photography scrolling underneath a blurred bar muddied both. Depth comes
- * from a hairline and one soft upward shadow instead.
+ * photography scrolling underneath a blurred bar muddied both. The bar's
+ * top corners are rounded and the shadow is lifted so it reads as a sheet
+ * laid over the feed rather than a strip welded to the screen edge.
  *
- * Switching tabs happens dozens of times a session, so the only transition
- * is colour — movement would slow the most-repeated action in the app.
+ * Selection is a filled accent disc behind the icon — the strongest mark
+ * a 21px glyph can carry — with the label below it in ink. Switching tabs
+ * happens dozens of times a session, so the only transition is colour;
+ * movement would slow the most-repeated action in the app.
  */
 export function BottomNav() {
   const isActive = useIsActive();
@@ -49,10 +52,10 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-card shadow-[0_-8px_28px_-16px_rgba(0,0,0,0.18)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 rounded-t-[1.75rem] bg-card shadow-[0_-10px_36px_-14px_rgba(0,0,0,0.22)] md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1">
+      <ul className="mx-auto grid max-w-md grid-cols-4 px-2 pt-1.5">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(href);
           return (
@@ -62,18 +65,18 @@ export function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className="pressable flex min-h-14 flex-col items-center justify-center gap-1 py-1.5"
               >
-                {/* The accent-soft pill carries the selection, so the icon
-                    itself never has to grow or move to say "you are here". */}
+                {/* The filled disc carries the selection, so the icon itself
+                    never has to grow or move to say "you are here". */}
                 <span
-                  className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors duration-200 ease-out ${
-                    active ? "bg-accent-soft text-accent" : "text-sub"
+                  className={`flex size-10 items-center justify-center rounded-full transition-colors duration-200 ease-out ${
+                    active ? "bg-accent text-white" : "text-sub"
                   }`}
                 >
                   <Icon size={21} active={active} />
                 </span>
                 <span
                   className={`text-[0.6875rem] transition-colors duration-200 ease-out ${
-                    active ? "font-semibold text-accent" : "font-medium text-sub"
+                    active ? "font-semibold text-ink" : "font-medium text-sub"
                   }`}
                 >
                   {label}

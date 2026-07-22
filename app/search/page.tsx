@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeader } from "../../components/PageHeader";
 import { SearchScreen } from "../../components/SearchScreen";
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 export default function SearchPage() {
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
-      <h1 className="title-lg text-ink">Search</h1>
+      <PageHeader
+        title="Search"
+        subtitle="Names, trades, jobs and areas — all read at once, as you type."
+      />
 
       <SearchScreen />
     </div>

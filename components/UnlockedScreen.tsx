@@ -18,6 +18,7 @@ import {
   Unlock,
 } from "lucide-react";
 import { CreditCoinIcon } from "./CreditCoinIcon";
+import { PageHeader } from "./PageHeader";
 import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
 import { useArtisanContact } from "../lib/useArtisanContact";
@@ -57,14 +58,17 @@ export function UnlockedScreen() {
   if (unlocked.length === 0) {
     return (
       <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
-        <div className="flex items-center justify-between">
-          <h1 className="title-lg text-ink">Unlocked Contacts</h1>
-          {credits > 0 && (
-            <span className="caption figure rounded-full bg-accent-soft px-3 py-1 font-semibold text-accent">
-              {credits} {credits === 1 ? "credit" : "credits"} ready
-            </span>
-          )}
-        </div>
+        <PageHeader
+          title="Unlocked Contacts"
+          compactTitle="Unlocked"
+          action={
+            credits > 0 ? (
+              <span className="caption figure rounded-full bg-accent-soft px-3 py-1 font-semibold text-accent">
+                {credits} {credits === 1 ? "credit" : "credits"} ready
+              </span>
+            ) : undefined
+          }
+        />
 
         <div className="mt-16 flex flex-col items-center text-center">
           <div className="flex size-20 items-center justify-center rounded-full bg-accent-soft">
@@ -90,28 +94,14 @@ export function UnlockedScreen() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="title-lg text-ink">Unlocked Contacts</h1>
-          <p className="caption mt-1 text-sub">
-            {unlocked.length} {unlocked.length === 1 ? "artisan" : "artisans"} in your contact book
-          </p>
-        </div>
-
-        <Link
-          href="/account"
-          className="pressable group flex items-center gap-2.5 rounded-full bg-card border border-line px-4 py-2 text-sm font-semibold text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-        >
-          <span className="flex size-7 items-center justify-center rounded-full bg-accent-soft text-accent">
-            <CreditCoinIcon size={14} />
-          </span>
-          <span>
-            {credits > 0 ? `${credits} credits` : "Buy Bundle"}
-          </span>
-          <ChevronRight size={14} className="text-faint transition-transform duration-200 group-hover:translate-x-0.5" />
-        </Link>
-      </div>
+      <PageHeader
+        title="Unlocked Contacts"
+        compactTitle="Unlocked"
+        subtitle={`${unlocked.length} ${
+          unlocked.length === 1 ? "artisan" : "artisans"
+        } in your contact book, kept for good.`}
+        action={<CreditsLink credits={credits} />}
+      />
 
       {/* Search within unlocked list */}
       {unlocked.length > 2 && (
@@ -207,6 +197,26 @@ export function UnlockedScreen() {
         onSubmit={submitRating}
       />
     </div>
+  );
+}
+
+/** The credits shortcut that rides in the header, on both the large title and
+ *  the collapsed bar. */
+function CreditsLink({ credits }: { credits: number }) {
+  return (
+    <Link
+      href="/account"
+      className="pressable group flex items-center gap-2.5 rounded-full border border-line bg-card px-4 py-2 text-sm font-semibold text-ink shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+    >
+      <span className="flex size-7 items-center justify-center rounded-full bg-accent-soft text-accent">
+        <CreditCoinIcon size={14} />
+      </span>
+      <span>{credits > 0 ? `${credits} credits` : "Buy Bundle"}</span>
+      <ChevronRight
+        size={14}
+        className="text-faint transition-transform duration-200 group-hover:translate-x-0.5"
+      />
+    </Link>
   );
 }
 

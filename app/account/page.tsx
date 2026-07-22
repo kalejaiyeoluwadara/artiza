@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { PageHeader } from "../../components/PageHeader";
 import { useUnlocks } from "../../context/UnlocksContext";
 import { confirm } from "../../lib/confirm";
 
@@ -47,7 +48,18 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-28 pt-6 md:px-6 md:pb-16 md:pt-10">
-      <h1 className="title-lg text-ink">Account</h1>
+      <PageHeader
+        title="Account"
+        // Signed out there is no name to show, and "Account" alone is honest
+        // about that — an eyebrow reading "Not signed in" would be noise above
+        // a screen whose first row already says so.
+        eyebrow={signedIn && session?.user?.name ? session.user.name : undefined}
+        subtitle={
+          signedIn
+            ? "Credits, unlocks and everything you've paid for."
+            : undefined
+        }
+      />
 
       {/* ── Credits ────────────────────────────────────── */}
       <section className="mt-6 overflow-hidden rounded-2xl bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
