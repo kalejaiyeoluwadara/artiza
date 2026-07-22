@@ -1,7 +1,8 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { BadgeCheck, ChevronRight, Star } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Artisan, TRADE_COVERS, TRADE_LABELS } from "../lib/artisans";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -19,7 +20,7 @@ import { FavoriteButton } from "./FavoriteButton";
 export function Poster({
   artisan,
   signal,
-  width = "w-40 sm:w-48",
+  width = "w-40 sm:w-48 lg:w-56",
   onOpen,
 }: {
   artisan: Artisan;
@@ -33,7 +34,7 @@ export function Poster({
   return (
     // The heart is its own control, so it sits beside the card's button rather
     // than inside it — nested buttons are invalid and the outer would eat the tap.
-    <div className={`relative ${width}`}>
+    <div className={`hover-lift relative rounded-lg ${width}`}>
       <button
         type="button"
         onClick={onOpen}
@@ -44,8 +45,8 @@ export function Poster({
             src={cover}
             alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
             fill
-            sizes="192px"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            sizes="(min-width: 1024px) 224px, (min-width: 640px) 192px, 160px"
+            className="object-cover"
           />
           {/* Scrim, not a tint — the type has to read without draining the
               colour out of the job underneath it. */}
@@ -121,12 +122,45 @@ export function PosterRail({
   signal?: (artisan: Artisan) => React.ReactNode;
   onOpen: (artisan: Artisan) => void;
 }) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const [edge, setEdge] = useState<Edge>("start");
+
+  /* Which arrows are worth showing. A touch screen answers this with the
+     rail itself — you can see there is more and you flick it. A mouse cannot,
+     so the desktop rail has to say so, and an arrow pointing at nothing is
+     worse than no arrow. */
+  const onScroll = useCallback(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const max = rail.scrollWidth - rail.clientWidth;
+    // A pixel of slack: fractional layout widths mean scrollLeft rarely
+    // lands exactly on the end.
+    if (max <= 1) setEdge("both");
+    else if (rail.scrollLeft <= 1) setEdge("start");
+    else if (rail.scrollLeft >= max - 1) setEdge("end");
+    else setEdge("middle");
+  }, []);
+
+  // Runs on mount and whenever the row's contents change, so a rail that
+  // arrives short never shows an arrow it doesn't need.
+  useEffect(() => {
+    onScroll();
+  }, [onScroll, artisans]);
+
   if (artisans.length === 0) return null;
 
   const headingId = `rail-${heading.replace(/\W+/g, "-").toLowerCase()}`;
 
+  // A page at a time, minus a poster's worth, so the card you were looking
+  // at stays on screen as the anchor for where you just came from.
+  const page = (direction: 1 | -1) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    rail.scrollBy({ left: direction * rail.clientWidth * 0.8, behavior: "smooth" });
+  };
+
   return (
-    <section aria-labelledby={headingId} className="mt-6">
+    <section aria-labelledby={headingId} className="group/rail relative mt-6">
       <div className="flex items-center justify-between gap-3 px-4 md:px-0">
         <h2 id={headingId} className="title text-ink">
           {heading}
@@ -143,8 +177,14 @@ export function PosterRail({
         )}
       </div>
 
-      <div className="no-scrollbar mt-2 overflow-x-auto scroll-px-4 px-4 md:scroll-px-0 md:px-0">
-        <ul className="flex w-max gap-2.5">
+      <div
+        ref={railRef}
+        onScroll={onScroll}
+        className="no-scrollbar mt-2 overflow-x-auto scroll-px-4 px-4 md:scroll-px-0 md:px-0"
+      >
+        {/* py- gives the hover lift somewhere to grow into; without it the
+            raised poster is clipped by the scroll container. */}
+        <ul className="flex w-max gap-2.5 md:py-2">
           {artisans.map((artisan) => (
             <li key={artisan.id}>
               <Poster
@@ -156,6 +196,47 @@ export function PosterRail({
           ))}
         </ul>
       </div>
+
+      {edge !== "start" && edge !== "both" && (
+        <RailArrow direction="left" heading={heading} onClick={() => page(-1)} />
+      )}
+      {edge !== "end" && edge !== "both" && (
+        <RailArrow direction="right" heading={heading} onClick={() => page(1)} />
+      )}
     </section>
+  );
+}
+
+/** Where the rail is sitting. `both` means it doesn't overflow at all. */
+type Edge = "start" | "middle" | "end" | "both";
+
+/**
+ * Desktop only — a touch rail is flicked, not clicked, and a control that
+ * covers a poster to offer a scroll you already have is a net loss on a phone.
+ * It fades in with the row rather than sitting there permanently, so a rail at
+ * rest is all artwork.
+ */
+function RailArrow({
+  direction,
+  heading,
+  onClick,
+}: {
+  direction: "left" | "right";
+  heading: string;
+  onClick: () => void;
+}) {
+  const Icon = direction === "left" ? ChevronLeft : ChevronRight;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Scroll ${heading} ${direction}`}
+      className={`chrome pressable absolute top-1/2 z-10 hidden size-11 -translate-y-1/2 place-items-center rounded-full text-ink opacity-0 transition-opacity duration-200 ease-out group-hover/rail:opacity-100 focus-visible:opacity-100 md:grid ${
+        direction === "left" ? "left-1" : "right-1"
+      }`}
+    >
+      <Icon size={22} strokeWidth={2.4} aria-hidden />
+    </button>
   );
 }

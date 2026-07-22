@@ -142,25 +142,34 @@ function Slide({
 }) {
   return (
     <div className="w-full shrink-0 snap-center snap-always px-4 md:px-0">
-      <div className="relative flex min-h-112 flex-col justify-end overflow-hidden rounded-2xl bg-fill p-5 md:min-h-128">
+      <div className="relative flex min-h-112 flex-col justify-end overflow-hidden rounded-2xl bg-fill p-5 md:min-h-128 md:p-10 lg:min-h-[38rem] lg:p-14">
         <Image
           src={image}
           alt=""
           fill
           priority={priority}
-          sizes="(min-width: 1024px) 1024px, 100vw"
+          sizes="(min-width: 1024px) 1536px, 100vw"
           className="object-cover"
         />
         {/* Scrim, not a tint: type has to hold at any photo brightness without
-            draining the colour out of the art underneath it. */}
+            draining the colour out of the art underneath it. On a phone the
+            type sits under the art so the scrim runs bottom-up; on a wide
+            screen it sits beside it, so a second one runs left-to-right and
+            leaves the right half of the photo unclouded. */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20"
+          className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20 md:from-black/70 md:via-black/20 md:to-transparent"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 hidden bg-linear-to-r from-black/85 via-black/45 to-transparent md:block"
         />
 
-        {/* Centred, the way the reference sets its billboard — the art is the
-            subject and the type is a caption under it, not a left column. */}
-        <div className="relative flex flex-col items-center text-center">
+        {/* Centred on a phone, where the type is a caption under the art.
+            Left-aligned and column-width from `md`, where centring 60ch of
+            offer copy across a 1400px card would leave nothing to read
+            along — the eye needs one left edge to return to. */}
+        <div className="relative flex flex-col items-center text-center md:max-w-xl md:items-start md:text-left lg:max-w-2xl">
           {children}
         </div>
       </div>
@@ -195,13 +204,13 @@ function BannerContent({ banner }: { banner: Banner }) {
       <h2 className="display mt-1.5 text-ink">
         <AccentedTitle title={banner.title} />
       </h2>
-      <p className="mt-2 max-w-[36ch] text-[0.9375rem] leading-relaxed text-sub">
+      <p className="mt-2 max-w-[36ch] text-[0.9375rem] leading-relaxed text-sub md:mt-3 md:text-base">
         {banner.body}
       </p>
 
       <Link
         href={banner.href}
-        className="pressable mt-4 inline-flex items-center gap-1.5 rounded-md bg-accent px-5 py-2.5 text-[0.9375rem] font-bold text-white"
+        className="pressable hover-dim mt-4 inline-flex items-center gap-1.5 rounded-md bg-accent px-5 py-2.5 text-[0.9375rem] font-bold text-white md:mt-6 md:px-7 md:py-3 md:text-base"
       >
         {banner.cta}
         <ArrowRight size={16} strokeWidth={2.6} aria-hidden />
@@ -238,7 +247,7 @@ function ArtisanContent({
 
       {/* Netflix's genre row, read as credentials. The middots are decoration,
           so they're hidden rather than announced between every item. */}
-      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.8125rem] font-medium text-ink">
+      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.8125rem] font-medium text-ink md:justify-start md:text-[0.9375rem]">
         {[
           TRADE_LABELS[artisan.trade],
           `${artisan.yearsExperience} yrs`,
@@ -256,7 +265,7 @@ function ArtisanContent({
         ))}
       </p>
 
-      <div className="mt-4 flex w-full max-w-sm items-center gap-2.5">
+      <div className="mt-4 flex w-full max-w-sm items-center gap-2.5 md:mt-6 md:w-auto">
         <button
           type="button"
           onClick={onOpen}

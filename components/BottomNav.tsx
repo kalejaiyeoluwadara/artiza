@@ -33,6 +33,16 @@ function useIsConsole(): boolean {
 }
 
 /**
+ * Home runs a wider grid than the rest of the app — a catalogue of rails wants
+ * the screen, where a settings list or a search result does not. The header is
+ * shared, so it matches whichever column it is sitting above; anything else
+ * puts the logo visibly inboard of the artwork it is heading.
+ */
+function useIsWideGrid(): boolean {
+  return usePathname() === "/";
+}
+
+/**
  * Mobile only. A solid card-coloured floor, not a translucent film:
  * photography scrolling underneath a blurred bar muddied both. The bar's
  * top corners are rounded and the shadow is lifted so it reads as a sheet
@@ -94,12 +104,17 @@ export function BottomNav() {
 export function SiteHeader() {
   const isActive = useIsActive();
   const inConsole = useIsConsole();
+  const wide = useIsWideGrid();
 
   if (inConsole) return null;
 
   return (
     <header className="chrome sticky top-0 z-50 hidden border-b border-line md:block">
-      <div className="mx-auto flex h-14 max-w-5xl items-center gap-8 px-6">
+      <div
+        className={`mx-auto flex h-14 items-center gap-8 ${
+          wide ? "max-w-[96rem] px-8 lg:px-12" : "max-w-5xl px-6"
+        }`}
+      >
         <Link
           href="/"
           className="pressable flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-ink"

@@ -103,7 +103,7 @@ export function NetflixHome() {
     <div className="min-h-screen pb-28 md:pb-16">
       <TopBar filters={filters} onChange={setFilters} onOpenFilters={() => setFiltersOpen(true)} />
 
-      <div className="mx-auto w-full max-w-5xl md:px-6">
+      <div className="mx-auto w-full max-w-[96rem] md:px-8 lg:px-12">
         {error ? (
           <Failed onRetry={retry} />
         ) : loading ? (
@@ -237,7 +237,7 @@ function TopBar({
     // Desktop already has the shared site header pinned at top-0, so only the
     // mobile bar sticks — two sticky bars at top-0 would stack on each other.
     <div className="chrome sticky top-0 z-40 md:static md:bg-transparent">
-      <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-3 px-4 md:hidden">
+      <div className="mx-auto flex h-16 w-full max-w-[96rem] items-center gap-3 px-4 md:hidden">
         <h1 className="title truncate text-ink">
           {firstName ? `For ${firstName}` : "Artiza"}
           <span className="text-accent">.</span>
@@ -269,7 +269,7 @@ function TopBar({
       {/* Netflix's Tv Series / Movies / Categories row. Every pill here is a
           real filter — an outlined pill that only says a word would be
           decoration sitting in the most prominent control slot on the page. */}
-      <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-6">
+      <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-8 lg:px-12">
         <div className="flex w-max items-center gap-2">
           {filters.trade ? (
             <Pill
@@ -377,7 +377,7 @@ function Results({
           </button>
         </div>
       ) : (
-        <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+        <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
           {results.map((artisan) => (
             <li key={artisan.id}>
               <Poster
@@ -397,11 +397,11 @@ function Results({
 /** Mirrors the billboard's geometry so the swap to real art is a fade. */
 function BillboardSkeleton() {
   return (
-    <div className="px-4 md:px-0">
-      <div className="skeleton -mx-4 h-[26rem] md:mx-0 md:h-[30rem] md:rounded-lg" />
-      <div className="mt-6 flex gap-2 overflow-hidden">
+    <div className="md:px-0">
+      <div className="skeleton mx-4 h-112 rounded-2xl md:mx-0 md:h-128 lg:h-[38rem]" />
+      <div className="mt-6 flex gap-2.5 overflow-hidden px-4 md:px-0">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton aspect-2/3 w-40 shrink-0 rounded-lg sm:w-48" />
+          <div key={i} className="skeleton aspect-2/3 w-40 shrink-0 rounded-lg sm:w-48 lg:w-56" />
         ))}
       </div>
     </div>
