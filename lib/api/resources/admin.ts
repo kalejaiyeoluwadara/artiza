@@ -162,6 +162,28 @@ export const adminResource = (token?: string) => ({
       });
     },
 
+    /**
+     * For a photo that already lives somewhere else — a link the artisan sent
+     * over WhatsApp, a shot on the team's Drive.
+     *
+     * Cloudinary fetches it and re-hosts it, so what comes back is an ordinary
+     * asset with the folder's crop applied. The pasted URL is never stored:
+     * a link that dies next month must not be able to blank an artisan's card.
+     */
+    fromUrl(
+      url: string,
+      folder: UploadFolder = "work",
+      signal?: AbortSignal,
+    ): Promise<UploadResult> {
+      return request<UploadResult>("/uploads/from-url", {
+        method: "POST",
+        body: { url },
+        query: { folder },
+        token,
+        signal,
+      });
+    },
+
     /** The public id contains slashes, so it has to go through the path encoded. */
     remove(publicId: string): Promise<unknown> {
       return request(`/uploads/${encodeURIComponent(publicId)}`, {

@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from "react";
 import Image from "next/image";
-import { ImageUp, Loader2, Star, Trash2 } from "lucide-react";
+import { ImageUp, Link as LinkIcon, Loader2, Star, Trash2 } from "lucide-react";
 import { useApi } from "../../lib/api/useApi";
 import { ApiError } from "../../lib/api/error";
 import type { UploadFolder } from "../../lib/api/types";
@@ -58,7 +58,112 @@ function useUploader(folder: UploadFolder) {
     }
   };
 
-  return { send, busy, error };
+  /**
+   * The same thing, from a link. It returns a `res.cloudinary.com` URL like an
+   * upload does — the pasted address is a way to fetch the photo, never what
+   * gets stored — so nothing downstream has to know which route it came in by.
+   */
+  const sendUrl = async (url: string): Promise<string | null> => {
+    setError(undefined);
+
+    setBusy(true);
+    try {
+      const result = await api.admin.uploads.fromUrl(url.trim(), folder);
+      return result.url;
+    } catch (cause) {
+      setError(
+        cause instanceof ApiError
+          ? cause.message
+          : "That link couldn't be fetched. Try again.",
+      );
+      return null;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return { send, sendUrl, busy, error };
+}
+
+/**
+ * The paste-a-link half of both fields.
+ *
+ * Closed by default: uploading is the normal path and the common case should
+ * not have to scroll past an alternative to reach it. Everything here is
+ * `type="button"` and Enter is caught rather than allowed to bubble — these
+ * inputs sit inside the artisan form, and a stray submit would try to save a
+ * half-filled listing.
+ */
+function LinkPaste({
+  busy,
+  onFetch,
+  label,
+}: {
+  busy: boolean;
+  onFetch: (url: string) => Promise<boolean>;
+  label: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState("");
+
+  const submit = async () => {
+    if (!url.trim() || busy) return;
+    if (await onFetch(url)) {
+      setUrl("");
+      setOpen(false);
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="pressable caption mt-2 inline-flex items-center gap-1 font-semibold text-accent"
+      >
+        <LinkIcon size={12} strokeWidth={2.4} />
+        {label}
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-2 flex gap-2">
+      <input
+        type="url"
+        value={url}
+        autoFocus
+        disabled={busy}
+        placeholder="https://…"
+        aria-label={label}
+        onChange={(event) => setUrl(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            void submit();
+          }
+          if (event.key === "Escape") setOpen(false);
+        }}
+        className="min-w-0 flex-1 rounded-full bg-fill px-4 py-2 text-sm text-ink placeholder:text-faint disabled:opacity-60"
+      />
+      <button
+        type="button"
+        disabled={busy || !url.trim()}
+        onClick={() => void submit()}
+        className="pressable inline-flex shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-canvas disabled:opacity-40"
+      >
+        {busy ? <Loader2 size={13} className="animate-spin" /> : null}
+        Fetch
+      </button>
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="pressable caption shrink-0 font-semibold text-sub"
+      >
+        Cancel
+      </button>
+    </div>
+  );
 }
 
 /**
@@ -86,13 +191,19 @@ export function ImageField({
 }) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
-  const { send, busy, error } = useUploader(folder);
+  const { send, sendUrl, busy, error } = useUploader(folder);
   const shown = error ?? externalError;
 
   const pick = async (files: FileList | null) => {
     if (!files?.length) return;
     const urls = await send([files[0]]);
     if (urls?.[0]) onChange(urls[0]);
+  };
+
+  const fetchLink = async (url: string) => {
+    const saved = await sendUrl(url);
+    if (saved) onChange(saved);
+    return Boolean(saved);
   };
 
   return (
@@ -153,6 +264,12 @@ export function ImageField({
         />
       </div>
 
+      <LinkPaste
+        busy={busy}
+        onFetch={fetchLink}
+        label={value ? "Replace with a link" : "Or paste a link"}
+      />
+
       {shown ? (
         <p className="caption mt-1.5 px-1 text-danger">{shown}</p>
       ) : hint ? (
@@ -181,7 +298,7 @@ export function GalleryField({
   max?: number;
 }) {
   const input = useRef<HTMLInputElement>(null);
-  const { send, busy, error } = useUploader("work");
+  const { send, sendUrl, busy, error } = useUploader("work");
   const room = max - values.length;
 
   const add = async (files: FileList | null) => {
@@ -189,6 +306,12 @@ export function GalleryField({
     // The API takes eight per request; the artisan takes twelve in total.
     const urls = await send(Array.from(files).slice(0, Math.min(room, 8)));
     if (urls) onChange([...values, ...urls].slice(0, max));
+  };
+
+  const addLink = async (url: string) => {
+    const saved = await sendUrl(url);
+    if (saved) onChange([...values, saved].slice(0, max));
+    return Boolean(saved);
   };
 
   const makeCover = (url: string) => {
@@ -271,6 +394,10 @@ export function GalleryField({
           event.target.value = "";
         }}
       />
+
+      {room > 0 ? (
+        <LinkPaste busy={busy} onFetch={addLink} label="Or paste a link" />
+      ) : null}
 
       {error ? (
         <p className="caption mt-2 px-1 text-danger">{error}</p>
