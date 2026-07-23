@@ -184,8 +184,15 @@ export const authOptions: AuthOptions = {
       }
 
       // `update()` from the client, after a purchase changes the balance.
-      if (trigger === "update" && typeof session?.credits === "number") {
-        return { ...token, credits: session.credits };
+      if (trigger === "update") {
+        // An explicit balance (a credit-funded unlock knows the new figure) is
+        // applied directly. A bare `update()` — the return from a bundle or a
+        // paid unlock, where the webhook changed the balance server-side — has
+        // no figure to trust, so it pulls the live one from the backend.
+        if (typeof session?.credits === "number") {
+          return { ...token, credits: session.credits };
+        }
+        return refreshAccessToken(token);
       }
 
       if (Date.now() < token.accessTokenExpires - REFRESH_SKEW_MS) {

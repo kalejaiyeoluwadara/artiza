@@ -18,6 +18,20 @@ const NEVER_CHANGES = () => () => {};
 const onClient = () => true;
 const onServer = () => false;
 
+type IOSBrowser = "safari" | "chrome" | "firefox" | "edge" | "other";
+
+// iOS forces every browser onto WebKit, but only some expose an "Add to Home
+// Screen" action and each puts its Share button in a different spot — so the
+// install steps have to be told apart by the actual browser, not just "iOS".
+function detectIOSBrowser(ua: string): IOSBrowser {
+  if (/CriOS/i.test(ua)) return "chrome";
+  if (/FxiOS/i.test(ua)) return "firefox";
+  if (/EdgiOS/i.test(ua)) return "edge";
+  // Real iOS Safari has "Safari" and "Version/" but none of the tokens above.
+  if (/Safari/i.test(ua) && /Version\//i.test(ua)) return "safari";
+  return "other";
+}
+
 export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -30,6 +44,9 @@ export function PWAInstallPrompt() {
     hydrated &&
     /iPhone|iPad|iPod/i.test(navigator.userAgent) &&
     !("MSStream" in window);
+  const iosBrowser: IOSBrowser = isIOS
+    ? detectIOSBrowser(navigator.userAgent)
+    : "other";
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   useEffect(() => {
@@ -119,6 +136,19 @@ export function PWAInstallPrompt() {
     setShowIOSInstructions(false);
   };
 
+  // Where the Share button lives, per iOS browser — this is the only step that
+  // meaningfully differs between them.
+  const shareLocation: Record<IOSBrowser, string> = {
+    safari: "in the Safari toolbar",
+    chrome: "in the address bar (or the ⋯ menu) in Chrome",
+    edge: "in the ⋯ menu in Edge",
+    firefox: "in the ⋯ menu in Firefox",
+    other: "in your browser's menu",
+  };
+  // Firefox for iOS has no "Add to Home Screen" action at all, so pointing at
+  // its Share sheet would just dead-end the user — send them to Safari instead.
+  const cannotInstallHere = iosBrowser === "firefox" || iosBrowser === "other";
+
   if (!showPrompt) return null;
 
   return (
@@ -193,24 +223,48 @@ export function PWAInstallPrompt() {
                     <h3 className="headline font-bold text-ink">
                       How to Install on iOS
                     </h3>
-                    <div className="caption mt-2 space-y-2 text-sub">
-                      <p className="flex items-center gap-2">
-                        <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">
-                          1
-                        </span>
-                        <span>
-                          Tap the <Share className="inline size-4 text-accent" /> Share button in Safari navigation.
-                        </span>
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">
-                          2
-                        </span>
-                        <span>
-                          Scroll down and tap <PlusSquare className="inline size-4 text-ink" /> <b>&quot;Add to Home Screen&quot;</b>.
-                        </span>
-                      </p>
-                    </div>
+                    {cannotInstallHere ? (
+                      <div className="caption mt-2 space-y-2 text-sub">
+                        <p>
+                          This browser can&apos;t add apps to your home screen on iOS.
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">
+                            1
+                          </span>
+                          <span>
+                            Open <b>artiza</b> in <b>Safari</b>.
+                          </span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">
+                            2
+                          </span>
+                          <span>
+                            Tap <Share className="inline size-4 text-accent" /> Share, then <PlusSquare className="inline size-4 text-ink" /> <b>&quot;Add to Home Screen&quot;</b>.
+                          </span>
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="caption mt-2 space-y-2 text-sub">
+                        <p className="flex items-center gap-2">
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">
+                            1
+                          </span>
+                          <span>
+                            Tap the <Share className="inline size-4 text-accent" /> Share button {shareLocation[iosBrowser]}.
+                          </span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent">
+                            2
+                          </span>
+                          <span>
+                            Scroll down and tap <PlusSquare className="inline size-4 text-ink" /> <b>&quot;Add to Home Screen&quot;</b>.
+                          </span>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 

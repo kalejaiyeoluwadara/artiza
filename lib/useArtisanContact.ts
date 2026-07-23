@@ -35,7 +35,17 @@ export function useArtisanContact(
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (!artisanId || !enabled || !signedIn) return;
+    // A new artisan (or a locked one) must never inherit the last one's
+    // sealed half. Clear it up front so the pinned reveal and contact rows
+    // fall back to their masked state instead of showing a stale number.
+    setDetails(null);
+    setLocked(false);
+    setError(null);
+
+    if (!artisanId || !enabled || !signedIn) {
+      setLoading(false);
+      return;
+    }
 
     const controller = new AbortController();
 

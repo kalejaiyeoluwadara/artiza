@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { PaymentVerification } from "../../../components/PaymentVerification";
@@ -19,22 +19,26 @@ export function PaymentReturn() {
 
   const { state, retry } = usePaymentVerification(reference);
 
-  // The unlock list was read when this page mounted — which is before the
-  // webhook granted anything. Without a re-read, /unlocked renders the empty
-  // state for a contact that was just paid for. Refetching the moment it
-  // settles means the list is already warm when the customer taps through.
+  // Both of these are stale the instant the payment settles: the unlock list
+  // was read before the webhook granted anything, and the session's credit
+  // count is a copy taken at sign-in that the bundle just changed server-side.
+  // Refreshing them the moment it settles — not on the customer's tap — means
+  // /unlocked is already warm and the new credits are spendable right away,
+  // even if they never tap through this screen. A ref keeps it to one pass, so
+  // an unstable `update` identity can't loop it or rotate the token twice.
   const settled = state.phase === "settled";
+  const refreshedRef = useRef(false);
   useEffect(() => {
-    if (settled) refresh();
-  }, [settled, refresh]);
+    if (!settled || refreshedRef.current) return;
+    refreshedRef.current = true;
+    refresh();
+    void update();
+  }, [settled, refresh, update]);
 
   async function handleDone() {
     const isBundle = state.payment?.purpose === "bundle";
 
     if (settled) {
-      // The session's credit count is a copy taken at sign-in; a purchase just
-      // changed it, so pull the live figure before the account page renders it.
-      await update();
       toast.success(
         isBundle ? "Credits added" : "Contact unlocked",
         {
