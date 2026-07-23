@@ -36,6 +36,9 @@ function toArtisan(summary: ArtisanSummary): Artisan {
 function toBanner(item: BannerItem): Banner {
   return {
     id: item.id,
+    // Rows written before the field existed come back without it — offer, the
+    // historical default, keeps the eyebrow honest for them.
+    type: item.type ?? "offer",
     title: item.title,
     body: item.body,
     cta: item.cta,

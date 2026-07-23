@@ -3,16 +3,24 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
-import { FormSection, TextArea, TextField, ToggleField } from "./Fields";
+import {
+  FormSection,
+  SelectField,
+  TextArea,
+  TextField,
+  ToggleField,
+} from "./Fields";
 import { ImageField } from "./ImageField";
 import { useApi } from "../../lib/api/useApi";
 import { ApiError } from "../../lib/api/error";
 import { toast } from "../../lib/toast";
+import { BANNER_TYPES, bannerTypeLabel, type BannerType } from "../../lib/artisans";
 import type { AdminBannerItem, BannerInput } from "../../lib/api/types";
 
 export const BANNER_LIMITS = { title: 40, body: 120, cta: 30 } as const;
 
 export interface BannerDraft {
+  type: BannerType;
   title: string;
   body: string;
   cta: string;
@@ -23,6 +31,8 @@ export interface BannerDraft {
 
 export function blankBanner(): BannerDraft {
   return {
+    // Every banner Artiza has run so far is an offer; it stays the default.
+    type: "offer",
     title: "",
     body: "",
     cta: "",
@@ -36,6 +46,7 @@ export function blankBanner(): BannerDraft {
 
 export function bannerDraftFrom(banner: AdminBannerItem): BannerDraft {
   return {
+    type: banner.type,
     title: banner.title,
     body: banner.body,
     cta: banner.cta,
@@ -106,6 +117,7 @@ export function BannerEditor({
     }
 
     const payload: BannerInput = {
+      type: draft.type,
       title: draft.title.trim(),
       body: draft.body.trim(),
       cta: draft.cta.trim(),
@@ -147,6 +159,14 @@ export function BannerEditor({
           onChange={(url) => set("image", url)}
           error={errors.image}
           hint="White type sits on a dark scrim over the bottom — keep that area busy-free."
+        />
+
+        <SelectField
+          label="Type"
+          value={draft.type}
+          onChange={(v) => set("type", v)}
+          options={BANNER_TYPES}
+          hint="The small label over the title. Only offers are priced promotions."
         />
 
         <TextField
@@ -248,6 +268,9 @@ export function BannerPreview({
 
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
         <div className="min-w-0">
+          <p className="text-[0.625rem] font-bold uppercase tracking-[0.18em] text-white/70">
+            {bannerTypeLabel(draft.type)}
+          </p>
           <p className="title text-white">
             {draft.title || "Your title here"}
           </p>

@@ -74,7 +74,7 @@ export function ApplyControl() {
         whileTap="swing"
         className="pressable flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-1.5 text-[0.8125rem] font-semibold text-accent"
       >
-        <HammerIcon size={13} />
+        {/* <HammerIcon size={13} /> */}
         Are you an artisan?
       </motion.button>
 

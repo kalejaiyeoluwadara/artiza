@@ -1,4 +1,4 @@
-import type { Trade } from "../artisans";
+import type { BannerType, Trade } from "../artisans";
 
 /**
  * The envelope every Artiza endpoint answers in. The client unwraps it, so
@@ -107,6 +107,8 @@ export interface ArtisanContact {
 
 export interface BannerItem {
   id: string;
+  /** The eyebrow label over the title. Offer is the historical default. */
+  type: BannerType;
   title: string;
   body: string;
   cta: string;
@@ -325,6 +327,8 @@ export interface AdminBannerItem extends BannerItem {
 }
 
 export interface BannerInput {
+  /** The eyebrow label over the title. Omitted, the API defaults it to offer. */
+  type?: BannerType;
   title: string;
   body: string;
   cta: string;

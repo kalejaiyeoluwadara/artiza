@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Banner } from "../lib/artisans";
+import { Banner, bannerTypeLabel } from "../lib/artisans";
 import { useBanners } from "../lib/useData";
 
 /** How long a slide holds before the rail advances itself. */
@@ -182,12 +182,12 @@ function AccentedTitle({ title }: { title: string }) {
   );
 }
 
-/** An offer: what it is, what it gets you, one way in. */
+/** A banner: what it is, what it gets you, one way in. */
 function BannerContent({ banner }: { banner: Banner }) {
   return (
     <>
       <p className="text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-accent">
-        Offer
+        {bannerTypeLabel(banner.type)}
       </p>
       <h2 className="display mt-1.5 text-ink">
         <AccentedTitle title={banner.title} />

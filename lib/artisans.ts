@@ -88,8 +88,26 @@ export const TRADE_SHORT_LABELS: Record<Trade, string> = {
 /** Price of one contact unlock, in kobo-free naira. */
 export const UNLOCK_PRICE = 500;
 
+/** What a banner is saying — renders as the eyebrow label over its title. */
+export type BannerType = "offer" | "announcement" | "feature" | "tip";
+
+/** The eyebrow label each type shows, and the order they list in the console. */
+export const BANNER_TYPES: { value: BannerType; label: string }[] = [
+  { value: "offer", label: "Offer" },
+  { value: "announcement", label: "Announcement" },
+  { value: "feature", label: "Feature" },
+  { value: "tip", label: "Tip" },
+];
+
+/** Uppercase eyebrow the billboard sets over the title. */
+export function bannerTypeLabel(type: BannerType): string {
+  return (BANNER_TYPES.find((t) => t.value === type)?.label ?? "Offer").toUpperCase();
+}
+
 export interface Banner {
   id: string;
+  /** The eyebrow label over the title. Offer is the historical default. */
+  type: BannerType;
   /** Two or three words. The banner is a picture with a label, not a poster. */
   title: string;
   body: string;
