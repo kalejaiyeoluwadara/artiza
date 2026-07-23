@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Hammer, Hourglass } from "lucide-react";
+import { motion } from "framer-motion";
+import { Hourglass } from "lucide-react";
 import { useApi } from "../lib/api/useApi";
 import { ApplySheet } from "./ApplySheet";
+import { HammerIcon } from "./HammerIcon";
 
 /**
  * The "Apply to join" call to action, sat in the category pill row.
@@ -62,14 +64,19 @@ export function ApplyControl() {
 
   return (
     <>
-      <button
+      <motion.button
         type="button"
         onClick={onClick}
+        initial="rest"
+        animate="rest"
+        whileHover="swing"
+        whileFocus="swing"
+        whileTap="swing"
         className="pressable flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-1.5 text-[0.8125rem] font-semibold text-accent"
       >
-        <Hammer size={13} strokeWidth={2.4} aria-hidden />
+        <HammerIcon size={13} />
         Are you an artisan?
-      </button>
+      </motion.button>
 
       <ApplySheet
         open={open}
