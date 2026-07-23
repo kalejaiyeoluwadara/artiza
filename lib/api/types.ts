@@ -201,6 +201,59 @@ export interface PendingReviews {
   count: number;
 }
 
+// ── Applications ─────────────────────────────────────────────────────────────
+
+export type ApplicationStatus = "pending" | "approved" | "declined";
+
+/**
+ * What an artisan submits to apply for a listing. Lighter than `ArtisanInput`:
+ * the team-only fields (portrait, reply window, verification month) are filled
+ * in at approval, not by the applicant.
+ */
+export interface ApplicationInput {
+  name: string;
+  trade: Trade;
+  location: string;
+  yearsExperience: number;
+  /** MSISDN, no + or spaces: 2348031234567. */
+  phone: string;
+  whatsapp?: string;
+  note: string;
+  services?: string[];
+  /** Cloudinary URLs from `POST /applications/photos`. */
+  work?: string[];
+}
+
+/** What the applicant reads back — enough to show a pending state on the CTA. */
+export interface ApplicationItem {
+  id: string;
+  status: ApplicationStatus;
+  name: string;
+  trade: Trade;
+  createdAt: string;
+}
+
+/** The whole record, as the console triages it. */
+export interface AdminApplication {
+  id: string;
+  name: string;
+  trade: Trade;
+  location: string;
+  yearsExperience: number;
+  phone: string;
+  whatsapp?: string;
+  note: string;
+  services: string[];
+  work: string[];
+  status: ApplicationStatus;
+  /** The live artisan an approved application became. */
+  artisanId?: string;
+  createdAt: string;
+}
+
+/** Which slice of the triage queue to read. */
+export type ApplicationFilter = "pending" | "approved" | "declined" | "all";
+
 // ── Admin ──────────────────────────────────────────────────────────────────
 
 /**

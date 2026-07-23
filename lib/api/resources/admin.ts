@@ -1,8 +1,10 @@
 import { request, upload } from "../client";
 import type { ArtisanQuery } from "./artisans";
 import type {
+  AdminApplication,
   AdminArtisan,
   AdminBannerItem,
+  ApplicationFilter,
   ArtisanInput,
   ArtisanPatch,
   ArtisanSummary,
@@ -86,6 +88,47 @@ export const adminResource = (token?: string) => ({
      */
     retire(id: string): Promise<{ deactivated: true }> {
       return request<{ deactivated: true }>(`/admin/artisans/${id}`, {
+        method: "DELETE",
+        token,
+      });
+    },
+  },
+
+  applications: {
+    /** The triage queue. Defaults to pending; `status` widens or narrows it. */
+    list(
+      status: ApplicationFilter = "pending",
+      signal?: AbortSignal,
+    ): Promise<AdminApplication[]> {
+      return request<AdminApplication[]>("/admin/applications", {
+        query: { status },
+        token,
+        cache: "no-store",
+        signal,
+      });
+    },
+
+    /**
+     * Promote a lead into the register. Creates a live artisan from the
+     * submitted data — idempotent, so a double click is safe.
+     */
+    approve(id: string): Promise<AdminApplication> {
+      return request<AdminApplication>(`/admin/applications/${id}/approve`, {
+        method: "POST",
+        token,
+      });
+    },
+
+    decline(id: string): Promise<AdminApplication> {
+      return request<AdminApplication>(`/admin/applications/${id}/decline`, {
+        method: "POST",
+        token,
+      });
+    },
+
+    /** Hard delete — an application carries no receipts worth keeping. */
+    remove(id: string): Promise<{ deleted: true }> {
+      return request<{ deleted: true }>(`/admin/applications/${id}`, {
         method: "DELETE",
         token,
       });

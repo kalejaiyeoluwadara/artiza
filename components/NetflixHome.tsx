@@ -22,6 +22,7 @@ import {
 import { useArtisans } from "../lib/useData";
 import { useFavorites } from "../lib/useFavorites";
 import { useUnlocks } from "../context/UnlocksContext";
+import { ApplyControl } from "./ApplyControl";
 import { ArtisanSheet } from "./ArtisanSheet";
 import { FilterSheet } from "./SearchBar";
 import { HomeBillboard } from "./HomeBillboard";
@@ -320,6 +321,11 @@ function TopBar({
               label="Categories"
               trailing={<ChevronDown size={14} strokeWidth={2.4} aria-hidden />}
             />
+
+            {/* Not a filter — the one action pill in the row, so it wears the
+                accent and sits last, after the register's own controls. */}
+            <span aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-line" />
+            <ApplyControl />
           </div>
         </div>
       </div>

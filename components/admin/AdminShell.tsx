@@ -3,7 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Image as ImageIcon, LayoutGrid, Users } from "lucide-react";
+import {
+  ArrowUpRight,
+  Image as ImageIcon,
+  Inbox,
+  LayoutGrid,
+  Users,
+} from "lucide-react";
 
 const SECTIONS = [
   {
@@ -17,6 +23,12 @@ const SECTIONS = [
     label: "Register",
     icon: Users,
     hint: "Add, edit and retire artisans",
+  },
+  {
+    href: "/admin/applications",
+    label: "Applications",
+    icon: Inbox,
+    hint: "Artisans applying to join",
   },
   {
     href: "/admin/banners",
