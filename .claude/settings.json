@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Bash(git show *)",
+      "Bash(cat)",
+      "Bash(NODE_PATH=\"$\\(pwd\\)/node_modules\" node /tmp/hist.js)"
+    ]
+  }
+}
