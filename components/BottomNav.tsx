@@ -154,7 +154,6 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <span className="caption">Ilisan · Ogun</span>
       </div>
     </header>
   );

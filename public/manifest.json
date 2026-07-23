@@ -4,8 +4,8 @@
   "description": "Find and unlock contact details for vetted hand workers in Ilisan, Ogun State.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FBFBFD",
-  "theme_color": "#0D7A5F",
+  "background_color": "#0B0B0E",
+  "theme_color": "#E50914",
   "orientation": "portrait",
   "icons": [
     {

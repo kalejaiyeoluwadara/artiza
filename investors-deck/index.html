@@ -1,0 +1,608 @@
+<title>Artiza — Investor Brief</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%230B0B0E%22%2F%3E%3Cpath%20d%3D%22M20%2044%20L32%2018%20L44%2044%22%20fill%3D%22none%22%20stroke%3D%22%23E50914%22%20stroke-width%3D%226%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+<style>
+  :root {
+    --canvas: #0B0B0E;
+    --canvas-2: #101015;
+    --card: #17171C;
+    --card-2: #1d1d23;
+    --fill: rgba(255,255,255,0.11);
+    --line: rgba(255,255,255,0.13);
+    --line-soft: rgba(255,255,255,0.08);
+    --ink: #FFFFFF;
+    --sub: #A1A1AA;
+    --faint: #6B6B75;
+    --accent: #E50914;
+    --accent-bright: #ff2d38;
+    --accent-soft: rgba(229,9,20,0.18);
+    --amber: #F5A524;
+    --green: #2ecc71;
+
+    --sans: "Clash Display", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+    --body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "SFMono-Regular", "Menlo", "Consolas", monospace;
+    --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--body);
+    background: var(--canvas);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ---------- deck scaffolding ---------- */
+  .deck {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+  .slide {
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2rem, 6vw, 6.5rem);
+    overflow: hidden;
+  }
+  .slide__inner {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* grounds */
+  .s-canvas { background: var(--canvas); }
+  .s-raise  { background: var(--canvas-2); }
+  .s-accent {
+    background:
+      radial-gradient(130% 130% at 12% 8%, #2a0508 0%, #14060a 46%, #0B0B0E 100%);
+  }
+  .s-accent::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(80% 60% at 85% 90%, rgba(229,9,20,0.16), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ---------- type ---------- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: clamp(0.66rem, 1vw, 0.78rem);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent-bright);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7em;
+    margin-bottom: clamp(1.1rem, 2.4vw, 1.9rem);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 26px; height: 2px;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  h1, h2 {
+    font-family: var(--sans);
+    font-weight: 600;
+    line-height: 1.0;
+    letter-spacing: -0.024em;
+    text-wrap: balance;
+  }
+  h2 {
+    font-size: clamp(1.95rem, 5.4vw, 4rem);
+    max-width: 17ch;
+  }
+  h2 .accent-word { font-family: var(--serif); font-weight: 400; font-style: italic; letter-spacing: 0; color: var(--accent-bright); }
+  .lede {
+    margin-top: clamp(1.2rem, 2.5vw, 1.9rem);
+    font-size: clamp(1.02rem, 1.7vw, 1.32rem);
+    line-height: 1.5;
+    max-width: 56ch;
+    color: var(--sub);
+    font-weight: 400;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- cover ---------- */
+  .cover__wordmark {
+    font-family: var(--sans);
+    font-size: clamp(3.8rem, 14vw, 10rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .cover__wordmark .mark {
+    color: var(--accent);
+  }
+  .cover__tag {
+    margin-top: clamp(1.4rem, 3vw, 2.4rem);
+    font-family: var(--sans);
+    font-size: clamp(1.2rem, 2.6vw, 2rem);
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .cover__tag em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent-bright); }
+  .cover__sub {
+    margin-top: 0.9rem;
+    max-width: 46ch;
+    color: var(--sub);
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.45;
+  }
+  .cover__sub strong { color: var(--ink); font-weight: 600; }
+  .cover__foot {
+    position: absolute;
+    left: clamp(2rem, 6vw, 6.5rem);
+    right: clamp(2rem, 6vw, 6.5rem);
+    bottom: clamp(1.8rem, 4vw, 3rem);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    z-index: 3;
+  }
+
+  /* ---------- grids & cards ---------- */
+  .grid { display: grid; gap: clamp(0.9rem, 1.8vw, 1.4rem); margin-top: clamp(1.8rem, 3.5vw, 2.8rem); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .card {
+    border: 1px solid var(--line-soft);
+    border-radius: 16px;
+    padding: clamp(1.1rem, 2vw, 1.6rem);
+    background: var(--card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .card__k {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-bright);
+    font-weight: 600;
+  }
+  .card__t { font-family: var(--sans); font-weight: 500; font-size: clamp(1.05rem, 1.5vw, 1.22rem); letter-spacing: -0.012em; }
+  .card__d { color: var(--sub); font-size: 0.94rem; line-height: 1.45; }
+
+  /* metric row */
+  .metrics { display: flex; flex-wrap: wrap; gap: clamp(1.4rem, 4vw, 3.4rem); margin-top: clamp(1.8rem, 3.5vw, 2.6rem); }
+  .metric { display: flex; flex-direction: column; gap: 0.3rem; }
+  .metric__n {
+    font-family: var(--sans);
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-bright);
+  }
+  .metric__l { font-size: 0.9rem; color: var(--sub); max-width: 22ch; line-height: 1.35; }
+
+  /* two-col status */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.2rem, 3vw, 2.4rem); margin-top: clamp(1.8rem, 3.5vw, 2.6rem); }
+  .col__h {
+    font-family: var(--mono);
+    font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 1rem; color: var(--sub);
+    display: flex; align-items: center; gap: 0.6em;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+  .dot--live { background: var(--green); box-shadow: 0 0 0 4px rgba(46,204,113,0.18); }
+  .dot--build { background: var(--amber); box-shadow: 0 0 0 4px rgba(245,165,36,0.2); }
+  .stack { display: flex; flex-direction: column; gap: 0.7rem; }
+  .row {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    font-size: 0.98rem; line-height: 1.4;
+  }
+  .row b { font-weight: 600; }
+  .row span { color: var(--sub); }
+  .tick { color: var(--green); font-weight: 700; }
+  .arw { color: var(--amber); font-weight: 700; }
+
+  /* comparison table */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: clamp(1.8rem, 3.5vw, 2.6rem); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .vs__col { padding: clamp(1.4rem, 2.6vw, 2.2rem); }
+  .vs__col--them { background: var(--card); }
+  .vs__col--us { background: linear-gradient(160deg, rgba(229,9,20,0.20), rgba(229,9,20,0.05)); border-left: 1px solid var(--line); }
+  .vs__name { font-family: var(--sans); font-weight: 600; font-size: 1.3rem; letter-spacing: -0.02em; margin-bottom: 1.1rem; }
+  .vs__col--them .vs__name { color: var(--sub); }
+  .vs__col--us .vs__name { color: var(--ink); }
+  .vs ul { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .vs li { font-size: 0.96rem; line-height: 1.4; color: var(--sub); padding-left: 1.3rem; position: relative; }
+  .vs__col--us li { color: rgba(255,255,255,0.94); }
+  .vs li::before { content: "—"; position: absolute; left: 0; color: var(--faint); }
+  .vs__col--us li::before { content: "✓"; color: var(--accent-bright); }
+
+  /* timeline */
+  .rail { margin-top: clamp(2rem, 4vw, 3rem); display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+  .rail::before { content: ""; position: absolute; top: 7px; left: 6%; right: 6%; height: 2px; background: var(--line); }
+  .stop { position: relative; padding-top: 2.2rem; padding-right: 1rem; }
+  .stop::before {
+    content: ""; position: absolute; top: 0; left: 0;
+    width: 16px; height: 16px; border-radius: 999px;
+    background: var(--canvas); border: 3px solid var(--accent);
+  }
+  .stop--now::before { background: var(--accent); box-shadow: 0 0 0 5px rgba(229,9,20,0.22); }
+  .stop__k { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-bright); font-weight: 600; }
+  .stop__t { font-family: var(--sans); font-weight: 500; font-size: 1.08rem; margin: 0.4rem 0 0.35rem; letter-spacing: -0.01em; }
+  .stop__d { font-size: 0.86rem; color: var(--sub); line-height: 1.4; }
+
+  /* ask */
+  .ask__big { font-family: var(--sans); font-size: clamp(2.4rem, 7vw, 5rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.02; margin-top: 0.4rem; }
+  .ask__big em { font-style: normal; color: var(--accent-bright); }
+  .use { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: clamp(2rem, 4vw, 3rem); max-width: 820px; }
+  .use__item { border-top: 2px solid var(--accent); padding-top: 0.9rem; }
+  .use__p { font-family: var(--sans); font-size: 1.5rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .use__l { font-size: 0.88rem; color: var(--sub); margin-top: 0.3rem; line-height: 1.35; }
+
+  .edit { color: var(--accent-bright); border-bottom: 1px dashed rgba(229,9,20,0.5); font-style: normal; }
+
+  /* close */
+  .close-inner { text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .close__tag { font-family: var(--sans); font-size: clamp(1.8rem, 5vw, 3.4rem); font-weight: 600; letter-spacing: -0.025em; color: var(--ink); margin-top: 1.6rem; }
+  .close__tag em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent-bright); }
+  .close__cta { color: var(--sub); font-size: clamp(1.1rem, 2.4vw, 1.5rem); font-weight: 400; margin-top: 0.7rem; }
+  .close__contact { margin-top: 2rem; font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
+
+  /* mock unlock card on cover */
+  .mark-logo { display: inline-flex; align-items: center; gap: 0.3em; }
+
+  /* ---------- chrome: progress, dots, counter ---------- */
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); width: 0; z-index: 60; transition: width 0.25s ease; }
+  .dots { position: fixed; right: clamp(1rem, 2.5vw, 2rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 0.7rem; z-index: 60; }
+  .dots button {
+    width: 9px; height: 9px; border-radius: 999px; border: none; padding: 0; cursor: pointer;
+    background: rgba(255,255,255,0.22); transition: all 0.2s ease;
+  }
+  .dots button.active { background: var(--accent); transform: scale(1.35); }
+  .dots button:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; }
+
+  .counter { position: fixed; left: clamp(1rem, 2.5vw, 2rem); bottom: clamp(1rem, 2.5vw, 1.6rem); font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.14em; color: var(--faint); z-index: 60; }
+  .counter b { color: var(--ink); }
+  .hint { position: fixed; right: clamp(1rem,2.5vw,2rem); bottom: clamp(1rem,2.5vw,1.6rem); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); z-index: 60; opacity: 0.8; transition: opacity 0.4s ease; }
+
+  /* watermark mark on content slides */
+  .wm { position: absolute; right: -3%; bottom: -22%; font-family: var(--sans); font-weight: 600; font-size: 60vh; line-height: 1; color: var(--accent); opacity: 0.05; pointer-events: none; z-index: 1; user-select: none; }
+
+  @media (max-width: 760px) {
+    .grid-3, .grid-4, .grid-2, .cols, .vs, .rail, .use { grid-template-columns: 1fr; }
+    .rail::before { display: none; }
+    .dots { display: none; }
+    .wm { display: none; }
+    h2 { max-width: 100%; }
+
+    .slide {
+      height: auto;
+      min-height: 100vh;
+      justify-content: center;
+      padding: clamp(2.4rem, 9vw, 4rem) 1.4rem;
+    }
+    .eyebrow { font-size: 0.82rem; letter-spacing: 0.18em; }
+    h2 { font-size: clamp(2.35rem, 8.5vw, 3.1rem); line-height: 1.04; }
+    .lede { font-size: 1.2rem; line-height: 1.55; max-width: 100%; }
+
+    .cover__wordmark { font-size: clamp(4.6rem, 22vw, 7rem); }
+    .cover__tag { font-size: 1.7rem; }
+    .cover__sub { font-size: 1.18rem; line-height: 1.5; max-width: 100%; }
+    .cover__foot { font-size: 0.66rem; gap: 0.5rem; flex-wrap: wrap; }
+
+    .card__k { font-size: 0.76rem; }
+    .card__t { font-size: 1.22rem; }
+    .card__d { font-size: 1.08rem; line-height: 1.5; }
+
+    .metric__n { font-size: clamp(2.8rem, 12vw, 3.6rem); }
+    .metric__l { font-size: 1.08rem; max-width: 100%; line-height: 1.45; }
+    .metrics { gap: 1.8rem; }
+
+    .col__h { font-size: 0.82rem; }
+    .row { font-size: 1.12rem; line-height: 1.5; }
+
+    .vs__name { font-size: 1.45rem; }
+    .vs li { font-size: 1.1rem; line-height: 1.5; }
+
+    .stop__k { font-size: 0.76rem; }
+    .stop__t { font-size: 1.25rem; }
+    .stop__d { font-size: 1.04rem; line-height: 1.5; }
+    .stop { padding-top: 2.4rem; padding-right: 0; padding-bottom: 0.6rem; }
+
+    .ask__big { font-size: clamp(2.9rem, 11vw, 4rem); }
+    .use { gap: 1.4rem; }
+    .use__p { font-size: 1.8rem; }
+    .use__l { font-size: 1.06rem; line-height: 1.45; }
+
+    .close__tag { font-size: clamp(2.2rem, 9vw, 3rem); }
+    .close__cta { font-size: 1.35rem; }
+    .close__contact { font-size: 0.82rem; line-height: 1.7; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html, .deck { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="progress" id="progress"></div>
+<nav class="dots" id="dots" aria-label="Slides"></nav>
+<div class="counter" id="counter"><b>01</b> / 12</div>
+<div class="hint" id="hint">↓ scroll · ← → keys</div>
+
+<main class="deck" id="deck">
+
+  <!-- 1 · COVER -->
+  <section class="slide s-accent" data-title="Cover">
+    <div class="slide__inner">
+      <div class="cover__wordmark"><span class="mark">A</span>rtiza</div>
+      <div class="cover__tag">Find a hand you can <em>trust</em>.</div>
+      <p class="cover__sub">The vetted directory for local artisans — plumbers, tilers, solar installers, laundry workers — starting in one town: <strong>Ilisan</strong>.</p>
+    </div>
+    <div class="cover__foot">
+      <span>Investor brief</span>
+      <span>Ilisan · Ogun State</span>
+      <span>2026 · Confidential</span>
+    </div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide s-canvas" data-title="Problem">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">The problem</div>
+      <h2>Finding a good artisan runs on luck.</h2>
+      <p class="lede">Need a plumber, a tiler, an electrician? You ask a neighbour, chase a number down a WhatsApp group, and hope. <strong>No profiles, no proof of past work, no ratings, no accountability</strong> — and the good ones stay invisible because they can't market themselves.</p>
+      <div class="grid grid-3">
+        <div class="card"><div class="card__k">For customers</div><div class="card__t">No way to judge before you hire</div><div class="card__d">A name and a number on faith — no portfolio, no reviews, no recourse if the job goes wrong.</div></div>
+        <div class="card"><div class="card__k">For artisans</div><div class="card__t">Skilled, but unfindable</div><div class="card__d">Word-of-mouth caps their reach. Great work goes unseen and unbooked.</div></div>
+        <div class="card"><div class="card__k">For the town</div><div class="card__t">A market with no square</div><div class="card__d">Demand and supply both exist — there's just nowhere they reliably meet.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · INSIGHT -->
+  <section class="slide s-raise" data-title="Insight">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">The insight</div>
+      <h2>The bottleneck isn't discovery. It's <span class="accent-word">trust</span>.</h2>
+      <p class="lede">People don't struggle to find <em>a</em> plumber — they struggle to find one they'd let into their home. The scarce thing is proof: portfolio, ratings, vetting, a track record. <strong>Whoever supplies the trust owns the transaction</strong> — and trust is worth paying a small fee to unlock.</p>
+      <div class="metrics">
+        <div class="metric"><div class="metric__n">₦500</div><div class="metric__l">to unlock a vetted contact — cheap next to a botched job</div></div>
+        <div class="metric"><div class="metric__n">Vetted</div><div class="metric__l">every artisan checked and listed by the Artiza team, not self-signup</div></div>
+        <div class="metric"><div class="metric__n">Proof</div><div class="metric__l">portfolio, ratings and job count visible before you pay</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · SOLUTION -->
+  <section class="slide s-canvas" data-title="Solution">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">What we're building</div>
+      <h2>A catalogue of vetted hands, unlocked in a tap.</h2>
+      <div class="grid grid-4">
+        <div class="card"><div class="card__k">Discovery</div><div class="card__t">Browse like Netflix</div><div class="card__d">Poster rails by trade, rating and location — browsing is the product, no name needed to start.</div></div>
+        <div class="card"><div class="card__k">Proof</div><div class="card__t">Judge before you pay</div><div class="card__d">Portfolio photos, years of experience, star ratings and completed-job count on every profile.</div></div>
+        <div class="card"><div class="card__k">Unlock</div><div class="card__t">₦500 to reveal contact</div><div class="card__d">Paystack card, transfer or USSD reveals phone & WhatsApp. Bundles for repeat customers.</div></div>
+        <div class="card"><div class="card__k">Accountability</div><div class="card__t">Rate after the job</div><div class="card__d">A follow-up prompt turns each job into a rating — the credibility signal compounds.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · WHY ILISAN -->
+  <section class="slide s-accent" data-title="Why Ilisan">
+    <div class="slide__inner">
+      <div class="eyebrow">Why start here</div>
+      <h2>Ilisan is a whole market in miniature.</h2>
+      <p class="lede">A dense university town with a large permanent off-campus community — students, staff and residents — constantly needing repairs, installs and services. Small enough to vet every artisan by hand, and to become <strong>the</strong> name for finding one.</p>
+      <div class="metrics">
+        <div class="metric"><div class="metric__n">One town</div><div class="metric__l">owned completely beats a thin presence across ten cities</div></div>
+        <div class="metric"><div class="metric__n">Vettable</div><div class="metric__l">small enough that the team can personally check every listing</div></div>
+        <div class="metric"><div class="metric__n">Recurring</div><div class="metric__l">homes and businesses need artisans again and again — demand refills itself</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · STATUS -->
+  <section class="slide s-raise" data-title="Where we are">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">Where we are</div>
+      <h2>The product is built. We're stocking the shelves.</h2>
+      <p class="lede">Pre-launch and honest about it — but the platform customers and admins actually use is live and running today.</p>
+      <div class="cols">
+        <div>
+          <div class="col__h"><span class="dot dot--live"></span> Live today</div>
+          <div class="stack">
+            <div class="row"><span class="tick">✓</span><div><b>Catalogue app</b> <span>— browse, search & filter by trade and location</span></div></div>
+            <div class="row"><span class="tick">✓</span><div><b>Artisan profiles</b> <span>— portfolio, ratings, experience, featured</span></div></div>
+            <div class="row"><span class="tick">✓</span><div><b>Unlock flow</b> <span>— ₦500 reveal, Paystack card / transfer / USSD</span></div></div>
+            <div class="row"><span class="tick">✓</span><div><b>Admin dashboard</b> <span>— team adds, edits & vets every listing</span></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="col__h"><span class="dot dot--build"></span> Building next</div>
+          <div class="stack">
+            <div class="row"><span class="arw">→</span><div><b>Bundle purchases</b> <span>— 3 unlocks for ₦1,200, repeat pricing</span></div></div>
+            <div class="row"><span class="arw">→</span><div><b>Post-job ratings</b> <span>— follow-up prompts that build credibility</span></div></div>
+            <div class="row"><span class="arw">→</span><div><b>Featured listings</b> <span>— paid promotion, the second revenue line</span></div></div>
+            <div class="row"><span class="arw">→</span><div><b>Ilisan launch ops</b> <span>— vetting and onboarding the first artisans</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · BUSINESS MODEL -->
+  <section class="slide s-canvas" data-title="Business model">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">How we make money</div>
+      <h2>We sell trust — twice.</h2>
+      <p class="lede">Two revenue lines stack on the same directory: customers pay to unlock a vetted contact, and artisans pay to rank above the rest.</p>
+      <div class="grid grid-3">
+        <div class="card"><div class="card__k">Line 1</div><div class="card__t">Contact unlocks</div><div class="card__d"><span class="edit">₦500</span> per reveal, or a bundle — <span class="edit">3 for ₦1,200</span>. Pure margin on top of a listing that already exists.</div></div>
+        <div class="card"><div class="card__k">Line 2</div><div class="card__t">Featured listings</div><div class="card__d">Artisans pay to rank higher in search — promotion revenue that grows as the directory fills.</div></div>
+        <div class="card"><div class="card__k">Line 3</div><div class="card__t">Bundles & retention</div><div class="card__d">Prepaid unlock bundles turn one-off buyers into repeat customers with balance on the platform.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · REPLICATION -->
+  <section class="slide s-raise" data-title="The model scales">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">The model scales by repetition</div>
+      <h2>Win Ilisan. Then run the same play across Ogun.</h2>
+      <p class="lede">Each town is a self-contained directory — its own vetted artisans, its own customers, profitable on its own. We don't need a mega-city war chest; we need a repeatable town launch and the discipline to do it again.</p>
+      <div class="metrics">
+        <div class="metric"><div class="metric__n">1</div><div class="metric__l">Ilisan — vet the artisans, prove customers pay to unlock</div></div>
+        <div class="metric"><div class="metric__n">→</div><div class="metric__l">Ikenne · Sagamu · Ago-Iwoye — nearby towns, the same play</div></div>
+        <div class="metric"><div class="metric__n">N</div><div class="metric__l">Ogun, then the South-West — a network of owned town directories</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · COMPETITION -->
+  <section class="slide s-raise" data-title="Landscape">
+    <div class="slide__inner">
+      <div class="eyebrow">The landscape</div>
+      <h2>WhatsApp groups can't vet. National apps won't come.</h2>
+      <div class="vs">
+        <div class="vs__col vs__col--them">
+          <div class="vs__name">Groups · classifieds · big-city apps</div>
+          <ul>
+            <li>A name and a number, zero proof of work</li>
+            <li>No vetting, no ratings, no accountability</li>
+            <li>National platforms skip small towns entirely</li>
+            <li>No local roots — nobody who knows the artisans</li>
+          </ul>
+        </div>
+        <div class="vs__col vs__col--us">
+          <div class="vs__name">Artiza</div>
+          <ul>
+            <li>Every artisan vetted and listed by the team</li>
+            <li>Portfolio, ratings & job count before you pay</li>
+            <li>Town-first — built for the market others ignore</li>
+            <li>On the ground: known artisans, real reputations</li>
+          </ul>
+        </div>
+      </div>
+      <p class="lede" style="margin-top:1.4rem">Our moat isn't a feature they can copy — it's <strong>the vetted directory of a town, built before anyone else bothers to come.</strong></p>
+    </div>
+  </section>
+
+  <!-- 10 · ROADMAP -->
+  <section class="slide s-raise" data-title="Roadmap">
+    <div class="wm">A</div>
+    <div class="slide__inner">
+      <div class="eyebrow">The plan</div>
+      <h2>From directory to a network of towns.</h2>
+      <div class="rail">
+        <div class="stop stop--now"><div class="stop__k">Now</div><div class="stop__t">Ilisan launch</div><div class="stop__d">First artisans vetted and live, real customers unlocking contacts.</div></div>
+        <div class="stop"><div class="stop__k">Next</div><div class="stop__t">Prove the paid unlock</div><div class="stop__d">Nail unlock conversion, ratings volume and repeat purchase in one town.</div></div>
+        <div class="stop"><div class="stop__k">Then</div><div class="stop__t">Second town</div><div class="stop__d">Replicate the vetting-and-launch playbook in the Babcock/OOU corridor.</div></div>
+        <div class="stop"><div class="stop__k">Scale</div><div class="stop__t">Own Ogun</div><div class="stop__d">Town-by-town directory rollout across the state and South-West.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · ASK -->
+  <section class="slide s-accent" data-title="The ask">
+    <div class="slide__inner">
+      <div class="eyebrow">The ask</div>
+      <div class="ask__big">Raising <em>₦500,000</em><br>to put Artiza in Ilisan's hands.</div>
+      <p class="lede" style="margin-top:1.4rem">A deliberately small first cheque. Vet and onboard the first wave of artisans, and put the rest into on-the-ground marketing — fliers, posters and referrals across town — to get the first paid unlocks flowing and prove the model.</p>
+      <div class="use">
+        <div class="use__item"><div class="use__p">₦250k</div><div class="use__l">Marketing — fliers, posters & referral push across Ilisan</div></div>
+        <div class="use__item"><div class="use__p">₦175k</div><div class="use__l">Artisan onboarding — vetting, profile shoots & portfolios</div></div>
+        <div class="use__item"><div class="use__p">₦75k</div><div class="use__l">Launch ops & reserve — the buffer to keep it running</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · CLOSE -->
+  <section class="slide s-canvas" data-title="Close">
+    <div class="slide__inner close-inner">
+      <svg width="132" height="132" viewBox="0 0 132 132" role="img" aria-label="Artiza mark" style="filter: drop-shadow(0 12px 34px rgba(229,9,20,0.35))">
+        <rect x="6" y="6" width="120" height="120" rx="28" fill="#17171C" stroke="rgba(255,255,255,0.08)"/>
+        <path d="M40 92 L66 36 L92 92" fill="none" stroke="#E50914" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M52 74 L80 74" fill="none" stroke="#E50914" stroke-width="11" stroke-linecap="round"/>
+      </svg>
+      <div class="close__tag">Find a hand you can <em>trust</em>.</div>
+      <div class="close__cta">Vetted artisans, one tap away.</div>
+      <div class="close__contact">artiza · Kalejaiye Oluwadara Oladele · <span style="text-transform:none">kalejaiyeoluwadara1@gmail.com</span></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const deck = document.getElementById('deck');
+  const slides = [...deck.querySelectorAll('.slide')];
+  const dotsWrap = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const hint = document.getElementById('hint');
+  const total = slides.length;
+  let current = 0;
+
+  slides.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', (s.dataset.title || ('Slide ' + (i+1))));
+    b.addEventListener('click', () => slides[i].scrollIntoView());
+    dotsWrap.appendChild(b);
+  });
+  const dots = [...dotsWrap.children];
+
+  const pad = n => String(n).padStart(2, '0');
+  function setActive(i) {
+    current = i;
+    dots.forEach((d, k) => d.classList.toggle('active', k === i));
+    counter.innerHTML = '<b>' + pad(i + 1) + '</b> / ' + pad(total);
+    progress.style.width = ((i) / (total - 1) * 100) + '%';
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) setActive(slides.indexOf(e.target));
+    });
+  }, { threshold: 0.55 });
+  slides.forEach(s => io.observe(s));
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
+      e.preventDefault(); slides[Math.min(current + 1, total - 1)].scrollIntoView();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault(); slides[Math.max(current - 1, 0)].scrollIntoView();
+    } else if (e.key === 'Home') { slides[0].scrollIntoView(); }
+      else if (e.key === 'End') { slides[total - 1].scrollIntoView(); }
+  });
+
+  setActive(0);
+  setTimeout(() => { if (hint) hint.style.opacity = '0'; }, 4500);
+</script>
