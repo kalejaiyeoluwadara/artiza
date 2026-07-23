@@ -109,7 +109,7 @@ export function SiteHeader() {
   if (inConsole) return null;
 
   return (
-    <header className="chrome sticky top-0 z-50 hidden border-b border-line md:block">
+    <header className="chrome sticky top-0 z-50 hidden border-b-0 border-line md:block">
       <div
         className={`mx-auto flex h-14 items-center gap-8 ${
           wide ? "max-w-[96rem] px-8 lg:px-12" : "max-w-5xl px-6"
