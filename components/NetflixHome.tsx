@@ -465,16 +465,22 @@ function Failed({ onRetry }: { onRetry: () => void }) {
  */
 function BrandMark({ className }: { className: string }) {
   return (
-    <span className={`relative block ${className}`}>
-      <Image
-        src="/logo-mark.png"
-        alt=""
-        width={72}
-        height={72}
-        priority
-        className="size-full object-contain mix-blend-screen"
-      />
-    </span>
+    <span
+      className={`block ${className}`}
+      style={{
+        backgroundColor: "currentColor",
+        WebkitMaskImage: "url(/logo-mark.png)",
+        maskImage: "url(/logo-mark.png)",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        maskMode: "luminance",
+      }}
+      aria-hidden
+    />
   );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+
 import { usePathname } from "next/navigation";
 import {
   AccountIcon,
@@ -119,15 +119,22 @@ export function SiteHeader() {
           href="/"
           className="pressable flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-ink"
         >
-          <div className="relative size-9 overflow-hidden">
-            <Image
-              src="/logo-mark.png"
-              alt="Artiza Logo"
-              width={36}
-              height={36}
-              className="size-full object-contain mix-blend-screen"
+          <span
+              className="block size-9 shrink-0"
+              style={{
+                backgroundColor: "currentColor",
+                WebkitMaskImage: "url(/logo-mark.png)",
+                maskImage: "url(/logo-mark.png)",
+                WebkitMaskSize: "contain",
+                maskSize: "contain",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+                WebkitMaskPosition: "center",
+                maskPosition: "center",
+                maskMode: "luminance",
+              }}
+              aria-hidden
             />
-          </div>
           <span>
             Artiza<span className="text-accent">.</span>
           </span>
