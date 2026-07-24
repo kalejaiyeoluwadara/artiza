@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { Loader2 } from "lucide-react";
 import { AuthField } from "../../components/AuthField";
 import { GoogleButton } from "../../components/GoogleButton";
 
@@ -95,7 +96,11 @@ export function SignInForm() {
           disabled={submitting || !email || !password}
           className="pressable mt-2 w-full rounded-full bg-accent py-3.5 text-[1.0625rem] font-semibold text-white disabled:opacity-50"
         >
-          {submitting ? "Signing in…" : "Sign in"}
+          {submitting ? (
+            <Loader2 size={20} className="mx-auto block animate-spin" />
+          ) : (
+            "Sign in"
+          )}
         </button>
       </form>
 

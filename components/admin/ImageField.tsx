@@ -152,8 +152,7 @@ function LinkPaste({
         onClick={() => void submit()}
         className="pressable inline-flex shrink-0 items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-canvas disabled:opacity-40"
       >
-        {busy ? <Loader2 size={13} className="animate-spin" /> : null}
-        Fetch
+        {busy ? <Loader2 size={15} className="animate-spin" /> : "Fetch"}
       </button>
       <button
         type="button"
@@ -242,11 +241,13 @@ export function ImageField({
             {busy ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (
-              <ImageUp size={20} strokeWidth={1.8} />
+              <>
+                <ImageUp size={20} strokeWidth={1.8} />
+                <span className="caption font-semibold">
+                  {value ? "Replace" : "Choose a photo"}
+                </span>
+              </>
             )}
-            <span className="caption font-semibold">
-              {busy ? "Uploading…" : value ? "Replace" : "Choose a photo"}
-            </span>
           </span>
         </button>
 
@@ -373,11 +374,11 @@ export function GalleryField({
               {busy ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
-                <ImageUp size={18} strokeWidth={1.8} />
+                <>
+                  <ImageUp size={18} strokeWidth={1.8} />
+                  <span className="caption font-semibold">Add work</span>
+                </>
               )}
-              <span className="caption font-semibold">
-                {busy ? "Uploading…" : "Add work"}
-              </span>
             </button>
           </li>
         ) : null}

@@ -242,11 +242,11 @@ function TopBar({
     // Desktop already has the shared site header pinned at top-0, so only the
     // mobile bar sticks — two sticky bars at top-0 would stack on each other.
     <div className="chrome sticky top-0 z-40 md:static md:bg-transparent">
-      <div className="mx-auto flex h-16 w-full max-w-[96rem] items-center gap-3 px-4 md:hidden">
+      <div className="mx-auto flex h-16 w-full max-w-[96rem] items-center gap-1 px-4 md:hidden">
         {/* The mark sits beside a title in both states — signed in the title
             names you, signed out it names the screen. Dropping the words when
             there is no name left the row reading as a bare logo bar. */}
-        <h1 className="title flex min-w-0 items-center gap-2 text-ink">
+        <h1 className="text-lg font-bold flex min-w-0 items-center text-ink">
           <BrandMark className="size-9 shrink-0" />
           <span className="truncate">
             {firstName ? `For ${firstName}` : "For You"}

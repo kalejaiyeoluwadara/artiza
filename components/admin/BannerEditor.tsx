@@ -220,8 +220,13 @@ export function BannerEditor({
             disabled={saving}
             className="pressable inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-            {banner ? "Save banner" : "Add banner"}
+            {saving ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : banner ? (
+              "Save banner"
+            ) : (
+              "Add banner"
+            )}
           </button>
           <button
             type="button"

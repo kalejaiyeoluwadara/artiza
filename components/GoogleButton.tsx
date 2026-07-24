@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getProviders, signIn } from "next-auth/react";
+import { Loader2 } from "lucide-react";
 
 /**
  * "Continue with Google" — renders nothing until it knows Google is actually
@@ -51,8 +52,14 @@ export function GoogleButton({
         }}
         className="pressable hover-dim mt-8 flex w-full items-center justify-center gap-3 rounded-full border border-line bg-card py-3.5 text-[1.0625rem] font-semibold text-ink disabled:opacity-50"
       >
-        <GoogleMark />
-        {pending ? "Taking you to Google…" : label}
+        {pending ? (
+          <Loader2 size={20} className="animate-spin" />
+        ) : (
+          <>
+            <GoogleMark />
+            {label}
+          </>
+        )}
       </button>
 
       {/* Sits below the button, so the divider separates it from the form that

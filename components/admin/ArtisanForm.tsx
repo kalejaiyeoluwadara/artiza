@@ -434,8 +434,13 @@ export function ArtisanForm({
           disabled={saving || !dirty}
           className="pressable inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
-          {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-          {mode === "create" ? "Add to the register" : "Save changes"}
+          {saving ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : mode === "create" ? (
+            "Add to the register"
+          ) : (
+            "Save changes"
+          )}
         </button>
       </div>
     </form>

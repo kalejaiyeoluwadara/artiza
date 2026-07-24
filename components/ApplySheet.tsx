@@ -228,8 +228,11 @@ export function ApplySheet({
             disabled={submitting}
             className="pressable inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
           >
-            {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
-            Send application
+            {submitting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              "Send application"
+            )}
           </button>
         </div>
       </form>
@@ -326,11 +329,11 @@ function PhotoField({
               {busy ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
-                <ImageUp size={18} strokeWidth={1.8} />
+                <>
+                  <ImageUp size={18} strokeWidth={1.8} />
+                  <span className="caption font-semibold">Add work</span>
+                </>
               )}
-              <span className="caption font-semibold">
-                {busy ? "Uploading…" : "Add work"}
-              </span>
             </button>
           </li>
         ) : null}

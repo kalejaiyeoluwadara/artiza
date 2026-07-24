@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Star } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import { Artisan, TRADE_LABELS } from "../lib/artisans";
 import { ApiError } from "../lib/api/error";
 import { Dialog } from "./Dialog";
@@ -163,7 +163,11 @@ function RatingForm({
           disabled={submitting || tooShort}
           className="pressable flex-1 rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white disabled:opacity-60"
         >
-          {submitting ? "Sending…" : "Submit rating"}
+          {submitting ? (
+            <Loader2 size={18} className="mx-auto block animate-spin" />
+          ) : (
+            "Submit rating"
+          )}
         </button>
       </div>
     </form>
