@@ -10,6 +10,7 @@ import {
   phoneE164,
   phoneGroups,
 } from "../lib/artisans";
+import { useUnlocks } from "../context/UnlocksContext";
 import { WhatsAppIcon } from "./BrandIcons";
 import { CopyButton } from "./ContactPanel";
 
@@ -44,6 +45,11 @@ export function SealedContact({
   onUnlock: () => void;
 }) {
   const { name } = artisan;
+
+  // A bundle already paid for this tap, so quoting ₦500 would be asking twice
+  // for money that is spent. The button names what it actually spends.
+  const { credits } = useUnlocks();
+  const payingWithCredit = credits > 0;
 
   // Masked until the real digits are in hand — so the moment between "paid"
   // and "loaded" still reads as sealed rather than flashing placeholder zeros.
@@ -112,10 +118,16 @@ export function SealedContact({
             onClick={onUnlock}
             className="pressable hover-dim mt-3 flex w-full items-center justify-center rounded-full bg-accent py-3 text-[0.9375rem] font-semibold text-white"
           >
-            Unlock contact · ₦{UNLOCK_PRICE}
+            {payingWithCredit
+              ? "Unlock with credit"
+              : `Unlock contact · ₦${UNLOCK_PRICE}`}
           </button>
           <p className="caption mt-2 text-center">
-            WhatsApp, Call, Text and more · paid once, kept forever
+            {payingWithCredit
+              ? `WhatsApp, Call, Text and more · ${credits} ${
+                  credits === 1 ? "credit" : "credits"
+                } left`
+              : "WhatsApp, Call, Text and more · paid once, kept forever"}
           </p>
         </>
       )}

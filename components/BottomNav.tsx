@@ -119,13 +119,13 @@ export function SiteHeader() {
           href="/"
           className="pressable flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-ink"
         >
-          <div className="relative size-7 overflow-hidden rounded-lg border border-line bg-canvas shadow-xs">
+          <div className="relative size-9 overflow-hidden">
             <Image
-              src="/icon-192.png"
+              src="/logo-mark.png"
               alt="Artiza Logo"
-              width={28}
-              height={28}
-              className="size-full object-cover"
+              width={36}
+              height={36}
+              className="size-full object-contain mix-blend-screen"
             />
           </div>
           <span>

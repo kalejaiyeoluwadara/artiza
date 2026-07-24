@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { BadgeCheck, ChevronRight, MapPin, Star } from "lucide-react";
 import { Artisan, TRADE_LABELS, UNLOCK_PRICE } from "../lib/artisans";
+import { useUnlocks } from "../context/UnlocksContext";
 import { ArtisanCover } from "./ArtisanCover";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -23,6 +24,10 @@ export function ArtisanCard({
   unlocked: boolean;
   onOpen: () => void;
 }) {
+  // Matches the sheet's button: with credits in hand the price is already
+  // paid, so the card promises a credit rather than quoting ₦500 again.
+  const { credits } = useUnlocks();
+
   return (
     // The heart is a control in its own right, so it cannot live inside the
     // card's button — nested buttons are invalid, and the outer one would
@@ -91,7 +96,9 @@ export function ArtisanCard({
             <span className="text-sm font-medium text-accent">
               {unlocked
                 ? "Contact unlocked"
-                : `₦${UNLOCK_PRICE} to unlock contact`}
+                : credits > 0
+                  ? "Unlock with credit"
+                  : `₦${UNLOCK_PRICE} to unlock contact`}
             </span>
             <ChevronRight
               size={16}
