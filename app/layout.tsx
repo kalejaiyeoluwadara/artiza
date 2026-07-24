@@ -112,7 +112,14 @@ export default function RootLayout({
       lang="en"
       className={`${satoshi.variable} ${clash.variable} ${instrument.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col bg-canvas text-ink">
+      {/* Extensions (Grammarly, ColorZilla, …) inject attributes onto <body>
+          before React hydrates. suppressHydrationWarning silences that one
+          level deep — the body's own attributes — without masking real
+          mismatches inside the tree. */}
+      <body
+        suppressHydrationWarning
+        className="flex min-h-full flex-col bg-canvas text-ink"
+      >
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:rounded-full focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
