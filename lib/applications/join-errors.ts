@@ -28,6 +28,7 @@ export interface JoinFailure {
 const FIELD_LABELS: Record<keyof JoinDraft, string> = {
   name: "full name",
   trade: "trade",
+  customTrade: "trade name",
   location: "where you work",
   yearsExperience: "years of experience",
   phone: "phone number",
@@ -92,6 +93,10 @@ function rewrite(field: keyof JoinDraft, raws: string[]): string {
         : "Enter your full name, at least two letters — this is what customers will see.";
     case "trade":
       return "Pick your trade from the list so customers can find you under it.";
+    case "customTrade":
+      return tooLong
+        ? "That trade name is too long to print on a profile. A word or two is enough."
+        : "Type what your trade is called, so your profile can say it.";
     case "location":
       return tooLong
         ? "That's longer than we can print on a profile. Just the area is enough, like Babcock Road."

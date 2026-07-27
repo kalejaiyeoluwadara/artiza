@@ -13,6 +13,8 @@ import { TRADE_LABELS, type Trade } from "../artisans";
 export interface ArtisanDraft {
   name: string;
   trade: Trade;
+  /** Their own words, when `trade` is `other`. Empty otherwise. */
+  customTrade: string;
   location: string;
   yearsExperience: string;
   phone: string;
@@ -43,6 +45,7 @@ export const MONTHS = [
 export const LIMITS = {
   name: 80,
   location: 60,
+  customTrade: 40,
   note: 240,
   respondsIn: 80,
   availability: 80,
@@ -74,6 +77,7 @@ export function blankDraft(): ArtisanDraft {
   return {
     name: "",
     trade: "plumber",
+    customTrade: "",
     location: "",
     yearsExperience: "",
     phone: "",
@@ -105,6 +109,7 @@ export function draftFrom(artisan: AdminArtisan): ArtisanDraft {
   return {
     name: artisan.name,
     trade: artisan.trade,
+    customTrade: artisan.customTrade ?? "",
     location: artisan.location,
     yearsExperience: String(artisan.yearsExperience),
     phone: nationalPart(artisan.phone),
@@ -193,6 +198,11 @@ export function validateDraft(draft: ArtisanDraft): DraftErrors {
   if (draft.name.trim().length < 2) errors.name = "Give their full name.";
   else if (draft.name.length > LIMITS.name) errors.name = "That's too long.";
 
+  if (draft.trade === "other" && !draft.customTrade.trim())
+    errors.customTrade = "Name the trade this is listed as.";
+  else if (draft.customTrade.length > LIMITS.customTrade)
+    errors.customTrade = "That's too long.";
+
   if (!draft.location.trim()) errors.location = "Which part of Ilisan?";
   else if (draft.location.length > LIMITS.location)
     errors.location = "That's too long.";
@@ -245,6 +255,9 @@ export function toInput(draft: ArtisanDraft): ArtisanInput {
   return {
     name: draft.name.trim(),
     trade: draft.trade,
+    ...(draft.trade === "other"
+      ? { customTrade: draft.customTrade.trim() }
+      : {}),
     location: draft.location.trim(),
     yearsExperience: Number(draft.yearsExperience),
     phone: toMsisdn(draft.phone),
@@ -289,6 +302,7 @@ export function toPatch(
   const scalars = [
     "name",
     "trade",
+    "customTrade",
     "location",
     "yearsExperience",
     "phone",

@@ -111,20 +111,19 @@ export function TradeField({
     return rows;
   }, [query]);
 
-  // Keep the highlight on a row that exists — the list reshapes on every
-  // keystroke, and an index pointing past the end would arrow into nothing.
-  useEffect(() => {
-    setActive((current) => Math.min(current, Math.max(0, options.length - 1)));
-  }, [options.length]);
+  // Clamped at render rather than corrected in an effect: the list reshapes on
+  // every keystroke, and an index left pointing past the end would arrow into
+  // nothing. Deriving it means there is never a frame where it is wrong.
+  const activeIndex = Math.min(active, Math.max(0, options.length - 1));
 
   // Follow the highlight when it is driven by the keyboard, so arrowing down a
   // long list never walks it out of view.
   useEffect(() => {
     if (!open) return;
     list.current
-      ?.querySelector(`[data-index="${active}"]`)
+      ?.querySelector(`[data-index="${activeIndex}"]`)
       ?.scrollIntoView({ block: "nearest" });
-  }, [active, open]);
+  }, [activeIndex, open]);
 
   // A click anywhere else is a dismissal. Pointerdown rather than click so it
   // lands before focus moves and the panel can't flicker.
@@ -160,8 +159,8 @@ export function TradeField({
         return;
       }
       const step = event.key === "ArrowDown" ? 1 : -1;
-      setActive((current) => {
-        const next = current + step;
+      setActive(() => {
+        const next = activeIndex + step;
         // Wraps, because a list this long is worse to walk off the end of.
         if (next < 0) return options.length - 1;
         if (next >= options.length) return 0;
@@ -174,7 +173,7 @@ export function TradeField({
       if (!open) return;
       // Only swallow Enter when it is actually choosing something — otherwise
       // it belongs to the form.
-      const option = options[active];
+      const option = options[activeIndex];
       if (!option) return;
       event.preventDefault();
       commit(option);
@@ -209,7 +208,9 @@ export function TradeField({
           aria-controls={listId}
           aria-autocomplete="list"
           aria-activedescendant={
-            open && options[active] ? `${id}-opt-${active}` : undefined
+            open && options[activeIndex]
+              ? `${id}-opt-${activeIndex}`
+              : undefined
           }
           aria-invalid={Boolean(error)}
           aria-describedby={
@@ -281,7 +282,7 @@ export function TradeField({
                   }}
                   onPointerEnter={() => setActive(index)}
                   className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[0.9375rem] ${
-                    index === active ? "bg-fill text-ink" : "text-sub"
+                    index === activeIndex ? "bg-fill text-ink" : "text-sub"
                   }`}
                 >
                   {option.kind === "custom" ? (

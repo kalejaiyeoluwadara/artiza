@@ -75,6 +75,8 @@ export interface ArtisanSummary {
   id: string;
   name: string;
   trade: Trade;
+  /** What they call it, when `trade` is `other`. */
+  customTrade?: string;
   location: string;
   yearsExperience: number;
   jobsCompleted: number;
@@ -217,6 +219,8 @@ export type ApplicationStatus = "pending" | "approved" | "declined";
 export interface ApplicationInput {
   name: string;
   trade: Trade;
+  /** Required when `trade` is `other`; omitted otherwise. */
+  customTrade?: string;
   location: string;
   yearsExperience: number;
   /** MSISDN, no + or spaces: 2348031234567. */
@@ -264,6 +268,7 @@ export interface JoinResult {
   status: ApplicationStatus;
   name: string;
   trade: Trade;
+  customTrade?: string;
   published: boolean;
   /**
    * The live listing this became. Only set when `published` — the id the
@@ -279,6 +284,7 @@ export interface AdminApplication {
   id: string;
   name: string;
   trade: Trade;
+  customTrade?: string;
   location: string;
   yearsExperience: number;
   phone: string;
@@ -347,6 +353,8 @@ export interface ContactInput {
 export interface ArtisanInput {
   name: string;
   trade: Trade;
+  /** Required when `trade` is `other`; omitted otherwise. */
+  customTrade?: string;
   location: string;
   yearsExperience: number;
   /** MSISDN, no + or spaces: 2348031234567. */

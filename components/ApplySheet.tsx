@@ -6,10 +6,11 @@ import { useSession } from "next-auth/react";
 import { ImageUp, Loader2, Trash2 } from "lucide-react";
 import { Sheet } from "./Sheet";
 import { SelectField, TagField, TextArea, TextField } from "./admin/Fields";
+import { TradeField } from "./TradeField";
 import { useApi } from "../lib/api/useApi";
 import { ApiError } from "../lib/api/error";
 import { toast } from "../lib/toast";
-import { TRADE_OPTIONS } from "../lib/admin/artisan-draft";
+import {} from "../lib/admin/artisan-draft";
 import {
   APPLICATION_LIMITS,
   blankApplication,
@@ -18,7 +19,7 @@ import {
   type ApplicationDraft,
   type ApplicationErrors,
 } from "../lib/applications/application-draft";
-import type { Trade } from "../lib/artisans";
+import type {} from "../lib/artisans";
 import type { ApplicationItem } from "../lib/api/types";
 
 /** What the upload path accepts, said out loud so the copy and the picker agree. */
@@ -130,12 +131,13 @@ export function ApplySheet({
               error={errors.name}
             />
 
-            <SelectField<Trade>
-              label="Trade"
-              value={draft.trade}
-              onChange={(v) => set("trade", v)}
-              options={TRADE_OPTIONS}
-              hint="The work you'd be listed under."
+            <TradeField
+              trade={draft.trade}
+              customTrade={draft.customTrade}
+              onChange={(next) =>
+                setDraft((current) => ({ ...current, ...next }))
+              }
+              error={errors.customTrade}
             />
 
             <TextField

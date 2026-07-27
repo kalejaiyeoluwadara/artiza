@@ -12,6 +12,7 @@ import {
   TextField,
   ToggleField,
 } from "./Fields";
+import { TradeField } from "../TradeField";
 import { GalleryField, ImageField } from "./ImageField";
 import { ArtisanCard } from "../ArtisanCard";
 import { useApi } from "../../lib/api/useApi";
@@ -20,7 +21,6 @@ import { toast } from "../../lib/toast";
 import {
   LIMITS,
   MONTHS,
-  TRADE_OPTIONS,
   isUnchanged,
   toInput,
   toPatch,
@@ -189,11 +189,13 @@ export function ArtisanForm({
                 maxLength={LIMITS.name}
                 error={errors.name}
               />
-              <SelectField<Trade>
-                label="Trade"
-                value={draft.trade}
-                onChange={(v) => set("trade", v)}
-                options={TRADE_OPTIONS}
+              <TradeField
+                trade={draft.trade}
+                customTrade={draft.customTrade}
+                onChange={(next) =>
+                  setDraft((current) => ({ ...current, ...next }))
+                }
+                error={errors.customTrade}
                 hint="Decides which rail and filter they appear under."
               />
               <TextField

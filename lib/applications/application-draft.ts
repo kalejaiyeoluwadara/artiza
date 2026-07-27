@@ -14,6 +14,8 @@ import { toHandle, toMsisdn } from "../admin/artisan-draft";
 export interface ApplicationDraft {
   name: string;
   trade: Trade;
+  /** Their own words, when `trade` is `other`. Empty otherwise. */
+  customTrade: string;
   location: string;
   yearsExperience: string;
   phone: string;
@@ -30,6 +32,7 @@ export interface ApplicationDraft {
 export const APPLICATION_LIMITS = {
   name: 80,
   location: 60,
+  customTrade: 40,
   note: 240,
   instagram: 40,
   facebook: 60,
@@ -44,6 +47,7 @@ export function blankApplication(name = ""): ApplicationDraft {
   return {
     name,
     trade: "plumber",
+    customTrade: "",
     location: "",
     yearsExperience: "",
     phone: "",
@@ -79,6 +83,11 @@ export function validateApplication(
   else if (draft.name.length > APPLICATION_LIMITS.name)
     errors.name = "That's too long.";
 
+  if (draft.trade === "other" && !draft.customTrade.trim())
+    errors.customTrade = "Tell us what your trade is called.";
+  else if (draft.customTrade.length > APPLICATION_LIMITS.customTrade)
+    errors.customTrade = "That's too long.";
+
   if (!draft.location.trim()) errors.location = "Which part of Ilisan?";
   else if (draft.location.length > APPLICATION_LIMITS.location)
     errors.location = "That's too long.";
@@ -110,6 +119,9 @@ export function toApplicationInput(
   return {
     name: draft.name.trim(),
     trade: draft.trade,
+    ...(draft.trade === "other"
+      ? { customTrade: draft.customTrade.trim() }
+      : {}),
     location: draft.location.trim(),
     yearsExperience: Number(draft.yearsExperience),
     phone: toMsisdn(draft.phone),

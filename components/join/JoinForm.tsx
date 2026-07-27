@@ -6,13 +6,13 @@ import Link from "next/link";
 import { Check, ImageUp, Loader2, Trash2, TriangleAlert } from "lucide-react";
 import {
   FormSection,
-  SelectField,
   TagField,
   TextArea,
   TextField,
 } from "../admin/Fields";
+import { TradeField } from "../TradeField";
 import { publicApi } from "../../lib/api";
-import { TRADE_OPTIONS } from "../../lib/admin/artisan-draft";
+import {} from "../../lib/admin/artisan-draft";
 import { APPLICATION_LIMITS } from "../../lib/applications/application-draft";
 import {
   blankJoin,
@@ -29,7 +29,7 @@ import {
   rememberJustJoined,
   toJustJoined,
 } from "../../lib/applications/just-joined";
-import { TRADE_LABELS, type Trade } from "../../lib/artisans";
+import { tradeName } from "../../lib/artisans";
 import type { JoinResult } from "../../lib/api/types";
 
 /** What the upload path accepts, said out loud so the copy and the picker agree. */
@@ -189,12 +189,13 @@ export function JoinForm() {
             disabled={submitting}
           />
 
-          <SelectField<Trade>
-            label="Trade"
-            value={draft.trade}
-            onChange={(v) => set("trade", v)}
-            options={TRADE_OPTIONS}
-            hint="The work customers will find you under."
+          <TradeField
+            trade={draft.trade}
+            customTrade={draft.customTrade}
+            onChange={(next) =>
+              setDraft((current) => ({ ...current, ...next }))
+            }
+            error={errors.customTrade}
             disabled={submitting}
           />
 
@@ -640,7 +641,7 @@ function PhotoField({
  */
 function JoinDone({ result }: { result: JoinResult }) {
   const firstName = result.name.trim().split(/\s+/)[0];
-  const trade = TRADE_LABELS[result.trade].toLowerCase();
+  const trade = tradeName(result).toLowerCase();
 
   return (
     <div className="mx-auto w-full max-w-xl px-4 pb-24 pt-8 md:px-6 md:pb-20 md:pt-14">
