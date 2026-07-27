@@ -59,6 +59,18 @@ export const TRADE_LABELS = {
   caterer: "Caterer",
   "event-decorator": "Event decorator",
   photographer: "Photographer",
+
+  /**
+   * The escape hatch, and deliberately last in every list it appears in.
+   *
+   * An artisan whose trade is not above picks this and types it; `customTrade`
+   * carries what they wrote, and {@link tradeName} shows that instead of this
+   * label everywhere a trade is displayed. The closed list is what makes browse
+   * work — rails, filters and illustrations are all built on it — so this keeps
+   * the taxonomy intact rather than letting free text fragment the register,
+   * while still listing the artisan under their real trade.
+   */
+  other: "Other",
 } as const satisfies Record<string, string>;
 
 export type Trade = keyof typeof TRADE_LABELS;
@@ -89,6 +101,8 @@ export interface Artisan {
   id: string;
   name: string;
   trade: Trade;
+  /** What they call it, when `trade` is `other`. See {@link tradeName}. */
+  customTrade?: string;
   /** Area within Ilisan. */
   location: string;
   yearsExperience: number;
@@ -123,6 +137,23 @@ export interface Artisan {
 export interface SealedDetails {
   phone: string;
   contact: Contact;
+}
+
+/**
+ * What to call an artisan's trade, on screen.
+ *
+ * Always this, never a bare `TRADE_LABELS[artisan.trade]` — that renders the
+ * word "Other" at an artisan whose trade is the one thing the row exists to
+ * say. Filter chips and rail tiles are the exception and stay on the raw
+ * label, because there the subject really is the category and not a person.
+ */
+export function tradeName(artisan: {
+  trade: Trade;
+  customTrade?: string;
+}): string {
+  return artisan.trade === "other" && artisan.customTrade
+    ? artisan.customTrade
+    : TRADE_LABELS[artisan.trade];
 }
 
 /**
@@ -424,8 +455,8 @@ export function vCardFor(artisan: Artisan, details: SealedDetails): string {
     "VERSION:3.0",
     `N:${esc(last)};${esc(first)};;;`,
     `FN:${esc(artisan.name)}`,
-    `ORG:${esc(TRADE_LABELS[artisan.trade])} · Ilisan`,
-    `TITLE:${esc(TRADE_LABELS[artisan.trade])}`,
+    `ORG:${esc(tradeName(artisan))} · Ilisan`,
+    `TITLE:${esc(tradeName(artisan))}`,
     `TEL;TYPE=CELL:${phoneE164(details.phone)}`,
   ];
 

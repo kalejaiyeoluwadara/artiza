@@ -32,6 +32,9 @@ const FIELD_LABELS: Record<keyof JoinDraft, string> = {
   yearsExperience: "years of experience",
   phone: "phone number",
   whatsapp: "WhatsApp number",
+  instagram: "Instagram handle",
+  facebook: "Facebook page",
+  snapchat: "Snapchat handle",
   note: "description of your work",
   services: "services",
   work: "photos",
@@ -71,10 +74,16 @@ function fieldOf(message: string): keyof JoinDraft | undefined {
  * of these rules is one the form already knows. The raw text is only consulted
  * to tell "too short" from "too long" — never shown.
  */
-function rewrite(field: keyof JoinDraft, raw: string): string {
-  const tooLong = /longer than|maximal|max length|shorter than or equal/i.test(
-    raw,
-  );
+function rewrite(field: keyof JoinDraft, raws: string[]): string {
+  // Every rule that failed on this field, not just the first. class-validator
+  // reports a missing value as *all* of its rules failing at once — "must be
+  // shorter than or equal to 80", "must be longer than or equal to 2", "must
+  // be a string" — and the maximum-length one arrives first. Reading that one
+  // alone would tell someone who typed nothing that their answer is too long.
+  const has = (pattern: RegExp) => raws.some((raw) => pattern.test(raw));
+  const tooLong =
+    has(/shorter than or equal|maximal|max length|at most/i) &&
+    !has(/longer than or equal|must be a string|should not be empty|minimal/i);
 
   switch (field) {
     case "name":
@@ -93,6 +102,15 @@ function rewrite(field: keyof JoinDraft, raw: string): string {
       return "That phone number isn't a Nigerian mobile number. Ten digits after +234, like 803 123 4567.";
     case "whatsapp":
       return "That WhatsApp number isn't a Nigerian mobile number. Ten digits after +234, or leave it empty to use your phone number.";
+    case "instagram":
+    case "snapchat":
+      return tooLong
+        ? `That's longer than a ${field === "instagram" ? "Instagram" : "Snapchat"} handle can be. Just the handle, without the @.`
+        : `Artiza couldn't read that as a ${field === "instagram" ? "Instagram" : "Snapchat"} handle. Enter the handle without the @, paste the link to your page, or leave it empty.`;
+    case "facebook":
+      return tooLong
+        ? "That's longer than a Facebook page name can be. Just the page name, or the link to it."
+        : "Artiza couldn't read that as a Facebook page. Enter the page name, paste the link to it, or leave it empty.";
     case "note":
       return tooLong
         ? "That's longer than a profile shows. Keep it to a line or two on the work you do."
@@ -156,22 +174,28 @@ export function describeJoinFailure(cause: unknown): JoinFailure {
   }
 
   if (cause.status === 400 || cause.status === 422) {
-    const fields: JoinErrors = {};
+    // The API flattens class-validator's output into one array under `_errors`
+    // rather than keying it by field, so the field has to be read back out of
+    // each sentence. Grouping first, rewriting after, because which advice is
+    // right depends on *all* the rules a field broke — see `rewrite`.
+    const byField = new Map<keyof JoinDraft, string[]>();
     const unplaced: string[] = [];
 
     for (const messages of Object.values(cause.details ?? {})) {
       for (const raw of messages) {
         const field = fieldOf(raw);
-        // First one wins: a field with two broken rules gets the first fix,
-        // and the second surfaces after that one is corrected.
-        if (field && !fields[field]) fields[field] = rewrite(field, raw);
-        else if (!field) unplaced.push(raw);
+        if (!field) {
+          unplaced.push(raw);
+          continue;
+        }
+        byField.set(field, [...(byField.get(field) ?? []), raw]);
       }
     }
 
-    const named = (Object.keys(fields) as (keyof JoinDraft)[]).map(
-      (key) => FIELD_LABELS[key],
-    );
+    const fields: JoinErrors = {};
+    for (const [field, raws] of byField) fields[field] = rewrite(field, raws);
+
+    const named = [...byField.keys()].map((key) => FIELD_LABELS[key]);
 
     if (named.length > 0) {
       return {
@@ -186,6 +210,16 @@ export function describeJoinFailure(cause: unknown): JoinFailure {
     return {
       message: `Artiza couldn't accept these details${unplaced.length ? `: ${unplaced[0].toLowerCase()}` : ""}. ${KEPT} Check your answers and try again, or call the Artiza team and we'll enter them for you.`,
       fields,
+    };
+  }
+
+  // The form is served by one deployment and the API by another, so a 404 here
+  // is a version skew — the page is calling a route this API doesn't have yet.
+  // Nothing an artisan can fix by editing an answer, so it doesn't ask them to.
+  if (cause.status === 404) {
+    return {
+      message: `Artiza couldn't find the service that saves this form — the app was probably updated while you were filling it in. ${KEPT} Reload the page and press the button again.${reference(cause)}`,
+      fields: {},
     };
   }
 

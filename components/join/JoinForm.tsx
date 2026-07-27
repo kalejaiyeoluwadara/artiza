@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, ImageUp, Loader2, Trash2 } from "lucide-react";
+import { Check, ImageUp, Loader2, Trash2, TriangleAlert } from "lucide-react";
 import {
   FormSection,
   SelectField,
@@ -12,7 +12,6 @@ import {
   TextField,
 } from "../admin/Fields";
 import { publicApi } from "../../lib/api";
-import { ApiError } from "../../lib/api/error";
 import { TRADE_OPTIONS } from "../../lib/admin/artisan-draft";
 import { APPLICATION_LIMITS } from "../../lib/applications/application-draft";
 import {
@@ -322,10 +321,26 @@ export function JoinForm() {
           disabled={submitting}
         />
 
+        {/* A failure here can be three sentences — what happened, that the
+            form survived, what to do — so it gets a surface of its own rather
+            than a caption line the eye slides off. Amber, never red: a red
+            message directly above a red button reads as a second action. */}
         {failure ? (
-          <p role="alert" className="caption px-1 text-danger">
-            {failure}
-          </p>
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="flex items-start gap-3 rounded-2xl bg-card p-4 ring-1 ring-danger"
+          >
+            <TriangleAlert
+              size={18}
+              strokeWidth={2}
+              className="mt-0.5 shrink-0 text-danger"
+              aria-hidden
+            />
+            <p className="min-w-0 text-[0.9375rem] leading-relaxed text-pretty text-ink">
+              {failure}
+            </p>
+          </div>
         ) : null}
 
         <button
@@ -472,23 +487,48 @@ function PhotoField({
     if (!files?.length) return;
     setError(undefined);
 
-    const picked = Array.from(files).slice(0, room);
-    const oversized = picked.find((file) => file.size > MAX_BYTES);
+    const chosen = Array.from(files);
+
+    // Checked before the upload rather than after: on a metered connection,
+    // sending 12 MB only to be told it was too big costs the artisan money.
+    const oversized = chosen.find((file) => file.size > MAX_BYTES);
     if (oversized) {
-      setError(`"${oversized.name}" is over 8 MB. Pick a smaller photo.`);
+      setError(
+        `"${oversized.name}" is ${megabytes(oversized.size)}. Artiza takes photos up to 8 MB — pick a different one, or retake it at a lower quality in your camera settings.`,
+      );
       return;
     }
+
+    // The picker's `accept` is a filter, not a rule — a file dragged in, or
+    // picked through "All files", arrives regardless. The server rejects these
+    // too, but it can only do so after the whole file has been sent.
+    const wrongType = chosen.find(
+      (file) => file.type && !ACCEPTED_TYPES.has(file.type),
+    );
+    if (wrongType) {
+      setError(
+        `"${wrongType.name}" isn't a photo Artiza can use. Pick a JPEG, PNG, WebP or HEIC — a photo straight from your phone's camera roll will work.`,
+      );
+      return;
+    }
+
+    // Anything past the cap is dropped here, so the message can say so. The
+    // silent `.slice` this replaces looked like photos vanishing.
+    const picked = chosen.slice(0, room);
+    const dropped = chosen.length - picked.length;
 
     setBusy(true);
     try {
       const results = await publicApi.applications.joinPhotos(picked);
       onChange([...values, ...results.map((r) => r.url)].slice(0, max));
+
+      if (dropped > 0) {
+        setError(
+          `Artiza shows ${max} photos on a profile, so ${picked.length === 1 ? "the first one was" : `the first ${picked.length} were`} added and ${dropped === 1 ? "the last one wasn't" : `the last ${dropped} weren't`}. Remove one above if you'd rather use a different photo.`,
+        );
+      }
     } catch (cause) {
-      setError(
-        cause instanceof ApiError
-          ? cause.message
-          : "The upload didn't go through. Try again.",
-      );
+      setError(describeUploadFailure(cause, picked.length));
     } finally {
       setBusy(false);
     }
@@ -558,7 +598,9 @@ function PhotoField({
       />
 
       {error ? (
-        <p className="caption mt-2 px-1 text-danger">{error}</p>
+        <p role="alert" className="caption mt-2 px-1 leading-relaxed text-danger">
+          {error}
+        </p>
       ) : (
         <p className="caption mt-2 px-1">
           A photo of finished work is the single thing most likely to win a job.
