@@ -94,11 +94,19 @@ export function TextField({
   type = "text",
   inputMode,
   prefix,
+  autoComplete,
 }: BaseProps & {
   type?: "text" | "email" | "tel" | "number" | "url";
   inputMode?: "text" | "email" | "tel" | "numeric" | "url";
   /** A fixed, unwritable head to the value — the "+234" on a phone number. */
   prefix?: string;
+  /**
+   * Off by default, because the console is one person filling in someone
+   * else's details and their own name autofilled into it would be a bug. The
+   * customer-facing forms that reuse this field are the opposite case, and
+   * name themselves.
+   */
+  autoComplete?: string;
 }) {
   const id = useId();
 
@@ -131,6 +139,7 @@ export function TextField({
           placeholder={placeholder}
           disabled={disabled}
           inputMode={inputMode}
+          autoComplete={autoComplete}
           aria-invalid={Boolean(error)}
           aria-describedby={
             error ? `${id}-error` : hint ? `${id}-hint` : undefined

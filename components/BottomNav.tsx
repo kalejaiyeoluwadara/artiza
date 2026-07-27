@@ -24,12 +24,21 @@ function useIsActive() {
 }
 
 /**
+ * Where both bars stand down.
+ *
  * The admin console brings its own chrome and is not one of these four
- * destinations, so both bars stand down inside it. Rendering the customer tab
- * bar there would offer a "you are here" that is never true.
+ * destinations, so a customer tab bar there would offer a "you are here" that
+ * is never true. `/join` is the same problem from the other end: it is a
+ * standalone landing page for an artisan arriving from a WhatsApp link, and
+ * Browse / Search / Unlocked / Account are four wrong answers to hand someone
+ * mid-form — the last of which would also sit over the submit button. It
+ * carries its own brand mark instead.
  */
-function useIsConsole(): boolean {
-  return usePathname().startsWith("/admin");
+const BARE_ROUTES = ["/admin", "/join"];
+
+function useIsBare(): boolean {
+  const pathname = usePathname();
+  return BARE_ROUTES.some((route) => pathname.startsWith(route));
 }
 
 /**
@@ -55,9 +64,9 @@ function useIsWideGrid(): boolean {
  */
 export function BottomNav() {
   const isActive = useIsActive();
-  const inConsole = useIsConsole();
+  const bare = useIsBare();
 
-  if (inConsole) return null;
+  if (bare) return null;
 
   return (
     <nav
@@ -103,10 +112,10 @@ export function BottomNav() {
 /** Desktop counterpart. Same destinations, same names. */
 export function SiteHeader() {
   const isActive = useIsActive();
-  const inConsole = useIsConsole();
+  const bare = useIsBare();
   const wide = useIsWideGrid();
 
-  if (inConsole) return null;
+  if (bare) return null;
 
   return (
     <header className="chrome sticky top-0 z-50 hidden border-b-0 border-line md:block">

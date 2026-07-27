@@ -235,6 +235,33 @@ export interface ApplicationItem {
   createdAt: string;
 }
 
+/**
+ * Which door an application came through: the in-app sheet, or the public
+ * `/join` claim link the team sends to artisans it has already worked with.
+ */
+export type ApplicationSource = "app" | "join";
+
+/** An `/join` submission: an application plus the consent that made it legal. */
+export interface JoinInput extends ApplicationInput {
+  /** Always true — the API rejects anything else. */
+  consent: true;
+}
+
+/**
+ * What `/join` gets back. `published` is the field the page acts on: it decides
+ * between "you are live" and "we will be in touch", so the client never has to
+ * infer that from a status it would then have to keep in step with the server's
+ * auto-publish setting.
+ */
+export interface JoinResult {
+  id: string;
+  status: ApplicationStatus;
+  name: string;
+  trade: Trade;
+  published: boolean;
+  createdAt: string;
+}
+
 /** The whole record, as the console triages it. */
 export interface AdminApplication {
   id: string;
@@ -248,6 +275,7 @@ export interface AdminApplication {
   services: string[];
   work: string[];
   status: ApplicationStatus;
+  source: ApplicationSource;
   /** The live artisan an approved application became. */
   artisanId?: string;
   createdAt: string;

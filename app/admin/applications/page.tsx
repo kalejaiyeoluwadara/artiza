@@ -239,6 +239,15 @@ function ApplicationCard({
         <div className="min-w-0 flex-1 basis-48">
           <p className="headline flex items-center gap-1.5 text-ink">
             <span className="truncate">{application.name}</span>
+            {/* Which door they came through changes what the row means: a
+                `join` row is someone the team already worked with, claiming a
+                listing from the link. An `app` row is a stranger who still
+                owes a visit. */}
+            {application.source === "join" ? (
+              <span className="caption shrink-0 rounded-full bg-fill px-2 py-0.5 font-semibold text-ink">
+                Founding
+              </span>
+            ) : null}
             {application.status === "approved" ? (
               <span className="caption shrink-0 rounded-full bg-accent-soft px-2 py-0.5 font-semibold text-accent">
                 Approved
