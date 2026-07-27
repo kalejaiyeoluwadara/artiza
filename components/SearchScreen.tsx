@@ -4,9 +4,10 @@ import { useDeferredValue, useMemo, useRef, useState } from "react";
 import { BadgeCheck, ChevronRight, Clock, Search, Star, X } from "lucide-react";
 import {
   Artisan,
+  Trade,
   TRADE_LABELS,
   TRADE_SHORT_LABELS,
-  Trade,
+  tradeName,
 } from "../lib/artisans";
 import {
   MatchField,
@@ -369,7 +370,7 @@ function ResultRow({
           />
         </span>
         <span className="caption mt-0.5 block truncate">
-          <Marked text={TRADE_LABELS[artisan.trade]} query={query} /> ·{" "}
+          <Marked text={tradeName(artisan)} query={query} /> ·{" "}
           <Marked text={artisan.location} query={query} />
         </span>
         <Reason matched={matched} value={value} query={query} />

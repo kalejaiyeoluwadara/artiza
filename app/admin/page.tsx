@@ -17,7 +17,11 @@ import { ErrorState } from "../../components/admin/States";
 import { Avatar } from "../../components/ArtisanCard";
 import { Skeleton } from "../../components/Skeleton";
 import { useAdminList } from "../../lib/admin/useAdminList";
-import { TRADE_LABELS, type Trade } from "../../lib/artisans";
+import {
+  type Trade,
+  TRADE_LABELS,
+  tradeName,
+} from "../../lib/artisans";
 import type { Api } from "../../lib/api";
 import type { AdminArtisan } from "../../lib/api/types";
 
@@ -325,7 +329,7 @@ export default function OverviewPage() {
                           {artisan.name}
                         </span>
                         <span className="caption block truncate">
-                          {TRADE_LABELS[artisan.trade]} · {artisan.verifiedSince}
+                          {tradeName(artisan)} · {artisan.verifiedSince}
                         </span>
                       </span>
                     </Link>

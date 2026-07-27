@@ -1,5 +1,8 @@
 import Image from "next/image";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+} from "../lib/artisans";
 import { TRADE_TINTS, TradeIllustration } from "./TradeIllustration";
 
 /**
@@ -33,7 +36,7 @@ export function ArtisanCover({
     return (
       <Image
         src={photo}
-        alt={`${TRADE_LABELS[artisan.trade]} work by ${artisan.name}`}
+        alt={`${tradeName(artisan)} work by ${artisan.name}`}
         fill
         sizes={sizes}
         priority={priority}

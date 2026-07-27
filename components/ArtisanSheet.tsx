@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+} from "../lib/artisans";
 import { useArtisanContact } from "../lib/useArtisanContact";
 import { useArtisanReviews } from "../lib/useArtisanReviews";
 import { Avatar } from "./ArtisanCard";
@@ -33,7 +36,7 @@ export function ArtisanSheet({
     <Sheet
       open={artisan !== null}
       onClose={onClose}
-      label={artisan ? `${artisan.name}, ${TRADE_LABELS[artisan.trade]}` : ""}
+      label={artisan ? `${artisan.name}, ${tradeName(artisan)}` : ""}
     >
       {artisan && (
         <>
@@ -55,7 +58,7 @@ export function ArtisanSheet({
                   />
                 </h2>
                 <p className="caption mt-0.5 flex items-center gap-2">
-                  {TRADE_LABELS[artisan.trade]}
+                  {tradeName(artisan)}
                   <span aria-hidden className="text-faint">
                     ·
                   </span>
@@ -113,7 +116,7 @@ export function ArtisanSheet({
                     >
                       <Image
                         src={src}
-                        alt={`${TRADE_LABELS[artisan.trade]} job by ${
+                        alt={`${tradeName(artisan)} job by ${
                           artisan.name
                         }, photo ${i + 1}`}
                         fill

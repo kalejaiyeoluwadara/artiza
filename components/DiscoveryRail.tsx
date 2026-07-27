@@ -1,7 +1,10 @@
 "use client";
 
 import { BadgeCheck, Sparkle, Star, TrendingUp } from "lucide-react";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+} from "../lib/artisans";
 import { Avatar } from "./ArtisanCard";
 import { ArtisanCover } from "./ArtisanCover";
 
@@ -111,7 +114,7 @@ function RailCard({
           />
         </h3>
         <p className="caption mt-0.5 truncate">
-          {TRADE_LABELS[artisan.trade]} · {artisan.location}
+          {tradeName(artisan)} · {artisan.location}
         </p>
 
         <div className="mt-2 flex-1" />

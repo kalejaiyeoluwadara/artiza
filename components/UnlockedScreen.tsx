@@ -18,7 +18,10 @@ import {
 } from "lucide-react";
 import { CreditCoinIcon } from "./CreditCoinIcon";
 import { PageHeader } from "./PageHeader";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+} from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
 import { useArtisanContact } from "../lib/useArtisanContact";
 import { useUnlocks } from "../context/UnlocksContext";
@@ -44,7 +47,7 @@ export function UnlockedScreen() {
     const q = query.toLowerCase();
     return (
       a.name.toLowerCase().includes(q) ||
-      TRADE_LABELS[a.trade].toLowerCase().includes(q) ||
+      tradeName(a).toLowerCase().includes(q) ||
       a.location.toLowerCase().includes(q)
     );
   });
@@ -146,7 +149,7 @@ export function UnlockedScreen() {
                 <Avatar name={artisan.name} src={artisan.photo} size="size-10 text-sm" />
                 <div className="text-left max-sm:min-w-0">
                   <h4 className="text-sm font-bold text-ink max-sm:truncate">{artisan.name}</h4>
-                  <p className="caption text-[11px] max-sm:truncate">{TRADE_LABELS[artisan.trade]}</p>
+                  <p className="caption text-[11px] max-sm:truncate">{tradeName(artisan)}</p>
                 </div>
                 <div className="ml-1 flex shrink-0 items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white max-sm:ml-auto">
                   <Star size={11} fill="currentColor" />
@@ -261,7 +264,7 @@ function UnlockedCard({
           className="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/30"
         />
         <span className="chrome absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
-          {TRADE_LABELS[artisan.trade]}
+          {tradeName(artisan)}
         </span>
         {rated && (
           <span className="chrome absolute right-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-ink">

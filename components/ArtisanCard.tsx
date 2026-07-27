@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import { BadgeCheck, ChevronRight, MapPin, Star } from "lucide-react";
-import { Artisan, TRADE_LABELS, UNLOCK_PRICE } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+  UNLOCK_PRICE,
+} from "../lib/artisans";
 import { useUnlocks } from "../context/UnlocksContext";
 import { ArtisanCover } from "./ArtisanCover";
 import { FavoriteButton } from "./FavoriteButton";
@@ -141,7 +145,7 @@ function CoverPhoto({ artisan }: { artisan: Artisan }) {
       />
       <div className="absolute left-3 top-3 flex items-center gap-1.5">
         <span className="chrome rounded-full px-2.5 py-1 text-xs font-semibold text-ink">
-          {TRADE_LABELS[artisan.trade]}
+          {tradeName(artisan)}
         </span>
         {artisan.featured && (
           <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">

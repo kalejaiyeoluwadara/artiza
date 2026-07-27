@@ -25,6 +25,10 @@ import {
   describeJoinFailure,
   describeUploadFailure,
 } from "../../lib/applications/join-errors";
+import {
+  rememberJustJoined,
+  toJustJoined,
+} from "../../lib/applications/just-joined";
 import { TRADE_LABELS, type Trade } from "../../lib/artisans";
 import type { JoinResult } from "../../lib/api/types";
 
@@ -100,8 +104,17 @@ export function JoinForm() {
 
     setSubmitting(true);
     try {
-      setResult(await publicApi.applications.join(toJoinInput(draft)));
+      const joined = await publicApi.applications.join(toJoinInput(draft));
+      setResult(joined);
       window.scrollTo({ top: 0 });
+
+      // Home reads a cached register, so tapping "See Artiza" in a few seconds
+      // would land them on a page they aren't in yet — after being told they
+      // are live. Their own profile is entirely on this device already, so it
+      // travels with them and sits at the front of "New on Artiza" until the
+      // real register catches up. Only when it actually published: an artisan
+      // still waiting on the team must not see themselves listed.
+      if (joined.published) rememberJustJoined(toJustJoined(draft, joined));
     } catch (cause) {
       setSubmitting(false);
 
@@ -516,6 +529,13 @@ function PhotoField({
     // silent `.slice` this replaces looked like photos vanishing.
     const picked = chosen.slice(0, room);
     const dropped = chosen.length - picked.length;
+
+    if (picked.length === 0) {
+      setError(
+        `A profile shows ${max} photos, and you already have ${max}. Remove one above to add a different photo.`,
+      );
+      return;
+    }
 
     setBusy(true);
     try {

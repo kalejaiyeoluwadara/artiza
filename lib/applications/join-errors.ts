@@ -143,14 +143,15 @@ export function describeJoinFailure(cause: unknown): JoinFailure {
     // A bug in our own code rather than a rejected submission. Say that it
     // never left the phone, because "try again" is useless advice otherwise.
     return {
-      message: `Something on this page broke before your details could be sent, so nothing reached Artiza. ${KEPT} Reload the page and try once more, or call the Artiza team and we'll fill this in for you.`,
+      message:
+        `Something on this page broke before your details could be sent, so nothing reached Artiza. Your answers are still on the screen — press the button once more, and if that fails too, call the Artiza team and we'll fill this in for you over the phone. (Reloading the page clears the form, so try the button first.)`,
       fields: {},
     };
   }
 
   if (cause.isOffline) {
     return {
-      message: `Your phone couldn't reach Artiza — usually that means the data connection dropped for a moment. Nothing was sent. ${KEPT} Check your connection and press the button again.`,
+      message: `Your phone couldn't reach Artiza — usually that means the data connection dropped for a moment, so nothing was sent. ${KEPT} Check your connection and press the button again.`,
       fields: {},
     };
   }
@@ -159,7 +160,7 @@ export function describeJoinFailure(cause: unknown): JoinFailure {
   // that is not a mistake — it means they're already on Artiza.
   if (cause.status === 409) {
     return {
-      message: `${cause.message} You don't need to fill this in again — call the Artiza team and we'll update the listing that's already there.`,
+      message: `That number is already on Artiza, so you're listed. There's nothing more to fill in here — call the Artiza team if any of the details on your profile need changing.`,
       fields: {
         phone: "This number is already listed on Artiza.",
       },
@@ -218,7 +219,7 @@ export function describeJoinFailure(cause: unknown): JoinFailure {
   // Nothing an artisan can fix by editing an answer, so it doesn't ask them to.
   if (cause.status === 404) {
     return {
-      message: `Artiza couldn't find the service that saves this form — the app was probably updated while you were filling it in. ${KEPT} Reload the page and press the button again.${reference(cause)}`,
+      message: `Artiza couldn't find the service that saves this form — the app was probably updated while you were filling it in. ${KEPT} Press the button once more, and if it fails again reload the page (you'll have to type your answers in a second time).${reference(cause)}`,
       fields: {},
     };
   }

@@ -1,4 +1,9 @@
-import { Artisan, TRADE_LABELS, Trade } from "./artisans";
+import {
+  Artisan,
+  Trade,
+  TRADE_LABELS,
+  tradeName,
+} from "./artisans";
 
 /**
  * Free-text search over the register.
@@ -38,7 +43,7 @@ interface Field {
 function fieldsOf(artisan: Artisan): Field[] {
   return [
     { field: "name", value: artisan.name, lead: 100, mid: 62 },
-    { field: "trade", value: TRADE_LABELS[artisan.trade], lead: 90, mid: 56 },
+    { field: "trade", value: tradeName(artisan), lead: 90, mid: 56 },
     ...artisan.services.map((value) => ({
       field: "service" as const,
       value,

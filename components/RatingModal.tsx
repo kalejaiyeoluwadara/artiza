@@ -2,7 +2,10 @@
 
 import { useRef, useState } from "react";
 import { Loader2, Star } from "lucide-react";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+} from "../lib/artisans";
 import { ApiError } from "../lib/api/error";
 import { Dialog } from "./Dialog";
 
@@ -86,7 +89,7 @@ function RatingForm({
         </span>
         <h2 className="title mt-1 text-ink">Rate {artisan.name}</h2>
         <p className="caption mt-0.5">
-          How did the {TRADE_LABELS[artisan.trade].toLowerCase()} job go?
+          How did the {tradeName(artisan).toLowerCase()} job go?
         </p>
       </div>
 

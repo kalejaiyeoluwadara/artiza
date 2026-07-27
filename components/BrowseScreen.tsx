@@ -3,15 +3,16 @@
 import { useMemo, useState } from "react";
 import { BadgeCheck, Star } from "lucide-react";
 import {
-  Artisan,
-  Filters,
-  NO_FILTERS,
-  TRADE_LABELS,
   activeFilterCount,
+  Artisan,
   filterArtisans,
+  Filters,
   newArtisans,
+  NO_FILTERS,
   rankArtisans,
   topRatedArtisans,
+  TRADE_LABELS,
+  tradeName,
   trendingArtisans,
 } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
@@ -303,7 +304,7 @@ function FeaturedCard({
               aria-label="Verified"
             />
           </p>
-          <p className="caption text-white/75">{TRADE_LABELS[artisan.trade]}</p>
+          <p className="caption text-white/75">{tradeName(artisan)}</p>
         </div>
       </div>
 

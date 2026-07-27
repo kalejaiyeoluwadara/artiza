@@ -20,6 +20,7 @@ import {
   trendingArtisans,
 } from "../lib/artisans";
 import { useArtisans } from "../lib/useData";
+import { pinJustJoined, useJustJoined } from "../lib/applications/just-joined";
 import { useFavorites } from "../lib/useFavorites";
 import { useUnlocks } from "../context/UnlocksContext";
 import { ApplyControl } from "./ApplyControl";
@@ -56,14 +57,24 @@ export function NetflixHome({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [selected, setSelected] = useState<Artisan | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const { artisans, loading, error, retry } = useArtisans(initialArtisans);
+  const { artisans: register, loading, error, retry } =
+    useArtisans(initialArtisans);
+
+  /* Someone who finished `/join` seconds ago isn't in the cached register
+     yet, and was just told they are live. Their profile rides across from the
+     form until the register catches up, and drops out on its own when it
+     does. See `lib/applications/just-joined.ts`. */
+  const { artisans, joined } = useJustJoined(register);
   const { isUnlocked, unlock } = useUnlocks();
   const { ids: favoriteIds, ready: favoritesReady } = useFavorites();
 
   const browsing = activeFilterCount(filters) === 0;
 
   const trending = useMemo(() => trendingArtisans(artisans), [artisans]);
-  const arrivals = useMemo(() => newArtisans(artisans), [artisans]);
+  const arrivals = useMemo(
+    () => pinJustJoined(newArtisans(artisans), joined),
+    [artisans, joined],
+  );
   const topRated = useMemo(() => topRatedArtisans(artisans), [artisans]);
 
   /* Netflix's Top 10 is a strict count, not a window — it is always ten, and

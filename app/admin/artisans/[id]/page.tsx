@@ -10,7 +10,9 @@ import { ErrorState } from "../../../../components/admin/States";
 import { Skeleton } from "../../../../components/Skeleton";
 import { useAdminList } from "../../../../lib/admin/useAdminList";
 import { draftFrom } from "../../../../lib/admin/artisan-draft";
-import { TRADE_LABELS } from "../../../../lib/artisans";
+import {
+  tradeName,
+} from "../../../../lib/artisans";
 import type { Api } from "../../../../lib/api";
 import type { AdminArtisan } from "../../../../lib/api/types";
 
@@ -64,7 +66,7 @@ export default function EditArtisanPage() {
         <>
           <AdminHeader
             title={artisan.name}
-            lede={`${TRADE_LABELS[artisan.trade]} in ${artisan.location} · verified ${artisan.verifiedSince}${
+            lede={`${tradeName(artisan)} in ${artisan.location} · verified ${artisan.verifiedSince}${
               artisan.isActive ? "" : " · retired"
             }`}
           />

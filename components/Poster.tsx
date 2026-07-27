@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BadgeCheck, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { Artisan, TRADE_LABELS } from "../lib/artisans";
+import {
+  Artisan,
+  tradeName,
+} from "../lib/artisans";
 import { ArtisanCover } from "./ArtisanCover";
 import { FavoriteButton } from "./FavoriteButton";
 
@@ -79,7 +82,7 @@ export function Poster({
             />
           </p>
           <p className="mt-1 truncate text-[0.8125rem] font-medium text-white/70">
-            {TRADE_LABELS[artisan.trade]} · {artisan.location}
+            {tradeName(artisan)} · {artisan.location}
           </p>
           {signal ? (
             <p className="figure mt-1.5 flex items-center gap-1 text-[0.8125rem] text-white">

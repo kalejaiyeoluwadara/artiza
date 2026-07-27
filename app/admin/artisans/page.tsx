@@ -23,7 +23,12 @@ import { useApi } from "../../../lib/api/useApi";
 import { ApiError } from "../../../lib/api/error";
 import { toast } from "../../../lib/toast";
 import { confirm } from "../../../lib/confirm";
-import { TRADE_LABELS, formatPhone, type Trade } from "../../../lib/artisans";
+import {
+  formatPhone,
+  type Trade,
+  TRADE_LABELS,
+  tradeName,
+} from "../../../lib/artisans";
 import type { AdminArtisan, RegisterStatus } from "../../../lib/api/types";
 
 const STATUSES: { value: RegisterStatus; label: string }[] = [
@@ -97,7 +102,7 @@ export default function RegisterPage() {
       return (
         artisan.name.toLowerCase().includes(term) ||
         artisan.location.toLowerCase().includes(term) ||
-        TRADE_LABELS[artisan.trade].toLowerCase().includes(term) ||
+        tradeName(artisan).toLowerCase().includes(term) ||
         artisan.phone.includes(term.replace(/\D/g, "")) ||
         artisan.services.some((s) => s.toLowerCase().includes(term))
       );
@@ -399,7 +404,7 @@ function RegisterRow({
           )}
         </p>
         <p className="caption mt-0.5 truncate">
-          {TRADE_LABELS[artisan.trade]} · {artisan.location} ·{" "}
+          {tradeName(artisan)} · {artisan.location} ·{" "}
           <span className="figure">{formatPhone(artisan.phone)}</span>
         </p>
       </div>

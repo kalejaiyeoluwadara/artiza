@@ -15,7 +15,10 @@ import { useApi } from "../../../lib/api/useApi";
 import { ApiError } from "../../../lib/api/error";
 import { toast } from "../../../lib/toast";
 import { confirm } from "../../../lib/confirm";
-import { TRADE_LABELS, formatPhone } from "../../../lib/artisans";
+import {
+  formatPhone,
+  tradeName,
+} from "../../../lib/artisans";
 import type {
   AdminApplication,
   ApplicationFilter,
@@ -259,7 +262,7 @@ function ApplicationCard({
             ) : null}
           </p>
           <p className="caption mt-0.5">
-            {TRADE_LABELS[application.trade]} · {application.location} ·{" "}
+            {tradeName(application)} · {application.location} ·{" "}
             {application.yearsExperience} yrs
           </p>
           <p className="caption mt-0.5">

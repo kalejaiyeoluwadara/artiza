@@ -265,6 +265,12 @@ export interface JoinResult {
   name: string;
   trade: Trade;
   published: boolean;
+  /**
+   * The live listing this became. Only set when `published` — the id the
+   * just-joined preview on home is keyed to, so tapping that card opens the
+   * real profile rather than a stand-in. See `lib/applications/just-joined.ts`.
+   */
+  artisanId?: string;
   createdAt: string;
 }
 
