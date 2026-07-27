@@ -5,7 +5,7 @@ import { SearchScreen } from "../../components/SearchScreen";
 export const metadata: Metadata = {
   title: "Search artisans — Artiza",
   description:
-    "Search vetted artisans in Ilisan by name, trade, job or area — marble, burst pipes, inverter sizing, Babcock Road.",
+    "Search vetted artisans in Ilisan by name, trade, job or area — marble, burst pipes, inverter sizing",
 };
 
 /**

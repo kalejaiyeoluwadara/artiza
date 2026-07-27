@@ -29,7 +29,7 @@ import {
   rememberJustJoined,
   toJustJoined,
 } from "../../lib/applications/just-joined";
-import { tradeName } from "../../lib/artisans";
+import { tradeName, type Trade } from "../../lib/artisans";
 import type { JoinResult } from "../../lib/api/types";
 
 /** What the upload path accepts, said out loud so the copy and the picker agree. */
@@ -66,6 +66,19 @@ export function JoinForm() {
     // the fix reads as the field still being wrong.
     setErrors((current) =>
       key in current ? { ...current, [key]: undefined } : current,
+    );
+  };
+
+  /**
+   * The trade and its free-typed name move together — picking a listed trade
+   * has to clear the custom words, or a profile could keep saying "Screed
+   * specialist" after its owner switched to Tiler. Written as one setter so
+   * the two can never be updated apart.
+   */
+  const setTrade = (next: { trade: Trade; customTrade: string }) => {
+    setDraft((current) => ({ ...current, ...next }));
+    setErrors((current) =>
+      "customTrade" in current ? { ...current, customTrade: undefined } : current,
     );
   };
 
@@ -192,9 +205,7 @@ export function JoinForm() {
           <TradeField
             trade={draft.trade}
             customTrade={draft.customTrade}
-            onChange={(next) =>
-              setDraft((current) => ({ ...current, ...next }))
-            }
+            onChange={setTrade}
             error={errors.customTrade}
             disabled={submitting}
           />

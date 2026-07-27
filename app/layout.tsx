@@ -88,7 +88,6 @@ export const metadata: Metadata = {
   keywords: [
     "Ilisan",
     "Ogun State",
-    "Babcock University",
     "artisans",
     "plumber",
     "solar installer",

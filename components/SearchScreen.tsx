@@ -139,7 +139,7 @@ export function SearchScreen() {
         <p className="caption mt-8 text-center text-sub">Searching…</p>
       ) : hits.length === 0 ? (
         <Notice
-          body={`Nobody matches “${term}”. Try a trade, a job — marble, burst pipe, ironing — or an area like Babcock Road.`}
+          body={`Nobody matches “${term}”. Try a trade, a job — marble, burst pipe, ironing — or an area.`}
           action="Clear search"
           onAction={() => run("")}
         />
