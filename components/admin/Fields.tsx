@@ -66,6 +66,9 @@ function Shell({
 const WELL =
   "mt-1.5 w-full rounded-2xl bg-fill px-4 py-3 text-[1.0625rem] text-ink placeholder:text-faint disabled:opacity-60";
 
+/** The same well, but holding a row — the prefix and the input sit on one line. */
+const WELL_ROW = `${WELL} flex items-baseline gap-1.5`;
+
 interface BaseProps {
   label: string;
   value: string;
@@ -108,12 +111,15 @@ export function TextField({
       optional={optional}
       count={maxLength ? { value: value.length, max: maxLength } : undefined}
     >
-      <div className="relative">
+      <div
+        className={
+          prefix
+            ? `${WELL_ROW} ${error ? "ring-1 ring-danger" : ""}`
+            : "contents"
+        }
+      >
         {prefix ? (
-          <span
-            aria-hidden
-            className="figure pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 pt-0.5 text-[1.0625rem] text-sub"
-          >
+          <span aria-hidden className="figure shrink-0 text-sub">
             {prefix}
           </span>
         ) : null}
@@ -129,9 +135,11 @@ export function TextField({
           aria-describedby={
             error ? `${id}-error` : hint ? `${id}-hint` : undefined
           }
-          className={`${WELL} ${error ? "ring-1 ring-danger" : ""} ${
-            prefix ? "pl-15" : ""
-          }`}
+          className={
+            prefix
+              ? "min-w-0 flex-1 bg-transparent text-ink outline-none placeholder:text-faint disabled:opacity-60"
+              : `${WELL} ${error ? "ring-1 ring-danger" : ""}`
+          }
         />
       </div>
     </Shell>

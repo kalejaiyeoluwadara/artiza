@@ -6,11 +6,7 @@ import { fetchHome } from "../lib/artisan-source";
  * artisan, then stacked poster rails. It brings its own top bar and its own
  * palette scope, so it owns the full width of the screen — no page gutter and
  * no shared header above it.
- *
- * The rest of the app is unchanged and still light. See the `.netflix` block
- * in app/globals.css for how the two coexist.
- *
- * The register is read here, on the server, rather than from an effect inside
+ *The register is read here, on the server, rather than from an effect inside
  * the client tree. That is the whole difference between a page that opens on
  * skeletons and one that opens on artisans: the HTML that arrives already has
  * the rails in it, and Next holds the response for `revalidate` seconds so a
