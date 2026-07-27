@@ -99,8 +99,8 @@ function rewrite(field: keyof JoinDraft, raws: string[]): string {
         : "Type what your trade is called, so your profile can say it.";
     case "location":
       return tooLong
-        ? "That's longer than we can print on a profile. Just the area is enough, like Babcock Road."
-        : "Tell us the area you work in, like Babcock Road — customers search by area.";
+        ? "That's longer than we can print on a profile. Just the area is enough, like Market Road."
+        : "Tell us the area you work in, like Market Road — customers search by area.";
     case "yearsExperience":
       return "Years of experience has to be a whole number of years, like 8. Round up if you're not sure.";
     case "phone":

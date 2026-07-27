@@ -214,7 +214,7 @@ export function JoinForm() {
             label="Where you work"
             value={draft.location}
             onChange={(v) => set("location", v)}
-            placeholder="Babcock Road, Ilisan"
+            placeholder="Market Road, Ilisan"
             hint="The area customers will see on your profile."
             maxLength={APPLICATION_LIMITS.location}
             error={errors.location}

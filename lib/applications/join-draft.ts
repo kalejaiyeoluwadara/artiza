@@ -54,7 +54,7 @@ export function validateJoin(draft: JoinDraft): JoinErrors {
   // local noticeboard — so the prompt has to be as unplaced as the page is.
   if (errors.location) {
     errors.location = !draft.location.trim()
-      ? "Tell us the area you work in, like Babcock Road — it's how customers nearby find you."
+      ? "Tell us the area you work in, like Market Road — it's how customers nearby find you."
       : "That's longer than a profile shows. The area on its own is enough.";
   }
 

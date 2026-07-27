@@ -101,7 +101,7 @@ export function SearchScreen() {
             enterKeyHint="search"
             autoComplete="off"
             aria-label="Search artisans by name, trade, service or area"
-            placeholder="Marble, burst pipe, Babcock Road…"
+            placeholder="Marble, burst pipe, Market Road…"
             /* The browser's own clear affordance is a second, differently
                styled X — ours is the one that matches the app. */
             className="min-w-0 flex-1 bg-transparent text-[0.9375rem] font-medium text-ink outline-none placeholder:font-normal placeholder:text-faint [&::-webkit-search-cancel-button]:appearance-none"
