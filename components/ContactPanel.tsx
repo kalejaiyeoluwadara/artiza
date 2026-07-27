@@ -23,7 +23,12 @@ import {
   vCardFor,
 } from "../lib/artisans";
 import type { SealedDetails } from "../lib/artisans";
-import { InstagramIcon, WhatsAppIcon } from "./BrandIcons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  SnapchatIcon,
+  WhatsAppIcon,
+} from "./BrandIcons";
 
 /**
  * What every artisan has, shown masked before payment. The extras — Instagram,
@@ -194,6 +199,10 @@ function ChannelIcon({ kind }: { kind: ChannelKind }) {
       return <MessageSquare size={16} strokeWidth={2.1} />;
     case "instagram":
       return <InstagramIcon size={16} />;
+    case "facebook":
+      return <FacebookIcon size={16} />;
+    case "snapchat":
+      return <SnapchatIcon size={16} />;
     case "email":
       return <Mail size={16} strokeWidth={2.1} />;
     case "alt":

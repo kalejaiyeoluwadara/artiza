@@ -1,6 +1,6 @@
 import type { ApplicationInput } from "../api/types";
 import type { Trade } from "../artisans";
-import { toMsisdn } from "../admin/artisan-draft";
+import { toHandle, toMsisdn } from "../admin/artisan-draft";
 
 /**
  * The application form, as the form holds it. Every field is a string because
@@ -18,6 +18,9 @@ export interface ApplicationDraft {
   yearsExperience: string;
   phone: string;
   whatsapp: string;
+  instagram: string;
+  facebook: string;
+  snapchat: string;
   note: string;
   services: string[];
   work: string[];
@@ -28,6 +31,9 @@ export const APPLICATION_LIMITS = {
   name: 80,
   location: 60,
   note: 240,
+  instagram: 40,
+  facebook: 60,
+  snapchat: 40,
   service: 40,
   services: 12,
   work: 4,
@@ -42,6 +48,9 @@ export function blankApplication(name = ""): ApplicationDraft {
     yearsExperience: "",
     phone: "",
     whatsapp: "",
+    instagram: "",
+    facebook: "",
+    snapchat: "",
     note: "",
     services: [],
     work: [],
@@ -106,8 +115,30 @@ export function toApplicationInput(
     phone: toMsisdn(draft.phone),
     // Dropped rather than sent empty: the API validates any key present.
     ...(draft.whatsapp ? { whatsapp: toMsisdn(draft.whatsapp) } : {}),
+    ...socials(draft),
     note: draft.note.trim(),
     ...(draft.services.length ? { services: draft.services } : {}),
     ...(draft.work.length ? { work: draft.work } : {}),
+  };
+}
+
+/**
+ * The optional social handles, normalised and stripped of the empty ones.
+ *
+ * Pulled out of `toApplicationInput` because a pasted profile URL is the norm
+ * rather than the exception — see {@link toHandle} — and three near-identical
+ * ternaries inline would bury that.
+ */
+function socials(
+  draft: Pick<ApplicationDraft, "instagram" | "facebook" | "snapchat">,
+): Pick<ApplicationInput, "instagram" | "facebook" | "snapchat"> {
+  const instagram = toHandle(draft.instagram);
+  const facebook = toHandle(draft.facebook);
+  const snapchat = toHandle(draft.snapchat);
+
+  return {
+    ...(instagram ? { instagram } : {}),
+    ...(facebook ? { facebook } : {}),
+    ...(snapchat ? { snapchat } : {}),
   };
 }

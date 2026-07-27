@@ -64,6 +64,8 @@ export function useArtisanContact(
           contact: {
             whatsapp: contact.whatsapp,
             instagram: contact.instagram,
+            facebook: contact.facebook,
+            snapchat: contact.snapchat,
             email: contact.email,
             altPhone: contact.altPhone,
             respondsIn: contact.respondsIn,

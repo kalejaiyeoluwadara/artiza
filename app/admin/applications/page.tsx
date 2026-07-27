@@ -268,6 +268,21 @@ function ApplicationCard({
               ? ` · WhatsApp ${formatPhone(application.whatsapp)}`
               : ""}
           </p>
+
+          {/* The pages, when there are any — a triager checking whether a lead
+              is real looks at their Instagram before they look at anything
+              else on this card. */}
+          {application.instagram || application.facebook || application.snapchat ? (
+            <p className="caption mt-0.5">
+              {[
+                application.instagram && `IG @${application.instagram}`,
+                application.facebook && `FB ${application.facebook}`,
+                application.snapchat && `Snap @${application.snapchat}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ) : null}
         </div>
 
         {application.artisanId ? (

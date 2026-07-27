@@ -99,6 +99,8 @@ export interface ArtisanContact {
   phone: string;
   whatsapp?: string;
   instagram?: string;
+  facebook?: string;
+  snapchat?: string;
   email?: string;
   altPhone?: string;
   respondsIn: string;
@@ -220,6 +222,10 @@ export interface ApplicationInput {
   /** MSISDN, no + or spaces: 2348031234567. */
   phone: string;
   whatsapp?: string;
+  /** All bare — no @, no URL. */
+  instagram?: string;
+  facebook?: string;
+  snapchat?: string;
   note: string;
   services?: string[];
   /** Cloudinary URLs from `POST /applications/photos`. */
@@ -271,6 +277,9 @@ export interface AdminApplication {
   yearsExperience: number;
   phone: string;
   whatsapp?: string;
+  instagram?: string;
+  facebook?: string;
+  snapchat?: string;
   note: string;
   services: string[];
   work: string[];
@@ -295,6 +304,8 @@ export interface AdminArtisan extends ArtisanSummary {
   phone: string;
   whatsapp?: string;
   instagram?: string;
+  facebook?: string;
+  snapchat?: string;
   email?: string;
   altPhone?: string;
   /** False once retired: the record survives, the listing does not. */
@@ -314,6 +325,8 @@ export type RegisterStatus = "active" | "retired" | "all";
 export interface ContactInput {
   whatsapp?: string;
   instagram?: string;
+  facebook?: string;
+  snapchat?: string;
   email?: string;
   altPhone?: string;
   respondsIn: string;

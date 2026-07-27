@@ -41,3 +41,40 @@ export function InstagramIcon({ size = 18 }: { size?: number }) {
     </svg>
   );
 }
+
+export function FacebookIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      focusable="false"
+    >
+      <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.45 2.91h-2.33V22c4.78-.76 8.44-4.92 8.44-9.94Z" />
+    </svg>
+  );
+}
+
+/**
+ * Snapchat's ghost, simplified.
+ *
+ * The real mark is a fussy silhouette that turns to mush at 16px, so this keeps
+ * only what makes it recognisable — the domed head, the notched hem, the two
+ * eyes — at the same optical weight as the other marks in this file.
+ */
+export function SnapchatIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden
+      focusable="false"
+    >
+      <path d="M12 2.4c3.02 0 5.05 2.2 5.05 5.2 0 .8-.05 1.6-.13 2.35.35.17.75.2 1.13.08.5-.16 1.02.1 1.18.6.16.5-.1 1.03-.6 1.19-.6.19-1.02.35-1.36.5.28.86.8 1.72 1.56 2.4.5.44 1.1.78 1.78.98.44.13.72.56.66 1.01-.06.46-.43.8-.89.83-.9.06-1.6.2-2.06.4-.13.35-.24.75-.35 1.1-.13.44-.57.72-1.02.65-.6-.1-1.2-.13-1.75-.05-.6.09-1.1.36-1.68.75-.42.28-.85.5-1.52.5s-1.1-.22-1.52-.5c-.58-.39-1.08-.66-1.68-.75-.55-.08-1.15-.05-1.75.05-.45.07-.89-.21-1.02-.65-.11-.35-.22-.75-.35-1.1-.46-.2-1.16-.34-2.06-.4a.94.94 0 0 1-.89-.83c-.06-.45.22-.88.66-1.01a4.9 4.9 0 0 0 1.78-.98c.76-.68 1.28-1.54 1.56-2.4-.34-.15-.76-.31-1.36-.5a.94.94 0 0 1-.6-1.19c.16-.5.68-.76 1.18-.6.38.12.78.09 1.13-.08a17.4 17.4 0 0 1-.13-2.35c0-3 2.03-5.2 5.05-5.2Z" />
+    </svg>
+  );
+}

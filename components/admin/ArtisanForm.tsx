@@ -317,6 +317,24 @@ export function ArtisanForm({
                 placeholder="tundetiles_ilisan"
                 optional
                 maxLength={LIMITS.instagram}
+                hint="Handle or a pasted profile link."
+              />
+              <TextField
+                label="Facebook"
+                value={draft.facebook}
+                onChange={(v) => set("facebook", v)}
+                placeholder="tunde.tiles.ilisan"
+                optional
+                maxLength={LIMITS.facebook}
+                hint="Page name or a pasted profile link."
+              />
+              <TextField
+                label="Snapchat"
+                value={draft.snapchat}
+                onChange={(v) => set("snapchat", v)}
+                placeholder="tundetiles"
+                optional
+                maxLength={LIMITS.snapchat}
                 hint="Handle without the @."
               />
               <TextField

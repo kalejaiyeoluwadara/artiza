@@ -182,6 +182,34 @@ export function ApplySheet({
               hint="Only if WhatsApp is on a different line."
             />
 
+            <TextField
+              label="Instagram"
+              value={draft.instagram}
+              onChange={(v) => set("instagram", v)}
+              placeholder="tundetiles_ilisan"
+              optional
+              maxLength={APPLICATION_LIMITS.instagram}
+              hint="Handle, or paste the link to your page."
+            />
+
+            <TextField
+              label="Facebook"
+              value={draft.facebook}
+              onChange={(v) => set("facebook", v)}
+              placeholder="tunde.tiles.ilisan"
+              optional
+              maxLength={APPLICATION_LIMITS.facebook}
+            />
+
+            <TextField
+              label="Snapchat"
+              value={draft.snapchat}
+              onChange={(v) => set("snapchat", v)}
+              placeholder="tundetiles"
+              optional
+              maxLength={APPLICATION_LIMITS.snapchat}
+            />
+
             <TextArea
               label="What you do"
               value={draft.note}

@@ -11,7 +11,6 @@ import {
   TextArea,
   TextField,
 } from "../admin/Fields";
-import { PlaceMark } from "../PageHeader";
 import { publicApi } from "../../lib/api";
 import { ApiError } from "../../lib/api/error";
 import { TRADE_OPTIONS } from "../../lib/admin/artisan-draft";
@@ -23,12 +22,22 @@ import {
   type JoinDraft,
   type JoinErrors,
 } from "../../lib/applications/join-draft";
+import {
+  describeJoinFailure,
+  describeUploadFailure,
+} from "../../lib/applications/join-errors";
 import { TRADE_LABELS, type Trade } from "../../lib/artisans";
 import type { JoinResult } from "../../lib/api/types";
 
 /** What the upload path accepts, said out loud so the copy and the picker agree. */
 const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif";
+const ACCEPTED_TYPES = new Set(ACCEPT.split(","));
 const MAX_BYTES = 8 * 1024 * 1024;
+
+/** "12.4 MB" — so an oversized photo can be told how far over it is. */
+function megabytes(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
 
 /**
  * The claim form behind `artizahq.com/join`.
@@ -57,17 +66,36 @@ export function JoinForm() {
     );
   };
 
+  /** Moves the eye to the first thing that needs fixing, after React paints. */
+  const showFirstError = () => {
+    requestAnimationFrame(() => {
+      const field = form.current?.querySelector<HTMLElement>(
+        '[aria-invalid="true"]',
+      );
+      field?.scrollIntoView({ block: "center", behavior: "smooth" });
+      // Focus as well as scroll: a screen reader user is told which field, and
+      // the keyboard reopens on the answer that has to change.
+      field?.focus({ preventScroll: true });
+    });
+  };
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (submitting) return;
     setFailure(undefined);
 
     const found = validateJoin(draft);
-    if (Object.keys(found).length > 0) {
+    const count = Object.keys(found).length;
+    if (count > 0) {
       setErrors(found);
-      form.current
-        ?.querySelector('[aria-invalid="true"]')
-        ?.scrollIntoView({ block: "center", behavior: "smooth" });
+      // The banner exists because the broken field is often off-screen: on a
+      // phone, a silent scroll from the button reads as the button not working.
+      setFailure(
+        count === 1
+          ? "One answer still needs fixing before we can list you — it's marked in red below."
+          : `${count} answers still need fixing before we can list you — they're marked in red below.`,
+      );
+      showFirstError();
       return;
     }
 
@@ -78,23 +106,16 @@ export function JoinForm() {
     } catch (cause) {
       setSubmitting(false);
 
-      if (cause instanceof ApiError) {
-        // A field the API rejected lands back on its own field where we have
-        // one; anything else is said once, above the button.
-        const mapped: JoinErrors = {};
-        for (const [field, messages] of Object.entries(cause.details ?? {})) {
-          const key = field.split(".").pop() as keyof JoinDraft;
-          if (key in draft) mapped[key] = messages[0];
-        }
-        if (Object.keys(mapped).length > 0) setErrors(mapped);
+      // Every failure — rejected field, duplicate number, dropped connection,
+      // our own bug — is translated in one place, so none of the API's
+      // internal wording ever reaches an artisan. See `join-errors.ts`.
+      const { message, fields } = describeJoinFailure(cause);
+      setFailure(message);
 
-        setFailure(cause.message);
-        return;
+      if (Object.keys(fields).length > 0) {
+        setErrors(fields);
+        showFirstError();
       }
-
-      setFailure(
-        "That didn't send. Check your connection and try again — nothing was lost.",
-      );
     }
   }
 
@@ -105,17 +126,17 @@ export function JoinForm() {
       <Brand />
 
       <header className="mt-8">
-        <p className="caption flex items-center gap-1.5">
-          <PlaceMark />
-          Ilisan, Ogun State
-        </p>
         <h1 className="title-lg mt-1.5 text-ink">
           Get found by people who need your work
         </h1>
+        {/* No town named. Artiza is starting in one place, but an artisan
+            reading this should see a platform they are joining, not a local
+            noticeboard — and the copy shouldn't need rewriting the week a
+            second town opens. Where they work is a field, not the pitch. */}
         <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-sub">
-          Artiza is where customers around Ilisan look for artisans they can
-          trust. Confirm your details below and your profile goes live. It takes
-          about two minutes.
+          Artiza is where customers find artisans they can trust, and pay to
+          reach them directly. Confirm your details below and your profile goes
+          live. It takes about two minutes.
         </p>
       </header>
 
@@ -166,10 +187,11 @@ export function JoinForm() {
           />
 
           <TextField
-            label="Area of Ilisan"
+            label="Where you work"
             value={draft.location}
             onChange={(v) => set("location", v)}
-            placeholder="Babcock Road"
+            placeholder="Babcock Road, Ilisan"
+            hint="The area customers will see on your profile."
             maxLength={APPLICATION_LIMITS.location}
             error={errors.location}
             disabled={submitting}
@@ -215,6 +237,47 @@ export function JoinForm() {
             optional
             error={errors.whatsapp}
             hint="Only if your WhatsApp is on a different line."
+            disabled={submitting}
+          />
+        </FormSection>
+
+        {/* Every one optional, and grouped away from the phone so the form
+            never reads as "you must have an Instagram". For the artisans who
+            do keep a page of finished jobs, it is often more persuasive than
+            the call — so it is offered, not required. */}
+        <FormSection
+          title="Your pages"
+          note="If you post your work anywhere, add it. All optional, and unlocked along with your number."
+        >
+          <TextField
+            label="Instagram"
+            value={draft.instagram}
+            onChange={(v) => set("instagram", v)}
+            placeholder="tundetiles_ilisan"
+            optional
+            maxLength={APPLICATION_LIMITS.instagram}
+            hint="Your handle, or paste the link to your page."
+            disabled={submitting}
+          />
+
+          <TextField
+            label="Facebook"
+            value={draft.facebook}
+            onChange={(v) => set("facebook", v)}
+            placeholder="tunde.tiles.ilisan"
+            optional
+            maxLength={APPLICATION_LIMITS.facebook}
+            hint="Your page name, or paste the link."
+            disabled={submitting}
+          />
+
+          <TextField
+            label="Snapchat"
+            value={draft.snapchat}
+            onChange={(v) => set("snapchat", v)}
+            placeholder="tundetiles"
+            optional
+            maxLength={APPLICATION_LIMITS.snapchat}
             disabled={submitting}
           />
         </FormSection>
@@ -537,7 +600,7 @@ function JoinDone({ result }: { result: JoinResult }) {
 
         <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-sub">
           {result.published
-            ? `Your profile is live. Anyone looking for a ${trade} around Ilisan can now find you and pay to unlock your number.`
+            ? `Your profile is live. Someone looking for a ${trade} in your area can now find you and pay to unlock your number.`
             : "We have your details. The Artiza team will have your profile live shortly and will call you if anything is missing."}
         </p>
       </div>
@@ -548,7 +611,7 @@ function JoinDone({ result }: { result: JoinResult }) {
           {[
             {
               title: "A customer finds you",
-              body: `They browse artisans in Ilisan and read your profile — your work, your years, what you take on.`,
+              body: "They browse artisans near them and read your profile — your work, your years, what you take on.",
             },
             {
               title: "They pay to unlock your number",

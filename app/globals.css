@@ -67,6 +67,14 @@
   --t-laundry-light: #a9e0f0;
   --t-laundry-soft: #e4f4fa;
 
+  /* The toolbox, for trades with no drawing of their own yet. Warm neutral
+     rather than a colour of its own: it has to sit in a rail beside seven
+     saturated drawings without claiming to be an eighth trade. */
+  --t-generic: #8d7f70;
+  --t-generic-deep: #5f5449;
+  --t-generic-light: #d8cec3;
+  --t-generic-soft: #f1eeea;
+
   /* Tools are steel across every trade, so it is shared. */
   --t-steel: #9aa3af;
   --t-steel-deep: #6b7280;

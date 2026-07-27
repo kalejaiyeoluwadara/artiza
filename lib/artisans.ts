@@ -1,11 +1,67 @@
-export type Trade =
-  | "plumber"
-  | "solar-installer"
-  | "tiler"
-  | "carpenter"
-  | "electrician"
-  | "painter"
-  | "laundry";
+/**
+ * Every trade Artiza lists, and the one place the taxonomy is defined —
+ * {@link Trade} is derived from these keys, so adding a trade is this line and
+ * nothing else. The backend `Trade` enum mirrors it exactly; the two are a
+ * contract and drifting apart would 422 an artisan mid-form.
+ *
+ * The order is deliberate and not alphabetical: `TradeRail` walks it as-is, and
+ * that rail is a market stall where the trades people actually search for
+ * belong at the front. The `/join` dropdown sorts by label instead — thirty-odd
+ * options in a `<select>` are scanned, not browsed.
+ *
+ * A trade is the *category* a customer filters on. The long tail lives in an
+ * artisan's `services`, which is free text — "Marble" and "Grout repair" are
+ * things a tiler does, not trades of their own. Keeping that split is what
+ * stops the register fragmenting into thirty rails of one artisan each.
+ */
+export const TRADE_LABELS = {
+  // The building trades — the spine of the register.
+  plumber: "Plumber",
+  electrician: "Electrician",
+  carpenter: "Carpenter",
+  tiler: "Tiler",
+  painter: "Painter",
+  bricklayer: "Bricklayer",
+  welder: "Welder",
+  roofer: "Roofer",
+  "pop-installer": "POP installer",
+  "aluminium-fabricator": "Aluminium fabricator",
+  "borehole-driller": "Borehole driller",
+
+  // Power, cooling and the things bolted to a house.
+  "solar-installer": "Solar installer",
+  "generator-technician": "Generator technician",
+  "ac-technician": "AC technician",
+  "cctv-installer": "CCTV installer",
+  "satellite-installer": "Satellite installer",
+  "appliance-repair": "Appliance repair",
+
+  // Devices.
+  "phone-repair": "Phone repair",
+  "computer-repair": "Computer repair",
+
+  // Vehicles.
+  "auto-mechanic": "Auto mechanic",
+  "auto-electrician": "Auto electrician",
+  "panel-beater": "Panel beater",
+  vulcanizer: "Vulcanizer",
+
+  // Home and personal services.
+  laundry: "Laundry",
+  cleaner: "Cleaner",
+  fumigator: "Fumigator",
+  gardener: "Gardener",
+  upholsterer: "Upholsterer",
+  "interior-decorator": "Interior decorator",
+  tailor: "Tailor",
+  hairstylist: "Hairstylist",
+  barber: "Barber",
+  caterer: "Caterer",
+  "event-decorator": "Event decorator",
+  photographer: "Photographer",
+} as const satisfies Record<string, string>;
+
+export type Trade = keyof typeof TRADE_LABELS;
 
 /**
  * Everything the ₦500 buys. Phone is the spine — call, WhatsApp and SMS all
@@ -16,6 +72,10 @@ export interface Contact {
   whatsapp?: string;
   /** Handle without the @. */
   instagram?: string;
+  /** Page or profile name — the part after `facebook.com/`. */
+  facebook?: string;
+  /** Handle without the @. */
+  snapchat?: string;
   email?: string;
   /** Second line, e.g. a shop landline or apprentice.  */
   altPhone?: string;
@@ -65,24 +125,32 @@ export interface SealedDetails {
   contact: Contact;
 }
 
-export const TRADE_LABELS: Record<Trade, string> = {
-  plumber: "Plumber",
-  "solar-installer": "Solar installer",
-  tiler: "Tiler",
-  carpenter: "Carpenter",
-  electrician: "Electrician",
-  painter: "Painter",
-  laundry: "Laundry",
-};
-
 /**
  * Rail labels. The tile is only 4.75rem wide, so anything that would wrap
  * gets shortened here rather than truncated at render — a clipped trade
- * name is worse than a shorter true one.
+ * name is worse than a shorter true one. Only the labels that need it appear;
+ * everything else falls through to its full name.
  */
 export const TRADE_SHORT_LABELS: Record<Trade, string> = {
   ...TRADE_LABELS,
   "solar-installer": "Solar",
+  "generator-technician": "Generator",
+  "ac-technician": "AC",
+  "aluminium-fabricator": "Aluminium",
+  "pop-installer": "POP",
+  "borehole-driller": "Borehole",
+  "cctv-installer": "CCTV",
+  "satellite-installer": "Satellite",
+  "appliance-repair": "Appliance",
+  "phone-repair": "Phone",
+  "computer-repair": "Computer",
+  "auto-mechanic": "Mechanic",
+  "auto-electrician": "Auto elec",
+  "panel-beater": "Panel",
+  "interior-decorator": "Interior",
+  "event-decorator": "Events",
+  upholsterer: "Upholstery",
+  photographer: "Photo",
 };
 
 /** Price of one contact unlock, in kobo-free naira. */
@@ -232,6 +300,8 @@ export type ChannelKind =
   | "whatsapp"
   | "sms"
   | "instagram"
+  | "facebook"
+  | "snapchat"
   | "email"
   | "alt";
 
@@ -282,12 +352,38 @@ export function channelsFor(
     },
   ];
 
+  // The socials, in the order they are actually worth to an artisan: Instagram
+  // is where the work is, Facebook is where the customers are, Snapchat is a
+  // long way third. All optional, and a channel an artisan doesn't have simply
+  // isn't drawn.
   if (contact.instagram) {
     channels.push({
       kind: "instagram",
       label: "Instagram",
       value: `@${contact.instagram}`,
       href: `https://instagram.com/${contact.instagram}`,
+      external: true,
+    });
+  }
+
+  if (contact.facebook) {
+    channels.push({
+      kind: "facebook",
+      label: "Facebook",
+      // Not prefixed with an @: a Facebook page is a name, not a handle, and
+      // "@Tunde Tiles Ilisan" is a thing nobody has ever written down.
+      value: contact.facebook,
+      href: `https://facebook.com/${contact.facebook}`,
+      external: true,
+    });
+  }
+
+  if (contact.snapchat) {
+    channels.push({
+      kind: "snapchat",
+      label: "Snapchat",
+      value: `@${contact.snapchat}`,
+      href: `https://snapchat.com/add/${contact.snapchat}`,
       external: true,
     });
   }

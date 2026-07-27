@@ -1,4 +1,4 @@
-import { Trade } from "../lib/artisans";
+import { TRADE_LABELS, Trade } from "../lib/artisans";
 
 /**
  * Hand-built trade illustrations. One drawing grammar across all seven so
@@ -11,7 +11,7 @@ import { Trade } from "../lib/artisans";
  * one-accent rule still governs every actual control.
  */
 export function TradeIllustration({ trade }: { trade: Trade }) {
-  const Art = ART[trade];
+  const Art = ART[trade] ?? Generic;
   return (
     <svg
       viewBox="0 0 40 40"
@@ -291,7 +291,46 @@ function Laundry() {
   );
 }
 
-const ART: Record<Trade, () => React.JSX.Element> = {
+/**
+ * A toolbox, for any trade without a drawing of its own yet.
+ *
+ * The register's taxonomy is far wider than the set of hand-built drawings and
+ * always will be — a drawing is a deliberate act, and a new trade should never
+ * have to wait on one to be listable. So this is a real member of the set,
+ * drawn in the same grammar, rather than a blank tile: the honest picture of
+ * "a trade" when the specific one hasn't been drawn.
+ */
+function Generic() {
+  return (
+    <>
+      {/* Handle. */}
+      <path
+        d="M15 13v-2a5 5 0 0 1 10 0v2"
+        stroke="var(--t-generic-deep)"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <rect x="5" y="13" width="30" height="17" rx="4" fill="var(--t-generic)" />
+      <rect x="5" y="19" width="30" height="4" fill="var(--t-generic-deep)" />
+      <rect
+        x="16.5"
+        y="17"
+        width="7"
+        height="8"
+        rx="2"
+        fill="var(--t-generic-light)"
+      />
+    </>
+  );
+}
+
+/**
+ * The drawings that exist. Partial on purpose — see {@link Generic}. Adding a
+ * trade to `TRADE_LABELS` needs no entry here; adding one here is what upgrades
+ * that trade from the toolbox to its own picture.
+ */
+const ART: Partial<Record<Trade, () => React.JSX.Element>> = {
   plumber: Plumber,
   "solar-installer": SolarInstaller,
   tiler: Tiler,
@@ -301,8 +340,8 @@ const ART: Record<Trade, () => React.JSX.Element> = {
   laundry: Laundry,
 };
 
-/** The tile wash behind each drawing. */
-export const TRADE_TINTS: Record<Trade, string> = {
+/** The tile washes that exist, paired with the drawings above. */
+const TINTS: Partial<Record<Trade, string>> = {
   plumber: "var(--t-plumber-soft)",
   "solar-installer": "var(--t-solar-soft)",
   tiler: "var(--t-tiler-soft)",
@@ -311,3 +350,17 @@ export const TRADE_TINTS: Record<Trade, string> = {
   painter: "var(--t-painter-soft)",
   laundry: "var(--t-laundry-soft)",
 };
+
+/**
+ * The tile wash behind each drawing, filled in for every trade.
+ *
+ * Resolved once at module load rather than at each lookup, so the call sites
+ * stay a plain `TRADE_TINTS[trade]` and none of them has to know that some
+ * trades are still on the fallback.
+ */
+export const TRADE_TINTS = Object.fromEntries(
+  (Object.keys(TRADE_LABELS) as Trade[]).map((trade) => [
+    trade,
+    TINTS[trade] ?? "var(--t-generic-soft)",
+  ]),
+) as Record<Trade, string>;

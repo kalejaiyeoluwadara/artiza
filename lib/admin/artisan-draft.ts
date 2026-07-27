@@ -18,6 +18,8 @@ export interface ArtisanDraft {
   phone: string;
   whatsapp: string;
   instagram: string;
+  facebook: string;
+  snapchat: string;
   email: string;
   altPhone: string;
   respondsIn: string;
@@ -45,15 +47,26 @@ export const LIMITS = {
   respondsIn: 80,
   availability: 80,
   instagram: 40,
+  facebook: 60,
+  snapchat: 40,
   service: 40,
   services: 12,
   work: 12,
   years: 70,
 } as const;
 
-export const TRADE_OPTIONS = (
-  Object.keys(TRADE_LABELS) as Trade[]
-).map((trade) => ({ value: trade, label: TRADE_LABELS[trade] }));
+/**
+ * Every trade as a `<select>` option, alphabetical by label.
+ *
+ * Not `TRADE_LABELS` order, which is curated for the trade rail — a rail is
+ * browsed, so the trades people search for most belong at the front. A dropdown
+ * of thirty-odd options is the opposite: the reader already knows the word they
+ * are looking for, and any order but alphabetical makes them read all thirty to
+ * find it.
+ */
+export const TRADE_OPTIONS = (Object.keys(TRADE_LABELS) as Trade[])
+  .map((trade) => ({ value: trade, label: TRADE_LABELS[trade] }))
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 export function blankDraft(): ArtisanDraft {
   const now = new Date();
@@ -66,6 +79,8 @@ export function blankDraft(): ArtisanDraft {
     phone: "",
     whatsapp: "",
     instagram: "",
+    facebook: "",
+    snapchat: "",
     email: "",
     altPhone: "",
     // The two the team says out loud on every visit, pre-filled with what they
@@ -95,6 +110,8 @@ export function draftFrom(artisan: AdminArtisan): ArtisanDraft {
     phone: nationalPart(artisan.phone),
     whatsapp: nationalPart(artisan.whatsapp ?? ""),
     instagram: artisan.instagram ?? "",
+    facebook: artisan.facebook ?? "",
+    snapchat: artisan.snapchat ?? "",
     email: artisan.email ?? "",
     altPhone: nationalPart(artisan.altPhone ?? ""),
     respondsIn: artisan.respondsIn,
@@ -134,6 +151,29 @@ export function toMsisdn(input: string): string {
   if (digits.startsWith("234")) return digits;
   if (digits.startsWith("0")) return `234${digits.slice(1)}`;
   return `234${digits}`;
+}
+
+/**
+ * Whatever was typed, as the bare handle the API stores.
+ *
+ * Nobody types a handle. They long-press their own profile, hit "Copy link",
+ * and paste `https://www.instagram.com/tundetiles_ilisan/?igsh=…` — or they
+ * write `@tundetiles_ilisan`, because that is how a handle is written
+ * everywhere it is ever displayed. Storing either verbatim produces a dead
+ * link, since the client builds the URL itself. So the paste is unwrapped
+ * here: host and scheme off the front, query and trailing slash off the back,
+ * `@` stripped.
+ */
+export function toHandle(input: string): string {
+  return input
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    // Any of the three hosts, plus Snapchat's /add/ path segment.
+    .replace(/^(instagram|facebook|fb|snapchat)\.com\/(add\/)?/i, "")
+    .replace(/[?#].*$/, "")
+    .replace(/\/+$/, "")
+    .replace(/^@/, "");
 }
 
 export type DraftErrors = Partial<Record<keyof ArtisanDraft, string>>;
@@ -198,7 +238,9 @@ export function validateDraft(draft: ArtisanDraft): DraftErrors {
 
 /** A new listing, in the shape `POST /admin/artisans` takes. */
 export function toInput(draft: ArtisanDraft): ArtisanInput {
-  const instagram = draft.instagram.trim().replace(/^@/, "");
+  const instagram = toHandle(draft.instagram);
+  const facebook = toHandle(draft.facebook);
+  const snapchat = toHandle(draft.snapchat);
 
   return {
     name: draft.name.trim(),
@@ -211,6 +253,8 @@ export function toInput(draft: ArtisanDraft): ArtisanInput {
       // validates any key that is present, and "" is not a valid handle.
       ...(draft.whatsapp ? { whatsapp: toMsisdn(draft.whatsapp) } : {}),
       ...(instagram ? { instagram } : {}),
+      ...(facebook ? { facebook } : {}),
+      ...(snapchat ? { snapchat } : {}),
       ...(draft.email.trim() ? { email: draft.email.trim() } : {}),
       ...(draft.altPhone ? { altPhone: toMsisdn(draft.altPhone) } : {}),
       respondsIn: draft.respondsIn.trim(),
