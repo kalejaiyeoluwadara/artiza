@@ -200,7 +200,7 @@ export function ApplySheet({
               label="Instagram"
               value={draft.instagram}
               onChange={(v) => set("instagram", v)}
-              placeholder="tundetiles_ilisan"
+              placeholder=""
               optional
               maxLength={APPLICATION_LIMITS.instagram}
               hint="Handle, or paste the link to your page."
@@ -210,7 +210,7 @@ export function ApplySheet({
               label="Facebook"
               value={draft.facebook}
               onChange={(v) => set("facebook", v)}
-              placeholder="tunde.tiles.ilisan"
+              placeholder=""
               optional
               maxLength={APPLICATION_LIMITS.facebook}
             />
@@ -219,7 +219,7 @@ export function ApplySheet({
               label="Snapchat"
               value={draft.snapchat}
               onChange={(v) => set("snapchat", v)}
-              placeholder="tundetiles"
+              placeholder=""
               optional
               maxLength={APPLICATION_LIMITS.snapchat}
             />

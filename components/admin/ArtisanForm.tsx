@@ -327,7 +327,7 @@ export function ArtisanForm({
                 label="Instagram"
                 value={draft.instagram}
                 onChange={(v) => set("instagram", v)}
-                placeholder="tundetiles_ilisan"
+                placeholder=""
                 optional
                 maxLength={LIMITS.instagram}
                 hint="Handle or a pasted profile link."
@@ -336,7 +336,7 @@ export function ArtisanForm({
                 label="Facebook"
                 value={draft.facebook}
                 onChange={(v) => set("facebook", v)}
-                placeholder="tunde.tiles.ilisan"
+                placeholder=""
                 optional
                 maxLength={LIMITS.facebook}
                 hint="Page name or a pasted profile link."
@@ -345,7 +345,7 @@ export function ArtisanForm({
                 label="Snapchat"
                 value={draft.snapchat}
                 onChange={(v) => set("snapchat", v)}
-                placeholder="tundetiles"
+                placeholder=""
                 optional
                 maxLength={LIMITS.snapchat}
                 hint="Handle without the @."
