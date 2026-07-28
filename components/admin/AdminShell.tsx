@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   Inbox,
   LayoutGrid,
+  Send,
   Users,
 } from "lucide-react";
 
@@ -29,6 +30,12 @@ const SECTIONS = [
     label: "Applications",
     icon: Inbox,
     hint: "Artisans applying to join",
+  },
+  {
+    href: "/admin/outreach",
+    label: "Outreach",
+    icon: Send,
+    hint: "Founding artisans to message",
   },
   {
     href: "/admin/banners",

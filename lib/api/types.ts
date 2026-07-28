@@ -1,4 +1,5 @@
 import type { BannerType, Trade } from "../artisans";
+import type { ApprovalStatus, OutreachStatus } from "../outreach";
 
 /**
  * The envelope every Artiza endpoint answers in. The client unwraps it, so
@@ -407,3 +408,51 @@ export interface UploadResult {
 
 /** The crop the API applies. Pick the one that matches the slot. */
 export type UploadFolder = "portraits" | "work" | "banners";
+
+// ── Founding-artisan outreach ──────────────────────────────────────────────
+
+/**
+ * One artisan on the team's own contact list. Admin-only and never customer
+ * facing: this is the list Artiza's register is being built out of, held in
+ * the console so nobody has to save forty numbers to a phone to message them.
+ */
+export interface OutreachLead {
+  id: string;
+  name: string;
+  /** `2348031234567` when it could be read as one; the raw text otherwise. */
+  phone: string;
+  /** Whether `phone` is a number `wa.me` will open a chat for. */
+  whatsappReady: boolean;
+  trade: Trade;
+  customTrade?: string;
+  outreachStatus: OutreachStatus;
+  approvalStatus: ApprovalStatus;
+  notes: string;
+  /** Stamped when a message was last opened for them, not when it was sent. */
+  lastContactedAt?: string;
+  followUpAt?: string;
+  createdAt: string;
+}
+
+/** One parsed CSV row on its way to the import endpoint. */
+export interface OutreachLeadInput {
+  name: string;
+  phone: string;
+  trade?: Trade;
+  customTrade?: string;
+  outreachStatus?: OutreachStatus;
+  approvalStatus?: ApprovalStatus;
+  notes?: string;
+  followUpAt?: string | null;
+}
+
+/** Everything the console is allowed to correct after the fact. */
+export type OutreachLeadPatch = Partial<OutreachLeadInput>;
+
+/** What an import answers with: what it did, and the list as it now stands. */
+export interface OutreachImportResult {
+  created: number;
+  updated: number;
+  skipped: number;
+  leads: OutreachLead[];
+}

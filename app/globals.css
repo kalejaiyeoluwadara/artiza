@@ -363,6 +363,83 @@
   }
 }
 
+/* The header's search glyph (components/SearchTrigger.tsx).
+   One scan per approach, not a loop: the magnifier drifts across the
+   field and back while a glint travels the rim, and the handle draws
+   itself in behind it. Hover only — on touch the field is a tap away
+   from the real search screen and the animation would never be seen. */
+.search-glyph__body {
+  transform-box: fill-box;
+  transform-origin: 45% 45%;
+}
+
+.search-glyph__handle {
+  stroke-dasharray: 7;
+  stroke-dashoffset: 0;
+}
+
+/* Spins about the lens centre, so the glint stays on the rim. */
+.search-glyph__glint {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .search-trigger:hover .search-glyph__body {
+    animation: search-scan 780ms var(--ease-in-out);
+  }
+
+  .search-trigger:hover .search-glyph__handle {
+    animation: search-handle 460ms var(--ease-out) 240ms both;
+  }
+
+  .search-trigger:hover .search-glyph__glint {
+    animation: search-glint 780ms var(--ease-in-out);
+  }
+}
+
+@keyframes search-scan {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  35% {
+    transform: translate(2.2px, -1.4px) scale(1.06);
+  }
+  70% {
+    transform: translate(-1.6px, 1.2px) scale(1.04);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* The handle retracts under the lens as it lifts, then draws back out. */
+@keyframes search-handle {
+  0% {
+    stroke-dashoffset: 7;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes search-glint {
+  0% {
+    opacity: 0;
+    transform: rotate(-40deg);
+  }
+  25% {
+    opacity: 0.9;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(300deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

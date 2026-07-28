@@ -9,6 +9,7 @@ import {
   SearchIcon,
   UnlockedIcon,
 } from "./TabIcons";
+import { SearchTrigger } from "./SearchTrigger";
 
 const TABS = [
   { href: "/", label: "Browse", icon: BrowseIcon },
@@ -109,7 +110,14 @@ export function BottomNav() {
   );
 }
 
-/** Desktop counterpart. Same destinations, same names. */
+/**
+ * Desktop counterpart. Same destinations — except Search, which the header
+ * states as a field rather than a word: a bar with a magnifier in it says
+ * what it does before it is read, and the tab bar still carries the word on
+ * mobile where there is no room for a field.
+ */
+const HEADER_TABS = TABS.filter((tab) => tab.href !== "/search");
+
 export function SiteHeader() {
   const isActive = useIsActive();
   const bare = useIsBare();
@@ -149,9 +157,11 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav aria-label="Primary" className="ml-auto">
+        <SearchTrigger className="ml-auto w-56 shrink-0 lg:w-72" />
+
+        <nav aria-label="Primary">
           <ul className="flex items-center gap-1">
-            {TABS.map(({ href, label }) => {
+            {HEADER_TABS.map(({ href, label }) => {
               const active = isActive(href);
               return (
                 <li key={href}>

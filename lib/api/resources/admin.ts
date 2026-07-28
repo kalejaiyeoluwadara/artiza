@@ -9,6 +9,10 @@ import type {
   ArtisanPatch,
   ArtisanSummary,
   BannerInput,
+  OutreachImportResult,
+  OutreachLead,
+  OutreachLeadInput,
+  OutreachLeadPatch,
   RegisterStatus,
   UploadFolder,
   UploadResult,
@@ -129,6 +133,63 @@ export const adminResource = (token?: string) => ({
     /** Hard delete — an application carries no receipts worth keeping. */
     remove(id: string): Promise<{ deleted: true }> {
       return request<{ deleted: true }>(`/admin/applications/${id}`, {
+        method: "DELETE",
+        token,
+      });
+    },
+  },
+
+  /**
+   * The founding-artisan outreach list. The team's own contact book, and the
+   * only management surface with no customer-facing counterpart at all.
+   */
+  outreach: {
+    /** Every lead, oldest first. Unpaginated — the console works the lot. */
+    list(signal?: AbortSignal): Promise<OutreachLead[]> {
+      return request<OutreachLead[]>("/admin/outreach", {
+        token,
+        cache: "no-store",
+        signal,
+      });
+    },
+
+    /**
+     * Merge a parsed CSV in. Matches on phone number and keeps the progress on
+     * anyone already there, so re-importing a corrected file mid-campaign is
+     * safe — the answer carries the whole list back so the table can swap
+     * without a second read.
+     */
+    import(leads: OutreachLeadInput[]): Promise<OutreachImportResult> {
+      return request<OutreachImportResult>("/admin/outreach/import", {
+        method: "POST",
+        body: { leads },
+        token,
+      });
+    },
+
+    /** Partial — a corrected name, a status, a follow-up date. */
+    update(id: string, patch: OutreachLeadPatch): Promise<OutreachLead> {
+      return request<OutreachLead>(`/admin/outreach/${id}`, {
+        method: "PATCH",
+        body: patch,
+        token,
+      });
+    },
+
+    /**
+     * Records that the message was *opened* for this lead. Artiza never sends
+     * one — the operator reads the draft in WhatsApp and sends it themselves.
+     */
+    markContacted(id: string): Promise<OutreachLead> {
+      return request<OutreachLead>(`/admin/outreach/${id}/contacted`, {
+        method: "POST",
+        token,
+      });
+    },
+
+    /** Gone for good. Nothing else in the app points at a lead. */
+    remove(id: string): Promise<{ deleted: true }> {
+      return request<{ deleted: true }>(`/admin/outreach/${id}`, {
         method: "DELETE",
         token,
       });
