@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { Sheet } from "../../Sheet";
 import { TextArea, TextField } from "../Fields";
@@ -78,12 +78,15 @@ export function LeadSheet({
   );
   const [saving, setSaving] = useState(false);
 
-  // Re-seeds when a different row is opened, and when the row it is already
-  // showing changes underneath it — pressing Message stamps `lastContactedAt`
-  // and can move the status, and the open sheet has to show that.
-  useEffect(() => {
+  // Re-seed when a *different* row is opened, during render rather than in an
+  // effect so no pass ever paints the previous artisan's details. Keyed on the
+  // id and not the object: the row is replaced whenever anything is saved
+  // against it, and re-seeding on that would throw away a note being typed.
+  const [seenId, setSeenId] = useState(lead?.id);
+  if (lead?.id !== seenId) {
+    setSeenId(lead?.id);
     setDraft(lead ? toDraft(lead) : undefined);
-  }, [lead]);
+  }
 
   // Nothing is open, so there is nothing to render. The sheet mounts with the
   // row rather than sitting in the tree waiting — one lead's draft at a time.
@@ -173,7 +176,18 @@ export function LeadSheet({
                   : "Never messaged"}
               </p>
             </div>
-            <MessageButton lead={lead} onOpen={() => onMessaged(lead)} />
+            <MessageButton
+              lead={lead}
+              onOpen={() => {
+                onMessaged(lead);
+                // The parent's write lands on `lead`, which this draft is
+                // deliberately not re-seeded from — so the choice below is
+                // moved by hand to match what was just recorded.
+                if (draft.outreachStatus === "not_contacted") {
+                  set("outreachStatus", "contacted");
+                }
+              }}
+            />
           </header>
 
           <div className="mt-5 space-y-5">

@@ -71,10 +71,18 @@ export function ImportSheet({
 
     setImporting(true);
     try {
-      // `rawPhone` and `ready` are the preview's own workings — the API
-      // re-normalises what it is given and decides for itself.
+      // Sent field by field: `rawPhone` and `ready` are the preview's own
+      // workings, and the API rejects any key it did not ask for.
       const result = await api.admin.outreach.import(
-        parsed.rows.map(({ rawPhone: _raw, ready: _ready, ...lead }) => lead),
+        parsed.rows.map((row) => ({
+          name: row.name,
+          phone: row.phone,
+          trade: row.trade,
+          customTrade: row.customTrade,
+          outreachStatus: row.outreachStatus,
+          approvalStatus: row.approvalStatus,
+          notes: row.notes,
+        })),
       );
 
       onImported(result.leads);

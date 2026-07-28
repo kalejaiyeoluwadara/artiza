@@ -198,7 +198,7 @@ export default function AccountPage() {
         <Row
           icon={PhoneCall}
           label="Contact Artiza on WhatsApp"
-          external="https://wa.me/2348031234567"
+          external="https://wa.me/2349160758322"
         />
         <Row icon={HelpCircle} label="How unlocking works" />
         <Row icon={ShieldCheck} label="Privacy and terms" last />

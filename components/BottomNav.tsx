@@ -122,6 +122,10 @@ export function SiteHeader() {
   const isActive = useIsActive();
   const bare = useIsBare();
   const wide = useIsWideGrid();
+  // The search screen opens with a real field of its own, directly below
+  // this bar. A second one in the header would be the same control twice,
+  // and the one that cannot be typed into sits on top.
+  const onSearch = isActive("/search");
 
   if (bare) return null;
 
@@ -157,9 +161,11 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <SearchTrigger className="ml-auto w-56 shrink-0 lg:w-72" />
+        {onSearch ? null : (
+          <SearchTrigger className="ml-auto w-56 shrink-0 lg:w-72" />
+        )}
 
-        <nav aria-label="Primary">
+        <nav aria-label="Primary" className={onSearch ? "ml-auto" : undefined}>
           <ul className="flex items-center gap-1">
             {HEADER_TABS.map(({ href, label }) => {
               const active = isActive(href);
