@@ -27,6 +27,8 @@ export const TRADE_LABELS = {
   "pop-installer": "POP installer",
   "aluminium-fabricator": "Aluminium fabricator",
   "borehole-driller": "Borehole driller",
+  builder: "Builder",
+  "iron-bender": "Iron bender",
 
   // Power, cooling and the things bolted to a house.
   "solar-installer": "Solar installer",
@@ -36,15 +38,17 @@ export const TRADE_LABELS = {
   "satellite-installer": "Satellite installer",
   "appliance-repair": "Appliance repair",
 
-  // Devices.
+  // Devices and design work.
   "phone-repair": "Phone repair",
   "computer-repair": "Computer repair",
+  "graphic-artist": "Graphic artist",
 
   // Vehicles.
   "auto-mechanic": "Auto mechanic",
   "auto-electrician": "Auto electrician",
   "panel-beater": "Panel beater",
   vulcanizer: "Vulcanizer",
+  transporter: "Transporter",
 
   // Home and personal services.
   laundry: "Laundry",
@@ -59,6 +63,18 @@ export const TRADE_LABELS = {
   caterer: "Caterer",
   "event-decorator": "Event decorator",
   photographer: "Photographer",
+
+  // Building supplies. Not a hand trade, but the first call on any site — the
+  // register is what Ilisan actually asks for, not a purist list of crafts.
+  "building-materials": "Building materials",
+  "cement-distributor": "Cement distributor",
+  sawmiller: "Sawmiller",
+
+  // The professions a build needs before and after the hand trades.
+  architect: "Architect",
+  surveyor: "Surveyor",
+  "estate-agent": "Estate agent",
+  lawyer: "Lawyer",
 
   /**
    * The escape hatch, and deliberately last in every list it appears in.
@@ -182,6 +198,12 @@ export const TRADE_SHORT_LABELS: Record<Trade, string> = {
   "event-decorator": "Events",
   upholsterer: "Upholstery",
   photographer: "Photo",
+  "graphic-artist": "Graphics",
+  "iron-bender": "Iron",
+  transporter: "Transport",
+  "building-materials": "Materials",
+  "cement-distributor": "Cement",
+  "estate-agent": "Estate",
 };
 
 /** Price of one contact unlock, in kobo-free naira. */

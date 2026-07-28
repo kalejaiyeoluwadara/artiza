@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { BadgeCheck, MapPin, Star } from "lucide-react";
 import {
   Artisan,
@@ -10,6 +11,7 @@ import { useArtisanContact } from "../lib/useArtisanContact";
 import { useArtisanReviews } from "../lib/useArtisanReviews";
 import { Avatar } from "./ArtisanCard";
 import { ContactPanel } from "./ContactPanel";
+import { Lightbox } from "./Lightbox";
 import { SealedContact } from "./SealedContact";
 import { Sheet } from "./Sheet";
 
@@ -31,6 +33,13 @@ export function ArtisanSheet({
     unlocked,
   );
   const { reviews, loading: loadingReviews } = useArtisanReviews(artisan?.id ?? null);
+
+  // Which past-work photo is open full screen, if any. Tagged with the artisan
+  // it belongs to rather than cleared on close: the sheet outlives both, and a
+  // stale index would otherwise reopen the viewer over the next profile.
+  const [photo, setPhoto] = useState<{ id: string; index: number } | null>(null);
+  const openPhoto =
+    artisan && photo?.id === artisan.id ? photo.index : null;
 
   return (
     <Sheet
@@ -110,20 +119,23 @@ export function ArtisanSheet({
                     get the full width of the sheet rather than a grid. */}
                 <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-2.5 overflow-x-auto px-5">
                   {artisan.work.map((src, i) => (
-                    <div
+                    <button
                       key={src}
-                      className="relative h-40 w-56 shrink-0 snap-start overflow-hidden rounded-2xl bg-fill"
+                      type="button"
+                      onClick={() => setPhoto({ id: artisan.id, index: i })}
+                      aria-label={`View ${workAlt(artisan, i)} full screen`}
+                      className="pressable relative h-40 w-56 shrink-0 snap-start overflow-hidden rounded-2xl bg-fill"
                     >
+                      {/* The button carries the name; a described image here
+                          would only be read out twice. */}
                       <Image
                         src={src}
-                        alt={`${tradeName(artisan)} job by ${
-                          artisan.name
-                        }, photo ${i + 1}`}
+                        alt=""
                         fill
                         sizes="224px"
                         className="object-cover"
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
               </Section>
@@ -211,10 +223,22 @@ export function ArtisanSheet({
               onUnlock={onUnlock}
             />
           </div>
+
+          <Lightbox
+            photos={artisan.work}
+            index={openPhoto}
+            onClose={() => setPhoto(null)}
+            alt={(i) => workAlt(artisan, i)}
+          />
         </>
       )}
     </Sheet>
   );
+}
+
+/** One description for the photo, whether it's a thumbnail or full screen. */
+function workAlt(artisan: Artisan, i: number) {
+  return `${tradeName(artisan)} job by ${artisan.name}, photo ${i + 1}`;
 }
 
 function Stat({
