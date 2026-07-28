@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { JoinForm } from "../../components/join/JoinForm";
 
 export const metadata: Metadata = {
-  title: "Join Artiza — free listing for artisans in Ilisan",
+  title: "Join Artiza",
   description:
     "Artiza helps customers in Ilisan find trusted artisans. Confirm your details and your profile goes live. Listing is free, and Artiza never takes a cut of your job.",
   // The claim link is sent one-to-one over WhatsApp, not published. Keeping it
