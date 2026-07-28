@@ -123,20 +123,36 @@ export function greetingName(name: string): string {
 }
 
 /**
+ * Where the message sends people. Written out in full so WhatsApp turns it
+ * into a tappable link — a bare `artizahq.com/join` is left as plain text on
+ * some clients, and an artisan reading it on a phone has no way to open it.
+ */
+export const JOIN_URL = "https://www.artizahq.com/join";
+
+/**
  * The founding-artisan invitation.
  *
  * One message, the same for everyone but the name. It is written out in full
  * here rather than assembled from fragments because it is the first thing an
  * artisan ever reads about Artiza, and it should be editable by reading it.
+ *
+ * It ends on the link rather than on the question it used to end on: the reply
+ * "yes, I'm interested" costs the team a second message and a second wait,
+ * where the form takes their details in one go. The question stays, because
+ * asking before sending someone to a form is the difference between an
+ * invitation and a cold link — but the link is right there under it, with the
+ * two minutes stated so nobody puts it off as paperwork.
  */
 export function outreachMessage(name: string): string {
   return [
-    `Hello ${greetingName(name)}, my name is Dara, founder of Artiza.`,
+    `Hello ${greetingName(name)}, my name is Kalejaiye Oluwadara, founder of Artiza.`,
     "We're building Artiza, a platform that helps people discover trusted artisans and connect with them for their services.",
     "We'd love to invite you to become one of our Founding Artisans.",
     "Your profile would be listed on Artiza so potential customers can discover your work and contact you.",
     "There is no cost to join.",
     "Would you be interested in being listed?",
+    `If you are, please click the link below to confirm your details: ${JOIN_URL}`,
+    "It only takes about 2 minutes.",
   ].join("\n\n");
 }
 

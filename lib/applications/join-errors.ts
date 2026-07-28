@@ -268,6 +268,13 @@ export function describeUploadFailure(cause: unknown, count: number): string {
     return `Artiza has paused uploads from this phone for a minute — too many in a row. Wait a minute and add ${count === 1 ? "the photo" : "the photos"} again. Your answers are safe.`;
   }
 
+  // A timeout on a phone camera photo is usually the upload crawling on a weak
+  // signal, not anything wrong with the picture — so it says that, and asks for
+  // the one thing that actually helps rather than quoting a status code.
+  if (cause.status === 408 || cause.status === 504) {
+    return `${subject} ${count === 1 ? "is" : "are"} taking too long to upload — the signal here is slow. Your answers are safe. Move somewhere with better signal and try again, or finish without photos and the team will add them.`;
+  }
+
   if (cause.status === 400) {
     // The upload pipe's own messages are already written for a person
     // ("Image must be a JPEG, PNG, WebP or HEIC."), so they're kept.
