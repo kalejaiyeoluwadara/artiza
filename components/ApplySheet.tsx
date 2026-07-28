@@ -20,6 +20,7 @@ import {
   type ApplicationErrors,
 } from "../lib/applications/application-draft";
 import type { Trade } from "../lib/artisans";
+import { uploadWorkPhotos } from "../lib/uploads";
 import type { ApplicationItem } from "../lib/api/types";
 
 /** What the upload path accepts, said out loud so the copy and the picker agree. */
@@ -318,7 +319,11 @@ function PhotoField({
 
     setBusy(true);
     try {
-      const results = await api.applications.uploadPhotos(picked);
+      // Same path as `/join`: resized here, then straight to Cloudinary under a
+      // signature, with the API's own upload route kept as the fallback.
+      const results = await uploadWorkPhotos(picked, {
+        relay: (files, signal) => api.applications.uploadPhotos(files, signal),
+      });
       onChange([...values, ...results.map((r) => r.url)].slice(0, max));
     } catch (cause) {
       setError(

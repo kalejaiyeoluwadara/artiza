@@ -30,6 +30,7 @@ import {
   toJustJoined,
 } from "../../lib/applications/just-joined";
 import { tradeName, type Trade } from "../../lib/artisans";
+import { uploadWorkPhotos, type UploadProgress } from "../../lib/uploads";
 import type { JoinResult } from "../../lib/api/types";
 
 /** What the upload path accepts, said out loud so the copy and the picker agree. */
@@ -503,6 +504,7 @@ function PhotoField({
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<UploadProgress>();
   const [error, setError] = useState<string>();
 
   const max = APPLICATION_LIMITS.work;
@@ -550,8 +552,21 @@ function PhotoField({
     }
 
     setBusy(true);
+    setProgress({
+      fraction: 0,
+      files: picked.map(() => 0),
+      done: 0,
+      total: picked.length,
+    });
     try {
-      const results = await publicApi.applications.joinPhotos(picked);
+      // Resized in the browser and sent straight to Cloudinary, with the API
+      // only signing the request. `relay` is the old route through our server,
+      // kept as the fallback for when the signature can't be issued.
+      const results = await uploadWorkPhotos(picked, {
+        onProgress: setProgress,
+        relay: (files, signal) =>
+          publicApi.applications.joinPhotos(files, signal),
+      });
       onChange([...values, ...results.map((r) => r.url)].slice(0, max));
 
       if (dropped > 0) {
@@ -563,6 +578,7 @@ function PhotoField({
       setError(describeUploadFailure(cause, picked.length));
     } finally {
       setBusy(false);
+      setProgress(undefined);
     }
   };
 
@@ -596,22 +612,40 @@ function PhotoField({
           </li>
         ))}
 
-        {room > 0 ? (
+        {/* One tile per photo on its way up, filling as it goes. A single
+            spinner for a batch says only "wait"; on a slow line that is
+            indistinguishable from a hung app, and the honest answer — how much
+            of this photo has actually gone — is one the upload already knows. */}
+        {progress
+          ? Array.from({ length: progress.total }, (_, index) => (
+              <li
+                key={`pending-${index}`}
+                className="relative aspect-3/2 overflow-hidden rounded-xl bg-fill"
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 bottom-0 bg-accent/30 transition-[height] duration-200 ease-out"
+                  style={{
+                    height: `${Math.round((progress.files[index] ?? 0) * 100)}%`,
+                  }}
+                />
+                <span className="absolute inset-0 grid place-items-center">
+                  <Loader2 size={16} className="animate-spin text-sub" />
+                </span>
+              </li>
+            ))
+          : null}
+
+        {room > 0 && !busy ? (
           <li>
             <button
               type="button"
-              disabled={busy || disabled}
+              disabled={disabled}
               onClick={() => input.current?.click()}
               className="pressable flex aspect-3/2 w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-line bg-fill text-sub disabled:opacity-60"
             >
-              {busy ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <>
-                  <ImageUp size={18} strokeWidth={1.8} />
-                  <span className="caption font-semibold">Add photo</span>
-                </>
-              )}
+              <ImageUp size={18} strokeWidth={1.8} />
+              <span className="caption font-semibold">Add photo</span>
             </button>
           </li>
         ) : null}
@@ -632,6 +666,13 @@ function PhotoField({
       {error ? (
         <p role="alert" className="caption mt-2 px-1 leading-relaxed text-danger">
           {error}
+        </p>
+      ) : progress ? (
+        <p aria-live="polite" className="caption mt-2 px-1">
+          {progress.total === 1
+            ? "Sending your photo"
+            : `Sending your photos — ${progress.done} of ${progress.total} done`}
+          . They are made smaller first, so this uses very little data.
         </p>
       ) : (
         <p className="caption mt-2 px-1">

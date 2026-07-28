@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ImageUp, Link as LinkIcon, Loader2, Star, Trash2 } from "lucide-react";
 import { useApi } from "../../lib/api/useApi";
 import { ApiError } from "../../lib/api/error";
+import { shrinkImage } from "../../lib/uploads";
 import type { UploadFolder } from "../../lib/api/types";
 
 /** What the API accepts, said out loud so the picker and the copy agree. */
@@ -41,10 +42,16 @@ function useUploader(folder: UploadFolder) {
 
     setBusy(true);
     try {
+      // The console still relays through the API — it uploads to three folders
+      // and the signed route only covers `work`. It gets the other half of the
+      // win for free though: shrinking first means the bytes crossing both legs
+      // are the ones Cloudinary would have kept anyway.
+      const prepared = await Promise.all(files.map(shrinkImage));
+
       const results =
-        files.length === 1
-          ? [await api.admin.uploads.one(files[0], folder)]
-          : await api.admin.uploads.many(files, folder);
+        prepared.length === 1
+          ? [await api.admin.uploads.one(prepared[0], folder)]
+          : await api.admin.uploads.many(prepared, folder);
       return results.map((result) => result.url);
     } catch (cause) {
       setError(
