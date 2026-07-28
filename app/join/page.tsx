@@ -4,7 +4,7 @@ import { JoinForm } from "../../components/join/JoinForm";
 export const metadata: Metadata = {
   title: "Join Artiza",
   description:
-    "Artiza helps customers in Ilisan find trusted artisans. Confirm your details and your profile goes live. Listing is free, and Artiza never takes a cut of your job.",
+    "Artiza helps customers in and beyond Ilisan find trusted artisans. Confirm your details and your profile goes live. Artiza never takes a cut of your job.",
   // The claim link is sent one-to-one over WhatsApp, not published. Keeping it
   // out of search results means the register grows through the team rather
   // than through whoever finds the form.
