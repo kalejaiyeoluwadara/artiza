@@ -145,15 +145,23 @@ export const JOIN_URL = "https://www.artizahq.com/join";
  */
 export function outreachMessage(name: string): string {
   return [
-    `Hello ${greetingName(name)}, my name is Kalejaiye Oluwadara, founder of Artiza.`,
-    "We're building Artiza, a platform that helps people discover trusted artisans and connect with them for their services.",
-    "We'd love to invite you to become one of our Founding Artisans.",
-    "Your profile would be listed on Artiza so potential customers can discover your work and contact you.",
-    "There is no cost to join.",
-    "Would you be interested in being listed?",
-    `If you are, please click the link below to confirm your details: ${JOIN_URL}`,
-    "It only takes about 2 minutes.",
-  ].join("\n\n");
+  `Hello ${greetingName(name)}, my name is Kalejaiye Oluwadara, founder of Artiza.`,
+
+  "We're building Artiza, a platform that helps people find trusted artisans and skilled professionals for the services they need.",
+
+  "We came across your business and would love to feature you as one of our Founding Members.",
+
+  "This will help potential customers discover your services, view your profile, and contact you when they need your expertise.",
+
+  "There is no cost to be listed.",
+
+  `If you'd like to join, please use the link below to confirm your details:\n${JOIN_URL}`,
+
+  "The process takes less than 2 minutes.",
+
+  "Thank you, and we hope to welcome you to Artiza."
+].join("\n\n");
+  
 }
 
 /**
