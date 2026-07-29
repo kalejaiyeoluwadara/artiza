@@ -1,4 +1,9 @@
-import type { AdminArtisan, ArtisanInput, ArtisanPatch } from "../api/types";
+import type {
+  AdminArtisan,
+  ArtisanInput,
+  ArtisanPatch,
+  OutreachLead,
+} from "../api/types";
 import { TRADE_LABELS, type Trade } from "../artisans";
 
 /**
@@ -100,6 +105,38 @@ export function blankDraft(): ArtisanDraft {
     note: "",
     services: [],
     jobsCompleted: "",
+  };
+}
+
+/**
+ * A listing form opened from an outreach lead, with what we already know in it.
+ *
+ * An artisan who says yes on WhatsApp has already given us their name, their
+ * number and their trade — and re-typing a phone number off a second screen is
+ * exactly the kind of copying that puts a digit in the wrong place and leaves a
+ * customer paying ₦500 to unlock a dead line. So the three the list is certain
+ * of come across, and everything the list never asked for (where they work,
+ * their years, their photos) stays empty for the editor to fill in.
+ *
+ * The outreach `notes` deliberately do **not** land in `note`. Those are the
+ * team's own shorthand — "haggled, wants featured", "brother of the tiler" —
+ * and `note` is printed on the artisan's public card.
+ *
+ * WhatsApp is filled from the same number only when the lead's number actually
+ * reached WhatsApp. Guessing it for a number that never normalised would put a
+ * WhatsApp button on a profile that opens an error.
+ */
+export function draftFromLead(lead: OutreachLead): ArtisanDraft {
+  const blank = blankDraft();
+  const national = nationalPart(lead.phone);
+
+  return {
+    ...blank,
+    name: lead.name,
+    trade: lead.trade,
+    customTrade: lead.customTrade ?? "",
+    phone: national,
+    whatsapp: lead.whatsappReady ? national : "",
   };
 }
 

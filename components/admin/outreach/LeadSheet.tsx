@@ -5,6 +5,7 @@ import { Loader2, Trash2 } from "lucide-react";
 import { Sheet } from "../../Sheet";
 import { TextArea, TextField } from "../Fields";
 import { TradeField } from "../../TradeField";
+import { ListButton } from "./ListButton";
 import { MessageButton } from "./MessageButton";
 import { ApprovalChoices, OutreachChoices } from "./StatusControls";
 import { useApi } from "../../../lib/api/useApi";
@@ -189,6 +190,26 @@ export function LeadSheet({
               }}
             />
           </header>
+
+          {/* The step after "yes", offered where the answer was just recorded.
+              It reads the *saved* lead rather than the draft, because the link
+              leaves this sheet: offering it for an approval that only exists in
+              an unsaved draft would throw that approval away on the way out. */}
+          {draft.approvalStatus === "approved" ? (
+            <div className="mt-5 rounded-2xl bg-accent-soft p-4">
+              <p className="headline text-ink">They said yes</p>
+              <p className="caption mt-1">
+                {lead.approvalStatus === "approved"
+                  ? "Their name, number and trade carry over. You add where they work, their years and their photos."
+                  : "Save the list first, then the listing form can be opened with their details already in it."}
+              </p>
+              {lead.approvalStatus === "approved" ? (
+                <div className="mt-3">
+                  <ListButton lead={lead} variant="full" />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           <div className="mt-5 space-y-5">
             <div className="rounded-2xl bg-card p-4">

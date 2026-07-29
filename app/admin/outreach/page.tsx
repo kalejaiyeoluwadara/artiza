@@ -11,6 +11,7 @@ import {
 import { Skeleton } from "../../../components/Skeleton";
 import { ImportSheet } from "../../../components/admin/outreach/ImportSheet";
 import { LeadSheet } from "../../../components/admin/outreach/LeadSheet";
+import { ListButton } from "../../../components/admin/outreach/ListButton";
 import { MessageButton } from "../../../components/admin/outreach/MessageButton";
 import { NextUp } from "../../../components/admin/outreach/NextUp";
 import {
@@ -477,6 +478,9 @@ export default function OutreachPage() {
                       lead={lead}
                       onOpen={() => void markContacted(lead)}
                     />
+                    {/* Approved leads only, so the row's loudest control is
+                        always the next thing to do for that lead. */}
+                    <ListButton lead={lead} />
                     <button
                       type="button"
                       onClick={() => setOpenId(lead.id)}
