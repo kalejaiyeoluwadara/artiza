@@ -217,7 +217,7 @@ const RAILS: RailSpec[] = [
        the rank is the entire point, which is exactly why it cannot run short.
        Nine unlocked artisans and a filler is not a top ten. */
     id: "top-ten",
-    heading: "Top 10 in Ilisan today",
+    heading: "Top 10 today",
     signal: "unlocks",
     qualify: (a) => a.recentUnlocks > 0,
     measure: (a, b) => b.recentUnlocks - a.recentUnlocks,
@@ -497,6 +497,21 @@ function deliverPromotions(
 }
 
 /**
+ * A trade row's heading.
+ *
+ * No town in it. The register started in Ilisan but the artisans on it no
+ * longer all work there, so pinning every row to one town both undersells the
+ * list and misdescribes half of it. The trade is the claim; where each artisan
+ * works is on their card, which is the only place it is reliably true.
+ *
+ * `other` is the escape hatch trade, so its label pluralises into the meaningless
+ * "Others" — it gets named for what the row actually is instead.
+ */
+function tradeRailHeading(trade: Trade): string {
+  return trade === "other" ? "More trades" : `${TRADE_LABELS[trade]}s`;
+}
+
+/**
  * The directory half of the page: a row per trade that can fill one, then a
  * row per family for everything left over.
  */
@@ -512,7 +527,7 @@ function tradeRails(artisans: Artisan[], day: number): HomeRail[] {
 
   const rails: HomeRail[] = own.map(([trade, list]) => ({
     id: `trade-${trade}`,
-    heading: `${TRADE_LABELS[trade]}s in Ilisan`,
+    heading: tradeRailHeading(trade),
     artisans: rankArtisans(list, day),
     signal: "years" as const,
     trade,

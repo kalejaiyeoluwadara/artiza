@@ -450,8 +450,8 @@ function Results({
   onAsk: () => void;
 }) {
   const heading = filters.trade
-    ? `Every ${TRADE_LABELS[filters.trade].toLowerCase()} in Ilisan`
-    : "Every artisan in Ilisan";
+    ? `Every ${TRADE_LABELS[filters.trade].toLowerCase()} on Artiza`
+    : "Every artisan on Artiza";
 
   return (
     <section aria-labelledby="results-heading" className="px-4 pt-4 md:px-0">

@@ -75,8 +75,8 @@ export function BrowseScreen({
      sentence without breaking it. Singular, so "Every solar installer"
      works and the awkward plural never appears. */
   const heading = filters.trade
-    ? `Every ${TRADE_LABELS[filters.trade].toLowerCase()} in Ilisan`
-    : "Every artisan in Ilisan";
+    ? `Every ${TRADE_LABELS[filters.trade].toLowerCase()} on Artiza`
+    : "Every artisan on Artiza";
 
   /* The register is a browse surface, not an index: the first page is what
      anyone actually reads, and the rails above already made the case for the

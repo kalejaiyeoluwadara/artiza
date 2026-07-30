@@ -311,7 +311,7 @@ function Idle({
           Browse by trade
         </h2>
         <p className="caption mt-1">
-          Every artisan in Ilisan, grouped by what they do.
+          Every artisan on Artiza, grouped by what they do.
         </p>
 
         {loading ? (
