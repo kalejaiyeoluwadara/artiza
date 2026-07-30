@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Artisan, tradeName } from "../lib/artisans";
+import { Artisan } from "../lib/artisans";
 import { artisanPath } from "../lib/slug";
 import { toast } from "../lib/toast";
 
@@ -15,9 +15,14 @@ import { toast } from "../lib/toast";
  * profile the sheet shows, so the person receiving it sees the rating, the
  * years and the work before they decide.
  *
- * The Web Share API where it exists (every phone this app is used on), the
- * clipboard where it doesn't. Both land on the same URL, and the URL is the
- * artisan's name — see `lib/slug.ts` for why that is worth the trouble.
+ * It copies the link, always, rather than calling the Web Share API. Share is
+ * advertised by desktop browsers too, where it hands the tap to an OS menu of
+ * AirDrop, Notes, Reminders and Freeform — a list of places nobody sends an
+ * artisan, in a popover that covers the profile being shared. Copy is the one
+ * behaviour that is right on every surface: the link goes to the clipboard and
+ * the person pastes it wherever they were already going to paste it. And the
+ * URL is the artisan's name, which is what makes it worth pasting — see
+ * `lib/slug.ts`.
  */
 export function ShareButton({
   artisan,
@@ -28,9 +33,9 @@ export function ShareButton({
 }) {
   const reduced = useReducedMotion();
 
-  // The check that replaces the glyph after a share. Held briefly rather than
-  // toasted on the native path — the share sheet already confirmed it, and a
-  // toast on top of that is the app talking over the OS.
+  // The check that replaces the glyph once the link is on the clipboard. It
+  // says it at the button, where the finger already is; the toast says it
+  // again with the sentence, for anyone who looked away.
   const [done, setDone] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -51,21 +56,6 @@ export function ShareButton({
     // Built from the live origin rather than a configured base, so a preview
     // deployment shares a link into itself instead of into production.
     const url = `${window.location.origin}${artisanPath(artisan)}`;
-    const text = `${artisan.name} — ${tradeName(artisan)} in ${artisan.location}. Verified by Artiza.`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: `${artisan.name} on Artiza`, text, url });
-        confirm();
-        return;
-      } catch (cause) {
-        // Dismissing the OS sheet is a decision, not a failure — nothing is
-        // said about it, and nothing is copied behind their back.
-        if (cause instanceof DOMException && cause.name === "AbortError") return;
-        // Anything else (a browser that advertises share and then refuses it)
-        // falls through to the clipboard rather than dead-ending.
-      }
-    }
 
     try {
       await navigator.clipboard.writeText(url);
