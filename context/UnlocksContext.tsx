@@ -17,13 +17,13 @@ import { toast } from "../lib/toast";
 import { UNLOCK_PRICE } from "../lib/artisans";
 import type { TransactionItem } from "../lib/api/types";
 
-/** Naira with a thousands separator: 1200 → "₦1,200". */
+/** Naira with a thousands separator: 1000 → "₦1,000". */
 function naira(amount: number): string {
   return `₦${amount.toLocaleString("en-NG")}`;
 }
 
 const BUNDLE_CREDITS = 3;
-const BUNDLE_PRICE = 1200;
+const BUNDLE_PRICE = 1000;
 
 interface UnlocksValue {
   /** Artisan ids this customer has paid for. */
