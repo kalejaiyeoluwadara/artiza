@@ -1,7 +1,7 @@
 {
-  "name": "Artiza — Vetted Artisans in Ilisan",
+  "name": "Artiza — Vetted Artisans and skilled professionals",
   "short_name": "Artiza",
-  "description": "Find and unlock contact details for vetted hand workers in Ilisan, Ogun State.",
+  "description": "Find and unlock contact details for vetted artisans and skilled professionals",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b0b0e",
