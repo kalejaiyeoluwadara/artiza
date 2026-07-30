@@ -1,7 +1,6 @@
 "use client";
 
 import { ArrowRight, PenLine, SkipForward } from "lucide-react";
-import { ListButton } from "./ListButton";
 import { MessageButton } from "./MessageButton";
 import { ApprovalChoices, OutreachChoices, StatusTag } from "./StatusControls";
 import {
@@ -148,21 +147,6 @@ export function NextUp({
               onChange={(next) => onApproval(lead, next)}
             />
           </div>
-
-          {/* Appears the moment Approved is marked — the statuses here write
-              straight through, so there is no unsaved edit for this link to
-              lose on the way to the listing form. */}
-          {lead.approvalStatus === "approved" ? (
-            <div className="mt-5 border-t border-line pt-4">
-              <p className="caption">
-                They&apos;re in. Listing them carries their name, number and
-                trade over; the rest is yours to fill in.
-              </p>
-              <div className="mt-2.5">
-                <ListButton lead={lead} variant="full" />
-              </div>
-            </div>
-          ) : null}
 
           <div className="mt-5 flex flex-wrap gap-2">
             <button

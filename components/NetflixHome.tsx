@@ -28,6 +28,8 @@ import { ArtisanSheet } from "./ArtisanSheet";
 import { FilterSheet } from "./SearchBar";
 import { HomeBillboard } from "./HomeBillboard";
 import { POSTER_WIDTH, Poster, PosterRail, RatingSignal } from "./Poster";
+import { RequestArtisanSheet } from "./RequestArtisanSheet";
+import { RequestPrompt } from "./RequestPrompt";
 
 /** How many artisans a trade needs before it earns a row of its own. */
 const TRADE_RAIL_MIN = 3;
@@ -57,6 +59,7 @@ export function NetflixHome({
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [selected, setSelected] = useState<Artisan | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [asking, setAsking] = useState(false);
   const { artisans: register, loading, error, retry } =
     useArtisans(initialArtisans);
 
@@ -203,6 +206,24 @@ export function NetflixHome({
                 onOpen={setSelected}
               />
             ))}
+
+            {/* The last thing on the browse screen, after every rail has had
+                its say. A catalogue this size runs out — closing it with the
+                offer to go and find the missing artisan is the difference
+                between a short list and a list that grows. Quiet: nothing has
+                gone wrong here, so it is not competing with the posters. */}
+            <section
+              aria-label="Ask for an artisan"
+              className="mt-8 px-4 md:px-0"
+            >
+              <RequestPrompt
+                tone="quiet"
+                heading="Can't find who you need?"
+                body="Tell us the trade and leave your number — the team goes looking."
+                cta="Ask us"
+                onAsk={() => setAsking(true)}
+              />
+            </section>
           </>
         ) : (
           <Results
@@ -210,6 +231,7 @@ export function NetflixHome({
             results={results}
             onClear={() => setFilters(NO_FILTERS)}
             onOpen={setSelected}
+            onAsk={() => setAsking(true)}
           />
         )}
       </div>
@@ -225,6 +247,14 @@ export function NetflixHome({
         onClose={() => setFiltersOpen(false)}
         filters={filters}
         onChange={setFilters}
+      />
+      <RequestArtisanSheet
+        open={asking}
+        onClose={() => setAsking(false)}
+        source="home"
+        /* The trade they were filtering on, as the word they saw on the pill —
+           the form takes plain text, so the label is what goes in, not the key. */
+        need={filters.trade ? TRADE_LABELS[filters.trade] : undefined}
       />
     </div>
   );
@@ -374,11 +404,13 @@ function Results({
   results,
   onClear,
   onOpen,
+  onAsk,
 }: {
   filters: Filters;
   results: Artisan[];
   onClear: () => void;
   onOpen: (artisan: Artisan) => void;
+  onAsk: () => void;
 }) {
   const heading = filters.trade
     ? `Every ${TRADE_LABELS[filters.trade].toLowerCase()} in Ilisan`
@@ -396,31 +428,46 @@ function Results({
       </div>
 
       {results.length === 0 ? (
-        <div className="mt-4 rounded-lg bg-card p-8 text-center">
-          <p className="text-sm text-sub">
-            Nothing matches. Drop a filter — the team adds artisans weekly.
-          </p>
-          <button
-            type="button"
-            onClick={onClear}
-            className="pressable hover-fill mt-4 rounded-full bg-fill px-4 py-2 text-sm font-semibold text-ink"
-          >
-            Clear filters
-          </button>
+        /* A filter that matched nobody is the same dead end search hits, so it
+           gets the same answer: the trade they asked for is already known, so
+           the request opens with it filled in. */
+        <div className="mt-4">
+          <RequestPrompt
+            heading={
+              filters.trade
+                ? `No ${TRADE_LABELS[filters.trade].toLowerCase()}s listed yet`
+                : "Nothing matches those filters"
+            }
+            body="The register is still filling up. Tell us what you need and leave your number — the team goes looking and calls you back."
+            onAsk={onAsk}
+            secondary={{ label: "Clear filters", onSelect: onClear }}
+          />
         </div>
       ) : (
-        <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
-          {results.map((artisan) => (
-            <li key={artisan.id}>
-              <Poster
-                artisan={artisan}
-                width="w-full"
-                signal={<RatingSignal artisan={artisan} />}
-                onOpen={() => onOpen(artisan)}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+            {results.map((artisan) => (
+              <li key={artisan.id}>
+                <Poster
+                  artisan={artisan}
+                  width="w-full"
+                  signal={<RatingSignal artisan={artisan} />}
+                  onOpen={() => onOpen(artisan)}
+                />
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-5">
+            <RequestPrompt
+              tone="quiet"
+              heading="Not the one?"
+              body="We'll find someone who fits and call you back."
+              cta="Ask us"
+              onAsk={onAsk}
+            />
+          </div>
+        </>
       )}
     </section>
   );

@@ -456,3 +456,53 @@ export interface OutreachImportResult {
   skipped: number;
   leads: OutreachLead[];
 }
+
+// ── Requests: demand the register couldn't answer ──────────────────────────
+
+/**
+ * What the team has done about a request. The inverse of the outreach list:
+ * that is supply being chased, this is a customer waiting on a call back.
+ */
+export type ArtisanRequestStatus = "open" | "sourcing" | "matched" | "closed";
+
+/** Which dead end the customer hit before asking. */
+export type ArtisanRequestSource = "home" | "search";
+
+/** What the "can't find who you need?" form sends. */
+export interface ArtisanRequestInput {
+  /**
+   * Who they need, in their own words — free text, not a `Trade`. The form
+   * only opens when the register had nobody, so the answer worth having is
+   * exactly the one the taxonomy doesn't cover yet.
+   */
+  need: string;
+  details: string;
+  /** MSISDN, no + or spaces: 2348031234567. */
+  phone: string;
+  source?: ArtisanRequestSource;
+  /** The search that found nobody, verbatim — the most useful field on the row. */
+  query?: string;
+}
+
+/**
+ * The receipt. Deliberately thin — the route is anonymous, so it echoes back
+ * only enough for the form to name the ask in its confirmation.
+ */
+export interface ArtisanRequestReceipt {
+  id: string;
+  need: string;
+  createdAt: string;
+}
+
+/** The whole record, as the console works it. */
+export interface AdminArtisanRequest {
+  id: string;
+  need: string;
+  details: string;
+  phone: string;
+  source: ArtisanRequestSource;
+  query?: string;
+  status: ArtisanRequestStatus;
+  notes: string;
+  createdAt: string;
+}

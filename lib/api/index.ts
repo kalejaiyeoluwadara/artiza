@@ -4,6 +4,7 @@ import { artisansResource } from "./resources/artisans";
 import { authResource } from "./resources/auth";
 import { bannersResource } from "./resources/banners";
 import { homeResource } from "./resources/home";
+import { requestsResource } from "./resources/requests";
 import { reviewsResource } from "./resources/reviews";
 import { unlocksResource } from "./resources/unlocks";
 
@@ -26,6 +27,8 @@ export function createApi(token?: string) {
     reviews: reviewsResource(token),
     /** Self-application: file a listing request and check its state. Needs a session. */
     applications: applicationsResource(token),
+    /** "Find me someone" — what a customer asks for when the register is empty. Anonymous. */
+    requests: requestsResource(),
     /** Management routes. Every one of them 403s without an admin token. */
     admin: adminResource(token),
   };

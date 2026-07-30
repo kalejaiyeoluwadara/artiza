@@ -478,8 +478,6 @@ export default function OutreachPage() {
                       lead={lead}
                       onOpen={() => void markContacted(lead)}
                     />
-                    {/* Approved leads only, so the row's loudest control is
-                        always the next thing to do for that lead. */}
                     <ListButton lead={lead} />
                     <button
                       type="button"

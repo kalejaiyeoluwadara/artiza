@@ -3,8 +3,10 @@ import type { ArtisanQuery } from "./artisans";
 import type {
   AdminApplication,
   AdminArtisan,
+  AdminArtisanRequest,
   AdminBannerItem,
   ApplicationFilter,
+  ArtisanRequestStatus,
   ArtisanInput,
   ArtisanPatch,
   ArtisanSummary,
@@ -190,6 +192,45 @@ export const adminResource = (token?: string) => ({
     /** Gone for good. Nothing else in the app points at a lead. */
     remove(id: string): Promise<{ deleted: true }> {
       return request<{ deleted: true }>(`/admin/outreach/${id}`, {
+        method: "DELETE",
+        token,
+      });
+    },
+  },
+
+  /**
+   * Demand the register couldn't answer. Filed anonymously from the customer
+   * app's "can't find who you need?" form; worked from here.
+   */
+  requests: {
+    /** Newest first. Omit `status` for everything, including what's been closed. */
+    list(
+      status?: ArtisanRequestStatus,
+      signal?: AbortSignal,
+    ): Promise<AdminArtisanRequest[]> {
+      return request<AdminArtisanRequest[]>("/admin/requests", {
+        query: { status },
+        token,
+        cache: "no-store",
+        signal,
+      });
+    },
+
+    /** Move it along, or write down who was called. */
+    update(
+      id: string,
+      patch: { status?: ArtisanRequestStatus; notes?: string },
+    ): Promise<AdminArtisanRequest> {
+      return request<AdminArtisanRequest>(`/admin/requests/${id}`, {
+        method: "PATCH",
+        body: patch,
+        token,
+      });
+    },
+
+    /** For prank numbers and duplicates. Nothing else points at a request. */
+    remove(id: string): Promise<{ deleted: true }> {
+      return request<{ deleted: true }>(`/admin/requests/${id}`, {
         method: "DELETE",
         token,
       });

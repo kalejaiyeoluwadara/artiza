@@ -9,6 +9,7 @@ import {
   Inbox,
   LayoutGrid,
   Send,
+  UserRoundSearch,
   Users,
 } from "lucide-react";
 
@@ -36,6 +37,12 @@ const SECTIONS = [
     label: "Outreach",
     icon: Send,
     hint: "Founding artisans to message",
+  },
+  {
+    href: "/admin/requests",
+    label: "Requests",
+    icon: UserRoundSearch,
+    hint: "Artisans customers asked for",
   },
   {
     href: "/admin/banners",

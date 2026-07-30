@@ -21,6 +21,8 @@ import { useRecentSearches } from "../lib/useRecentSearches";
 import { useUnlocks } from "../context/UnlocksContext";
 import { Avatar } from "./ArtisanCard";
 import { ArtisanSheet } from "./ArtisanSheet";
+import { RequestArtisanSheet } from "./RequestArtisanSheet";
+import { RequestPrompt } from "./RequestPrompt";
 import { Skeleton } from "./Skeleton";
 import { TRADE_TINTS, TradeIllustration } from "./TradeIllustration";
 
@@ -37,6 +39,7 @@ import { TRADE_TINTS, TradeIllustration } from "./TradeIllustration";
 export function SearchScreen() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Artisan | null>(null);
+  const [asking, setAsking] = useState(false);
   const field = useRef<HTMLInputElement>(null);
 
   const { artisans, loading, error, retry } = useArtisans();
@@ -128,6 +131,7 @@ export function SearchScreen() {
           onPick={run}
           onForget={forget}
           onClear={clear}
+          onAsk={() => setAsking(true)}
         />
       ) : error ? (
         <Notice
@@ -138,11 +142,21 @@ export function SearchScreen() {
       ) : loading ? (
         <p className="caption mt-8 text-center text-sub">Searching…</p>
       ) : hits.length === 0 ? (
-        <Notice
-          body={`Nobody matches “${term}”. Try a trade, a job — marble, burst pipe, ironing — or an area.`}
-          action="Clear search"
-          onAction={() => run("")}
-        />
+        /* The one screen that says Artiza can't help. It never stops at the
+           absence — the register being thin is exactly the thing a request
+           fixes, so the offer to go looking is the loudest control here and
+           clearing the search is the quiet one. */
+        <div className="mt-6">
+          <RequestPrompt
+            heading={`Nobody for “${term}” yet`}
+            body="The register is still filling up. Tell us what you need and leave your number — the team goes looking and calls you back."
+            onAsk={() => setAsking(true)}
+            secondary={{ label: "Clear search", onSelect: () => run("") }}
+          />
+          <p className="caption mt-3 text-center">
+            Or try a trade, a job — marble, burst pipe, ironing — or an area.
+          </p>
+        </div>
       ) : (
         <section aria-label="Search results" className="mt-6">
           <p className="caption" role="status" aria-live="polite">
@@ -166,6 +180,19 @@ export function SearchScreen() {
               </li>
             ))}
           </ul>
+
+          {/* Results are not the same as the right result — a tiler who does
+              floors when you need marble is still a dead end, just a slower
+              one. Quiet, because this screen did its job. */}
+          <div className="mt-4">
+            <RequestPrompt
+              tone="quiet"
+              heading="Not the one?"
+              body="We'll find someone who fits and call you back."
+              cta="Ask us"
+              onAsk={() => setAsking(true)}
+            />
+          </div>
         </section>
       )}
 
@@ -174,6 +201,15 @@ export function SearchScreen() {
         onClose={() => setSelected(null)}
         unlocked={selected ? isUnlocked(selected.id) : false}
         onUnlock={() => selected && void unlock(selected.id, selected.name)}
+      />
+      <RequestArtisanSheet
+        open={asking}
+        onClose={() => setAsking(false)}
+        source="search"
+        /* The words that found nobody are the request, verbatim — there is
+           nothing to guess at and no list to map them onto. */
+        need={term}
+        query={term}
       />
     </>
   );
@@ -197,6 +233,7 @@ function Idle({
   onPick,
   onForget,
   onClear,
+  onAsk,
 }: {
   recents: string[];
   trades: { trade: Trade; count: number }[];
@@ -205,6 +242,7 @@ function Idle({
   onPick: (query: string) => void;
   onForget: (query: string) => void;
   onClear: () => void;
+  onAsk: () => void;
 }) {
   return (
     <>
@@ -331,6 +369,19 @@ function Idle({
           </ul>
         </section>
       )}
+
+      {/* The trade tiles above are an honest inventory, so this is the honest
+          footnote to them: what to do when your trade isn't one of the tiles.
+          Quiet — nobody has hit a dead end yet. */}
+      <section aria-label="Ask for an artisan" className="mt-7">
+        <RequestPrompt
+          tone="quiet"
+          heading="Trade not listed?"
+          body="Tell us who you need and we'll go and find them."
+          cta="Ask us"
+          onAsk={onAsk}
+        />
+      </section>
     </>
   );
 }
