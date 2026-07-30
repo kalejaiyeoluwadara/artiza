@@ -173,7 +173,7 @@ export function BannerEditor({
           label="Title"
           value={draft.title}
           onChange={(v) => set("title", v)}
-          placeholder="3 for ₦1,200"
+          placeholder="3 for ₦1,000"
           maxLength={BANNER_LIMITS.title}
           error={errors.title}
         />

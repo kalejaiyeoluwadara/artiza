@@ -39,7 +39,7 @@ A local artisan discovery platform where customers find and unlock contact detai
 ## Payments
 
 - ₦500 per contact unlock
-- Bundle: e.g. 3 unlocks for ₦1,200
+- Bundle: e.g. 3 unlocks for ₦1,000
 - Paystack integration for card/transfer/USSD
 
 ## Revenue streams

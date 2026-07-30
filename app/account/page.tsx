@@ -73,7 +73,7 @@ export default function AccountPage() {
             onClick={() => void buyBundle()}
             className="pressable rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white"
           >
-            Buy 3 for ₦1,200
+            Buy 3 for ₦1,000
           </button>
         </div>
         <div className="border-t border-line px-4 py-3">
