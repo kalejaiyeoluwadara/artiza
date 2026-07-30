@@ -8,7 +8,7 @@ import { UnlocksProvider } from "../context/UnlocksContext";
 import { BottomNav, SiteHeader } from "../components/BottomNav";
 import { PWAInstallPrompt } from "../components/PWAInstallPrompt";
 import { TopLoader } from "../components/TopLoader";
-
+import { Analytics } from "@vercel/analytics/next"
 import { PageTransition } from "../components/PageTransition";
 
 /**
@@ -127,6 +127,7 @@ export default function RootLayout({
         </a>
         {/* Outside the providers: navigation feedback shouldn't wait on the
             session or the unlocks cache to hydrate. */}
+        <Analytics/>
         <TopLoader />
         <AuthProvider>
           <UnlocksProvider>
