@@ -78,8 +78,12 @@ export default function UsersPage() {
    * loading state itself, rather than the fetch effect doing it on the way
    * past. An effect that sets state in its own body re-renders the tree twice
    * for one intent; this way the skeleton appears on the click that caused it.
+   *
+   * `changed` is what stops a click on the already-active chip from showing a
+   * skeleton forever — nothing changes, so the read never re-runs to clear it.
    */
-  function reload(change: () => void) {
+  function reload(changed: boolean, change: () => void) {
+    if (!changed) return;
     setLoading(true);
     change();
   }
@@ -184,7 +188,7 @@ export default function UsersPage() {
                 type="button"
                 aria-pressed={active}
                 onClick={() =>
-                  reload(() => {
+                  reload(!active, () => {
                     setRole(option.value);
                     setPage(1);
                   })
@@ -210,7 +214,7 @@ export default function UsersPage() {
                 type="button"
                 aria-pressed={active}
                 onClick={() =>
-                  reload(() => {
+                  reload(!active, () => {
                     setSort(option.value);
                     setPage(1);
                   })
@@ -275,7 +279,7 @@ export default function UsersPage() {
             type="button"
             disabled={!meta?.hasPrev}
             onClick={() =>
-              reload(() => setPage((current) => Math.max(1, current - 1)))
+              reload(true, () => setPage((current) => Math.max(1, current - 1)))
             }
             className="pressable hover-fill grid size-9 place-items-center rounded-full text-sub disabled:opacity-30"
           >
@@ -290,7 +294,7 @@ export default function UsersPage() {
           <button
             type="button"
             disabled={!meta?.hasNext}
-            onClick={() => reload(() => setPage((current) => current + 1))}
+            onClick={() => reload(true, () => setPage((current) => current + 1))}
             className="pressable hover-fill grid size-9 place-items-center rounded-full text-sub disabled:opacity-30"
           >
             <ChevronRight size={17} strokeWidth={2.2} />

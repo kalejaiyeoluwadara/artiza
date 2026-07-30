@@ -74,10 +74,24 @@ export function HomeBillboard({
 
   // Any deliberate attention — a touch, a hover, tabbing into a CTA — stops
   // the rail moving under the person looking at it.
-  const hold = () => setPaused(true);
-  const release = () => {
-    window.setTimeout(() => setPaused(false), RESUME);
+  //
+  // The resume is held on a ref rather than fired and forgotten: attention
+  // comes and goes faster than RESUME, so an untracked timer from the last
+  // release would start the rail moving again under the finger that just
+  // arrived, and one left pending at unmount outlives the component.
+  const resumeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const hold = () => {
+    clearTimeout(resumeTimer.current);
+    setPaused(true);
   };
+
+  const release = () => {
+    clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => setPaused(false), RESUME);
+  };
+
+  useEffect(() => () => clearTimeout(resumeTimer.current), []);
 
   if (count === 0) return null;
 

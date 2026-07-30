@@ -16,6 +16,9 @@ function toArtisan(summary: ArtisanSummary): Artisan {
     id: summary.id,
     name: summary.name,
     trade: summary.trade,
+    // Dropping this is what makes an `other` artisan read as "Other" on every
+    // customer screen — `tradeName` has nothing to prefer over the label.
+    customTrade: summary.customTrade,
     location: summary.location,
     yearsExperience: summary.yearsExperience,
     jobsCompleted: summary.jobsCompleted,

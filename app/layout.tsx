@@ -10,6 +10,7 @@ import { PWAInstallPrompt } from "../components/PWAInstallPrompt";
 import { TopLoader } from "../components/TopLoader";
 import { Analytics } from "@vercel/analytics/next"
 import { PageTransition } from "../components/PageTransition";
+import { SITE_URL } from "../lib/site";
 
 /**
  * Satoshi (Fontshare, ITF Free Font License — free for commercial use).
@@ -67,6 +68,9 @@ const instrument = localFont({
 });
 
 export const metadata: Metadata = {
+  // Shared artisan links carry a canonical URL and OG tags with relative
+  // paths; without a base, a scraper resolves them against its own host.
+  metadataBase: new URL(SITE_URL),
   title: "Artiza — Vetted artisans and skilled professionals",
   description:
     "Plumbers, solar installers, tilers, carpenters and more, visited and verified in person around Ilisan. Read the record for free, unlock a contact for ₦500.",

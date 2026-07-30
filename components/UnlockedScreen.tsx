@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Phone,
@@ -38,6 +38,13 @@ export function UnlockedScreen() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
+  // The confirmation timer, held rather than fired and forgotten. Copying a
+  // second number within the window would otherwise let the first row's timer
+  // clear the second row's tick early, and a copy on the way out of the screen
+  // would leave a timer writing to a component that is gone.
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(copiedTimer.current), []);
+
   if (!ready || loading) return null;
 
   const unlocked = artisans.filter((a) => unlockedIds.includes(a.id));
@@ -55,7 +62,8 @@ export function UnlockedScreen() {
   const handleCopyPhone = (phone: string, id: string) => {
     navigator.clipboard.writeText(phone);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+    clearTimeout(copiedTimer.current);
+    copiedTimer.current = setTimeout(() => setCopiedId(null), 2000);
   };
 
   if (unlocked.length === 0) {
