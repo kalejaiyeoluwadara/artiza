@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artiza Founding Members Campaign Banner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .font-serif-italic {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-style: italic;
+    }
+    .font-sans-custom {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#050507] text-white font-sans-custom min-h-screen flex flex-col items-center justify-center p-6">
+
+  <div class="max-w-md w-full mb-4 text-center">
+    <p class="text-xs uppercase tracking-widest text-zinc-500 font-semibold mb-1">Live Campaign Graphic Preview</p>
+    <h2 class="text-lg font-bold text-white">Artiza Founding Member Outreach</h2>
+  </div>
+
+  <!-- Square Campaign Banner Graphic -->
+  <div class="relative w-full max-w-lg aspect-square bg-[#0B0B0E] rounded-3xl overflow-hidden shadow-2xl border border-white/10 p-8 flex flex-col justify-between select-none">
+    
+    <!-- Background Image Scrim Effect -->
+    <div class="absolute inset-0 z-0">
+      <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1000&auto=format&fit=crop" alt="Skilled Electrician Craftsman" class="w-full h-full object-cover opacity-30 mix-blend-luminosity filter brightness-75 scale-105" />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#0B0B0E] via-[#0B0B0E]/85 to-[#0B0B0E]/40"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-[#0B0B0E] via-transparent to-transparent"></div>
+    </div>
+
+    <!-- Header Section -->
+    <div class="relative z-10 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <!-- SVG Artiza Logo Mark -->
+        <svg class="w-8 h-8 text-white" viewBox="0 0 100 100" fill="currentColor">
+          <path d="M50 15 L20 85 L35 85 L44 63 L56 63 L65 85 L80 85 Z M50 35 L53 54 L47 54 Z"/>
+          <path d="M25 60 C35 48, 65 48, 75 60 C80 66, 75 72, 60 70" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+        <span class="font-extrabold tracking-widest text-base text-white">ARTIZA</span>
+      </div>
+
+      <!-- Red Accent Tag -->
+      <span class="bg-[#E50914]/15 border border-[#E50914]/40 text-[#E50914] text-[11px] font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+        Founding Member
+      </span>
+    </div>
+
+    <!-- Center Headline & Copy -->
+    <div class="relative z-10 my-auto py-6">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-[1.15]">
+        Get Discovered By <br />
+        <span class="font-serif-italic font-normal text-red-50 text-4xl sm:text-5xl">Future Customers.</span>
+      </h1>
+      <p class="text-zinc-300 text-sm sm:text-base mt-4 max-w-sm leading-relaxed font-normal">
+        Artiza is helping people discover trusted artisans & skilled professionals nearby — join our founding members today at zero cost.
+      </p>
+    </div>
+
+    <!-- Bottom CTA & QR Section -->
+    <div class="relative z-10 flex items-center justify-between pt-5 border-t border-white/10">
+      <a href="https://artizahq.com/join" class="bg-[#E50914] hover:bg-[#E50914]/90 text-white font-bold px-6 py-3.5 rounded-full text-sm flex items-center gap-2 shadow-lg shadow-[#E50914]/25 transition-all">
+        <span>artizahq.com/join</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden sm:block">
+          <p class="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">Scan to Join</p>
+          <p class="text-[11px] text-zinc-200 font-bold">100% Free</p>
+        </div>
+        <!-- Clean QR Box -->
+        <div class="w-12 h-12 bg-white rounded-xl p-1.5 flex items-center justify-center shadow-md">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://artizahq.com/join" alt="QR Code" class="w-full h-full object-contain" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

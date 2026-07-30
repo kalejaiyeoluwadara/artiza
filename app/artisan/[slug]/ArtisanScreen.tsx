@@ -39,7 +39,7 @@ export function ArtisanScreen({ artisan }: { artisan: Artisan }) {
           className="pressable hover-fill -ml-2 flex items-center gap-1 rounded-full py-1.5 pr-3 pl-2 text-[0.9375rem] font-semibold text-sub"
         >
           <ChevronLeft size={18} strokeWidth={2.4} aria-hidden />
-          All artisans
+          All artizans
         </Link>
 
         {/* Saving belongs up here rather than in the profile: on a card the
