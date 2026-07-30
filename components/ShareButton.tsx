@@ -52,22 +52,22 @@ export function ShareButton({
     timer.current = setTimeout(() => setDone(false), 1600);
   };
 
-  async function share() {
+  async function copyLink() {
     // Built from the live origin rather than a configured base, so a preview
     // deployment shares a link into itself instead of into production.
     const url = `${window.location.origin}${artisanPath(artisan)}`;
 
-    try {
-      await navigator.clipboard.writeText(url);
+    if (await writeToClipboard(url)) {
       confirm();
       toast.success("Link copied", {
         description: `Paste it anywhere to share ${artisan.name}'s profile.`,
       });
-    } catch {
-      // No clipboard permission and no share sheet: the link itself is the
-      // fallback, since it can still be selected and copied by hand.
-      toast.error("Couldn't copy the link", { description: url });
+      return;
     }
+
+    // Nothing left to try, so the link itself is the message — it can still be
+    // selected out of the toast and copied by hand.
+    toast.error("Couldn't copy the link", { description: url });
   }
 
   return (
@@ -76,9 +76,12 @@ export function ShareButton({
       onClick={(event) => {
         // Every surface this sits on is itself a tap target somewhere.
         event.stopPropagation();
-        void share();
+        void copyLink();
       }}
-      aria-label={`Share ${artisan.name}'s profile`}
+      // Names what actually happens. The glyph says share, and the two agree
+      // — the link is how you share someone — but a screen reader announcing
+      // "share" and then landing on a clipboard is a small lie.
+      aria-label={`Copy a link to ${artisan.name}'s profile`}
       // Feedback on press, matching the heart it sits beside.
       whileTap={reduced ? undefined : { scale: 0.88 }}
       // The glyph's own states ride on the button's variants, so hover and
@@ -92,6 +95,44 @@ export function ShareButton({
       <ShareGlyph done={done} reduced={Boolean(reduced)} />
     </motion.button>
   );
+}
+
+/**
+ * The clipboard, with the old way behind the new one.
+ *
+ * `navigator.clipboard` needs a secure context and a permission that Safari
+ * hands out only inside the gesture that asked for it — both of which hold
+ * here, but neither of which is guaranteed on an in-app browser or a phone
+ * reaching the dev server over the LAN. The offscreen textarea is deprecated
+ * and works everywhere, which is exactly what a fallback is for.
+ */
+async function writeToClipboard(value: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    // Falls through.
+  }
+
+  try {
+    const field = document.createElement("textarea");
+    field.value = value;
+    // Off screen rather than hidden: `display: none` is not selectable, and
+    // `readOnly` keeps iOS from raising the keyboard on the way past.
+    field.readOnly = true;
+    field.setAttribute("aria-hidden", "true");
+    field.style.cssText = "position:fixed;top:0;left:-9999px;opacity:0";
+
+    document.body.append(field);
+    field.select();
+    field.setSelectionRange(0, value.length);
+    const copied = document.execCommand("copy");
+    field.remove();
+
+    return copied;
+  } catch {
+    return false;
+  }
 }
 
 /**
