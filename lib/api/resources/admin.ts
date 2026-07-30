@@ -1,20 +1,26 @@
-import { request, upload } from "../client";
+import { request, requestPaginated, upload } from "../client";
 import type { ArtisanQuery } from "./artisans";
 import type {
+  AdjustCreditsInput,
+  AdjustCreditsResult,
   AdminApplication,
   AdminArtisan,
   AdminArtisanRequest,
   AdminBannerItem,
+  AdminUser,
+  AdminUserQuery,
   ApplicationFilter,
   ArtisanRequestStatus,
   ArtisanInput,
   ArtisanPatch,
   ArtisanSummary,
   BannerInput,
+  CreditGrant,
   OutreachImportResult,
   OutreachLead,
   OutreachLeadInput,
   OutreachLeadPatch,
+  Paginated,
   RegisterStatus,
   UploadFolder,
   UploadResult,
@@ -232,6 +238,58 @@ export const adminResource = (token?: string) => ({
     remove(id: string): Promise<{ deleted: true }> {
       return request<{ deleted: true }>(`/admin/requests/${id}`, {
         method: "DELETE",
+        token,
+      });
+    },
+  },
+
+  /**
+   * The people on the other side of the register.
+   *
+   * The one management list that pages rather than arriving whole: artisans are
+   * a few dozen, customers are however many sign up. Everything else in the
+   * console filters in the browser; this filters on the server, so the search
+   * box is a request rather than an `Array.filter`.
+   */
+  users: {
+    /** Newest first unless `sort` says otherwise. Counters ride in `meta`. */
+    list(
+      query: AdminUserQuery = {},
+      signal?: AbortSignal,
+    ): Promise<Paginated<AdminUser>> {
+      return requestPaginated<AdminUser>("/admin/users", {
+        query: { ...query },
+        token,
+        cache: "no-store",
+        signal,
+      });
+    },
+
+    /** Every hand-made credit adjustment on this account, most recent first. */
+    creditHistory(id: string, signal?: AbortSignal): Promise<CreditGrant[]> {
+      return request<CreditGrant[]>(`/admin/users/${id}/credits`, {
+        token,
+        cache: "no-store",
+        signal,
+      });
+    },
+
+    /**
+     * Gives a customer credits, or takes them back — one signed adjustment
+     * with a reason attached.
+     *
+     * Every credit is a free ₦500 unlock, and the reason is not optional: the
+     * API writes it to an append-only trail against the admin who called this.
+     * There is no edit and no delete, so a mistake is fixed by sending the
+     * opposite amount.
+     */
+    adjustCredits(
+      id: string,
+      input: AdjustCreditsInput,
+    ): Promise<AdjustCreditsResult> {
+      return request<AdjustCreditsResult>(`/admin/users/${id}/credits`, {
+        method: "POST",
+        body: input,
         token,
       });
     },

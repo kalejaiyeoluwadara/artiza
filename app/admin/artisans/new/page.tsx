@@ -8,9 +8,14 @@ import { AdminHeader, AdminPage } from "../../../../components/admin/AdminShell"
 import { ArtisanForm } from "../../../../components/admin/ArtisanForm";
 import { ErrorState } from "../../../../components/admin/States";
 import { useAdminList } from "../../../../lib/admin/useAdminList";
-import { blankDraft, draftFromLead } from "../../../../lib/admin/artisan-draft";
+import {
+  blankDraft,
+  draftFromLead,
+  duplicateDraft,
+} from "../../../../lib/admin/artisan-draft";
+import { tradeName } from "../../../../lib/artisans";
 import type { Api } from "../../../../lib/api";
-import type { OutreachLead } from "../../../../lib/api/types";
+import type { AdminArtisan, OutreachLead } from "../../../../lib/api/types";
 
 export default function NewArtisanPage() {
   return (
@@ -24,9 +29,12 @@ export default function NewArtisanPage() {
 }
 
 function NewArtisan() {
-  const leadId = useSearchParams().get("lead");
+  const params = useSearchParams();
+  const leadId = params.get("lead");
+  const copyId = params.get("copy");
 
   if (leadId) return <FromLead leadId={leadId} />;
+  if (copyId) return <FromArtisan artisanId={copyId} />;
 
   return (
     <NewArtisanFrame>
@@ -121,15 +129,84 @@ function FromLead({ leadId }: { leadId: string }) {
 }
 
 /**
+ * The same form, started from an artisan already on the register.
+ *
+ * The whole point of "Duplicate" is the second artisan in a trade the team has
+ * already described once, so the copy is read fresh from the API rather than
+ * carried over from the register's row — the row holds the same record, but a
+ * link that only works when it was clicked from the list isn't one that can be
+ * refreshed or sent on. What survives the copy is decided in `duplicateDraft`.
+ */
+function FromArtisan({ artisanId }: { artisanId: string }) {
+  const load = useCallback(
+    async (client: Api, signal: AbortSignal) => [
+      await client.admin.artisans.get(artisanId, signal),
+    ],
+    [artisanId],
+  );
+
+  const { items, loading, error, message, retry } =
+    useAdminList<AdminArtisan>(load);
+
+  const source = items[0];
+
+  if (loading) {
+    return (
+      <NewArtisanFrame>
+        <div className="flex items-center gap-2.5 rounded-2xl bg-card p-6">
+          <Loader2 size={16} className="animate-spin text-sub" />
+          <p className="caption">Copying the listing you picked…</p>
+        </div>
+      </NewArtisanFrame>
+    );
+  }
+
+  if (error || !source) {
+    return (
+      <NewArtisanFrame>
+        <ErrorState
+          title="Couldn't read the listing you're copying"
+          message={message}
+          onRetry={retry}
+        />
+        <div className="mt-3 text-center">
+          <Link
+            href="/admin/artisans/new"
+            className="pressable inline-flex rounded-full bg-fill px-4 py-2 text-sm font-semibold text-ink"
+          >
+            Start a blank listing
+          </Link>
+        </div>
+      </NewArtisanFrame>
+    );
+  }
+
+  return (
+    <NewArtisanFrame copiedFrom={source}>
+      <ArtisanForm
+        // Remounts if the link is followed for a different artisan, so the
+        // seeded draft is rebuilt rather than left showing the previous one.
+        key={source.id}
+        mode="create"
+        initial={duplicateDraft(source)}
+      />
+    </NewArtisanFrame>
+  );
+}
+
+/**
  * The page around the form. When it was opened from a lead it says so, and
  * carries the one thing the outreach list knows that the listing form has
  * nowhere to put: what the team wrote about them.
  */
 function NewArtisanFrame({
   lead,
+  copiedFrom,
   children,
 }: {
   lead?: OutreachLead;
+  /** The listing this draft was duplicated from, when it was. */
+  copiedFrom?: AdminArtisan;
   children: React.ReactNode;
 }) {
   return (
@@ -143,11 +220,19 @@ function NewArtisanFrame({
       </Link>
 
       <AdminHeader
-        title={lead ? `List ${lead.name}` : "Add an artisan"}
+        title={
+          lead
+            ? `List ${lead.name}`
+            : copiedFrom
+              ? `Another ${tradeName(copiedFrom).toLowerCase()}`
+              : "Add an artisan"
+        }
         lede={
           lead
             ? "Their name, number and trade came from the outreach list. Everything else is still to fill in."
-            : "Everything here except the contact block is public the moment you save."
+            : copiedFrom
+              ? `Trade, area, services and hours came across from ${copiedFrom.name}. Their name, contact, photos and note are yours to fill in — none of it copies.`
+              : "Everything here except the contact block is public the moment you save."
         }
       />
 

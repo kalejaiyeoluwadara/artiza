@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   ArrowUpRight,
+  CircleUserRound,
   Image as ImageIcon,
   Inbox,
   LayoutGrid,
@@ -25,6 +26,12 @@ const SECTIONS = [
     label: "Register",
     icon: Users,
     hint: "Add, edit and retire artisans",
+  },
+  {
+    href: "/admin/users",
+    label: "Customers",
+    icon: CircleUserRound,
+    hint: "Accounts, credits and unlocks",
   },
   {
     href: "/admin/applications",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { BadgeCheck, ChevronRight, Clock, Search, Star, X } from "lucide-react";
 import {
   Artisan,
@@ -41,6 +41,16 @@ export function SearchScreen() {
   const [selected, setSelected] = useState<Artisan | null>(null);
   const [asking, setAsking] = useState(false);
   const field = useRef<HTMLInputElement>(null);
+
+  /* Arriving here is the decision to type — nobody opens Search to look at
+     the search screen — so the caret is already in the field and the first
+     keystroke lands. Done in an effect rather than with `autoFocus` so the
+     focus can be taken without the browser scrolling the field into view:
+     the header above it is the page's own answer to "where am I", and
+     losing it to a jump on every visit costs more than it saves. */
+  useEffect(() => {
+    field.current?.focus({ preventScroll: true });
+  }, []);
 
   const { artisans, loading, error, retry } = useArtisans();
   const { isUnlocked, unlock } = useUnlocks();

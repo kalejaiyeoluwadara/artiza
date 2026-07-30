@@ -506,3 +506,69 @@ export interface AdminArtisanRequest {
   notes: string;
   createdAt: string;
 }
+
+// ── Accounts (admin) ───────────────────────────────────────────────────────
+
+/**
+ * A customer as the console sees them. Wider than `UserProfile` — the phone
+ * number, how they sign in, and what they have actually bought.
+ */
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: UserRole;
+  /** Unspent bundle unlocks. */
+  credits: number;
+  /** Artisans this customer has paid to reach. */
+  unlocks: number;
+  /** True when the account has a Google identity attached. */
+  google: boolean;
+  isActive: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+}
+
+export type UserRoleFilter = UserRole | "all";
+
+/** `credits` puts the largest unspent balances first. */
+export type UserSort = "recent" | "name" | "credits";
+
+export interface AdminUserQuery {
+  search?: string;
+  role?: UserRoleFilter;
+  sort?: UserSort;
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * One hand-made adjustment to a balance, as it sits on the audit trail.
+ * Append-only: a mistake is corrected by granting the opposite, never by
+ * editing the row.
+ */
+export interface CreditGrant {
+  id: string;
+  /** Signed. Negative is a revocation. */
+  amount: number;
+  /** The balance once this landed. */
+  balanceAfter: number;
+  reason: string;
+  /** The admin who did it, as identified at the time. */
+  grantedByName?: string;
+  createdAt: string;
+}
+
+/** What an adjustment answers with: the account as it now stands, and the row. */
+export interface AdjustCreditsResult {
+  user: AdminUser;
+  grant: CreditGrant;
+}
+
+export interface AdjustCreditsInput {
+  /** Whole unlocks. Negative takes them back. Never zero, ±20 at a time. */
+  amount: number;
+  /** Why. Kept forever on the trail — the API requires it. */
+  reason: string;
+}

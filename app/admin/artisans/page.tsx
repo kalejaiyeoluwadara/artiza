@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  Copy,
   ImageOff,
   Pencil,
   Plus,
@@ -458,6 +459,18 @@ function RegisterRow({
             {artisan.featured ? "Remove featured from" : "Feature"} {artisan.name}
           </span>
         </button>
+
+        {/* Duplicating opens a new listing, not this one — so it is a link to
+            the add screen with this artisan as its starting point, and nothing
+            here is written to until that form is saved. */}
+        <Link
+          href={`/admin/artisans/new?copy=${artisan.id}`}
+          title="Start a new listing from this one"
+          className="pressable hover-fill grid size-9 place-items-center rounded-full text-sub"
+        >
+          <Copy size={15} strokeWidth={2.1} />
+          <span className="sr-only">Duplicate {artisan.name}</span>
+        </Link>
 
         <Link
           href={`/admin/artisans/${artisan.id}`}

@@ -140,6 +140,47 @@ export function draftFromLead(lead: OutreachLead): ArtisanDraft {
   };
 }
 
+/**
+ * A blank listing that starts where an existing one does — the form behind
+ * "Duplicate" on the register.
+ *
+ * Two artisans in the same trade on the same street share almost everything the
+ * form asks for that isn't a person: the trade, the area, the services list, the
+ * hours, how fast they reply. Typing all of it a second time is the tedious part
+ * of listing the tiler's brother, so it comes across.
+ *
+ * Everything that *is* the person does not. Name, every contact channel, the
+ * portrait and the work photos are cleared, and so is `note` — it is printed on
+ * the public card in their own terms, and a duplicated one would describe
+ * somebody else. `featured` and `jobsCompleted` are earned, not inherited.
+ * Between them, the required-field checks in `validateDraft` mean this draft
+ * cannot be saved until the new artisan's own details are actually in it.
+ */
+export function duplicateDraft(artisan: AdminArtisan): ArtisanDraft {
+  const blank = blankDraft();
+  const source = draftFrom(artisan);
+
+  return {
+    ...source,
+    name: "",
+    phone: "",
+    whatsapp: "",
+    instagram: "",
+    facebook: "",
+    snapchat: "",
+    email: "",
+    altPhone: "",
+    photo: "",
+    work: [],
+    note: "",
+    featured: false,
+    jobsCompleted: "",
+    // The copy is being verified today, not whenever the original was.
+    verifiedMonth: blank.verifiedMonth,
+    verifiedYear: blank.verifiedYear,
+  };
+}
+
 export function draftFrom(artisan: AdminArtisan): ArtisanDraft {
   const [month, year] = artisan.verifiedSince.split(" ");
 
