@@ -67,7 +67,7 @@ const instrument = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Artiza — Vetted artisans",
+  title: "Artiza — Vetted artisans and skilled professionals",
   description:
     "Plumbers, solar installers, tilers, carpenters and more, visited and verified in person around Ilisan. Read the record for free, unlock a contact for ₦500.",
   manifest: "/manifest.json",

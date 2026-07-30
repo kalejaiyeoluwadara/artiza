@@ -160,7 +160,7 @@ export function JoinForm() {
             noticeboard — and the copy shouldn't need rewriting the week a
             second town opens. Where they work is a field, not the pitch. */}
         <p className="mt-3 text-[0.9375rem] leading-relaxed text-pretty text-sub">
-          Artiza is where customers find artisans they can trust, and pay to
+          Artiza is where customers find artisans and skilled professionals they can trust, and pay to
           reach them directly. Confirm your details below and your profile goes
           live. It takes about two minutes.
         </p>
