@@ -260,7 +260,17 @@ export function filterArtisans(list: Artisan[], filters: Filters): Artisan[] {
   );
 }
 
-/** Featured first, then by jobs completed. Promotion is the only lever. */
+/**
+ * Featured first, then by jobs completed.
+ *
+ * @deprecated Superseded by `rankArtisans` in `lib/home-rails.ts`, which caps
+ * promotion at one lead slot and rotates artisans level on record. Sorting
+ * every featured artisan to the front was fine when the register had a spread
+ * of completed jobs to fall back on; on the live register almost every artisan
+ * is on zero, so the fallback never fires and this returns the promoted block
+ * followed by whatever order the API replied in. Only the unrouted
+ * `BrowseScreen` still calls it.
+ */
 export function rankArtisans(list: Artisan[]): Artisan[] {
   return [...list].sort((a, b) => {
     if (a.featured !== b.featured) return a.featured ? -1 : 1;
@@ -284,13 +294,26 @@ const MONTHS = [
 ];
 
 /** `verifiedSince` as a sortable month count. "Mar 2026" → 24315. */
-function verifiedMonth(artisan: Artisan): number {
+export function verifiedMonth(artisan: Artisan): number {
   const [month, year] = artisan.verifiedSince.split(" ");
   return Number(year) * 12 + Math.max(0, MONTHS.indexOf(month));
 }
 
 /** How many artisans a discovery rail carries before it stops. */
 const RAIL_SIZE = 6;
+
+/*
+ * The three selectors below are superseded by `composeHome` in
+ * `lib/home-rails.ts` and survive only for the unrouted `BrowseScreen`.
+ *
+ * Do not reach for them on home. Each one sorts the whole register in
+ * isolation and takes the top six, which is what produced the repetition they
+ * were reported for: `trendingArtisans` and home's Top 10 ranked on the very
+ * same key, making trending a strict prefix of the ten, and all three fall
+ * back to the API's `featured: -1` order the moment their key ties — which,
+ * on a register where sixteen of seventeen artisans sit on zero unlocks and
+ * zero reviews, is nearly always.
+ */
 
 /**
  * Most unlocked in the last 30 days. Demand, not reputation — a good artisan

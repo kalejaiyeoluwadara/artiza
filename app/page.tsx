@@ -1,5 +1,6 @@
 import { NetflixHome } from "../components/NetflixHome";
 import { fetchHome } from "../lib/artisan-source";
+import { dayIndex } from "../lib/home-rails";
 
 /**
  * Home is running a Netflix-shaped experiment: a billboard on one promoted
@@ -19,7 +20,14 @@ export default async function HomePage() {
      down to the retry. A slow origin must not be able to 500 the landing page. */
   const initial = await fetchHome().catch(() => null);
 
+  /* Read here, not inside the rails, so the cached HTML and the hydration that
+     follows it hash tie-breaks against the same day even when the two land
+     either side of UTC midnight. */
   return (
-    <NetflixHome artisans={initial?.artisans} banners={initial?.banners} />
+    <NetflixHome
+      artisans={initial?.artisans}
+      banners={initial?.banners}
+      day={dayIndex()}
+    />
   );
 }

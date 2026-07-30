@@ -2,23 +2,28 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { ChevronDown, Search, Sparkle, Star, TrendingUp, X } from "lucide-react";
+import {
+  ChevronDown,
+  Clock,
+  Hammer,
+  Images,
+  Search,
+  Sparkle,
+  Star,
+  TrendingUp,
+  X,
+} from "lucide-react";
 import {
   Artisan,
   Banner,
   Filters,
   NO_FILTERS,
   TRADE_LABELS,
-  Trade,
   activeFilterCount,
   filterArtisans,
-  newArtisans,
-  rankArtisans,
-  topRatedArtisans,
-  trendingArtisans,
 } from "../lib/artisans";
+import { RailSignal, composeHome, rankArtisans } from "../lib/home-rails";
 import { useArtisans } from "../lib/useData";
 import { pinJustJoined, useJustJoined } from "../lib/applications/just-joined";
 import { useFavorites } from "../lib/useFavorites";
@@ -31,9 +36,6 @@ import { POSTER_WIDTH, Poster, PosterRail, RatingSignal } from "./Poster";
 import { RequestArtisanSheet } from "./RequestArtisanSheet";
 import { RequestPrompt } from "./RequestPrompt";
 
-/** How many artisans a trade needs before it earns a row of its own. */
-const TRADE_RAIL_MIN = 3;
-
 /**
  * Home, running Netflix's layout grammar: a billboard on one promoted
  * artisan, then dense stacked poster rails, each one a different cut of the
@@ -45,16 +47,25 @@ const TRADE_RAIL_MIN = 3;
  * rails are an argument for who to look at first. What does *not* map is
  * Netflix's endless catalogue — Ilisan has one town's worth of artisans, so
  * the rails run out, and every one of them hides itself rather than padding.
+ *
+ * Which rails those are is decided by `composeHome` in `lib/home-rails.ts`,
+ * not here: this component picks no artisans of its own any more, it renders
+ * whatever rows the register could actually support. See that module for why.
  */
 export function NetflixHome({
   artisans: initialArtisans,
   banners: initialBanners,
+  day,
 }: {
   /* Read on the server by app/page.tsx. Both are optional: if the API was
      unreachable there, the hooks below fall back to fetching from the browser
      and the screen behaves as it always did. */
   artisans?: Artisan[];
   banners?: Banner[];
+  /* The rotation seed for tie-breaks, also read on the server. A prop rather
+     than a `Date.now()` in here so the server pass and hydration cannot
+     disagree across a UTC midnight. See `dayIndex`. */
+  day: number;
 }) {
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [selected, setSelected] = useState<Artisan | null>(null);
@@ -73,21 +84,19 @@ export function NetflixHome({
 
   const browsing = activeFilterCount(filters) === 0;
 
-  const trending = useMemo(() => trendingArtisans(artisans), [artisans]);
-  const arrivals = useMemo(
-    () => pinJustJoined(newArtisans(artisans), joined),
-    [artisans, joined],
-  );
-  const topRated = useMemo(() => topRatedArtisans(artisans), [artisans]);
-
-  /* Netflix's Top 10 is a strict count, not a window — it is always ten, and
-     the rank is the entire point. Demand, not reputation. */
-  const topTen = useMemo(
+  /* Every row on the page, in order, decided in one pass so that no artisan
+     fills two discovery rails and no heading outruns its evidence. */
+  const rails = useMemo(
     () =>
-      [...artisans]
-        .sort((a, b) => b.recentUnlocks - a.recentUnlocks)
-        .slice(0, 10),
-    [artisans],
+      composeHome(artisans, day).map((rail) =>
+        /* Someone who finished `/join` seconds ago was just told they are
+           live, so they ride to the front of the arrivals row until the
+           register catches up. */
+        rail.id === "arrivals"
+          ? { ...rail, artisans: pinJustJoined(rail.artisans, joined) }
+          : rail,
+      ),
+    [artisans, day, joined],
   );
 
   /* Favourites are this device's, so they only exist after hydration —
@@ -102,23 +111,9 @@ export function NetflixHome({
     [favoriteIds, favoritesReady, artisans],
   );
 
-  /* Netflix stacks several near-identical genre rows and lets the genre carry
-     the difference. The trade is Artiza's genre, so each one with enough
-     artisans to be worth scrolling gets its own row, busiest trade first. */
-  const tradeRails = useMemo(() => {
-    const byTrade = new Map<Trade, Artisan[]>();
-    for (const artisan of artisans) {
-      byTrade.set(artisan.trade, [...(byTrade.get(artisan.trade) ?? []), artisan]);
-    }
-    return [...byTrade.entries()]
-      .filter(([, list]) => list.length >= TRADE_RAIL_MIN)
-      .sort((a, b) => b[1].length - a[1].length)
-      .map(([trade, list]) => ({ trade, artisans: rankArtisans(list) }));
-  }, [artisans]);
-
   const results = useMemo(
-    () => rankArtisans(filterArtisans(artisans, filters)),
-    [artisans, filters],
+    () => rankArtisans(filterArtisans(artisans, filters), day),
+    [artisans, filters, day],
   );
 
   return (
@@ -144,65 +139,29 @@ export function NetflixHome({
               onOpen={setSelected}
             />
 
-            <PosterRail
-              heading="Trending now"
-              artisans={trending}
-              signal={(a) => (
-                <>
-                  <TrendingUp size={13} strokeWidth={2.4} aria-hidden />
-                  {a.recentUnlocks}
-                  <span className="font-normal text-white/60">this month</span>
-                </>
-              )}
-              onOpen={setSelected}
-            />
-
-            {/* Netflix prints the rank into the artwork here. Artiza's
-                posters are photographs of real jobs, and a numeral laid over
-                one covers the evidence the poster exists to show — so the row
-                keeps the cut and drops the numbering. The order is the rank. */}
-            <PosterRail
-              heading="Top 10 in Ilisan today"
-              artisans={topTen}
-              signal={(a) => <RatingSignal artisan={a} />}
-              onOpen={setSelected}
-            />
-
-            <PosterRail
-              heading="New on Artiza"
-              artisans={arrivals}
-              signal={(a) => (
-                <>
-                  <Sparkle
-                    size={13}
-                    strokeWidth={2.4}
-                    fill="currentColor"
-                    aria-hidden
-                  />
-                  <span className="font-normal text-white/60">Verified</span>
-                  {a.verifiedSince}
-                </>
-              )}
-              onOpen={setSelected}
-            />
-
-            <PosterRail
-              heading="Top rated"
-              artisans={topRated}
-              signal={(a) => <RatingSignal artisan={a} />}
-              onOpen={setSelected}
-            />
-
-            {tradeRails.map(({ trade, artisans: list }) => (
+            {/* Netflix prints the rank into the artwork on its Top 10.
+                Artiza's posters are photographs of real jobs, and a numeral
+                laid over one covers the evidence the poster exists to show —
+                so that row keeps the cut and drops the numbering. The order is
+                the rank. */}
+            {rails.map((rail) => (
               <PosterRail
-                key={trade}
-                heading={`${TRADE_LABELS[trade]}s in Ilisan`}
-                action={{
-                  label: "See all",
-                  onSelect: () => setFilters({ ...filters, trade }),
-                }}
-                artisans={list}
-                signal={(a) => <RatingSignal artisan={a} />}
+                key={rail.id}
+                heading={rail.heading}
+                /* Only a trade row has somewhere to send you: the same trade,
+                   unfiltered. The discovery rows are already the whole of
+                   what they have to say. */
+                action={
+                  rail.trade
+                    ? {
+                        label: "See all",
+                        onSelect: () =>
+                          setFilters({ ...filters, trade: rail.trade! }),
+                      }
+                    : undefined
+                }
+                artisans={rail.artisans}
+                signal={(a) => <RailSignalFor kind={rail.signal} artisan={a} />}
                 onOpen={setSelected}
               />
             ))}
@@ -258,6 +217,84 @@ export function NetflixHome({
       />
     </div>
   );
+}
+
+/**
+ * The number a poster prints, which is always the one its rail ranked on.
+ *
+ * This is the half of the de-duplication the eye actually does. Even where two
+ * rows legitimately share an artisan — the top ten and their own trade row —
+ * the poster reads differently in each, because it is showing why *that* row
+ * chose them. A rail whose evidence were the star rating everywhere would look
+ * like the same row twice however different its membership was.
+ */
+function RailSignalFor({
+  kind,
+  artisan,
+}: {
+  kind: RailSignal;
+  artisan: Artisan;
+}) {
+  switch (kind) {
+    case "unlocks":
+      return (
+        <>
+          <TrendingUp size={13} strokeWidth={2.4} aria-hidden />
+          {artisan.recentUnlocks}
+          <span className="font-normal text-white/60">this month</span>
+        </>
+      );
+
+    case "verified":
+      return (
+        <>
+          <Sparkle size={13} strokeWidth={2.4} fill="currentColor" aria-hidden />
+          <span className="font-normal text-white/60">Verified</span>
+          {artisan.verifiedSince}
+        </>
+      );
+
+    case "years":
+      /* An artisan with no rating yet has nothing to say in stars, and a
+         "0.0 (0)" under their face is worse than no line at all — so the
+         record they do have stands in. Once reviews land, the rating leads. */
+      return artisan.reviewCount > 0 ? (
+        <RatingSignal artisan={artisan} />
+      ) : (
+        <>
+          <Hammer size={13} strokeWidth={2.4} aria-hidden />
+          {artisan.yearsExperience}
+          <span className="font-normal text-white/60">
+            {artisan.yearsExperience === 1 ? "year" : "years"} on the job
+          </span>
+        </>
+      );
+
+    case "work":
+      return (
+        <>
+          <Images size={13} strokeWidth={2.4} aria-hidden />
+          {artisan.work.length}
+          <span className="font-normal text-white/60">photos of past jobs</span>
+        </>
+      );
+
+    case "responds":
+      return (
+        <>
+          <Clock size={13} strokeWidth={2.4} aria-hidden />
+          <span className="font-normal text-white/60">
+            {/* The stored line is a sentence — "Usually replies within an
+                hour" — and the poster has room for the fact, not the prose. */}
+            {artisan.respondsIn.replace(/^usually replies /i, "Replies ")}
+          </span>
+        </>
+      );
+
+    case "rating":
+    default:
+      return <RatingSignal artisan={artisan} />;
+  }
 }
 
 /**
