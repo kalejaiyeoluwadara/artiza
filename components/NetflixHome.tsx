@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import {
@@ -117,7 +117,7 @@ export function NetflixHome({
   );
 
   return (
-    <div className="relative min-h-screen overflow-x-clip pb-28 md:pb-16">
+    <div className="relative min-h-screen pb-28 md:pb-16">
       {/* The light behind the top of the screen. It sits under everything
           rather than inside the billboard because it has to spill past the
           billboard's edges — the whole point is that you cannot tell what is
@@ -312,6 +312,30 @@ function RailSignalFor({
  * has moved — the same trick Netflix uses so the hero starts at the very top
  * of the screen instead of below a bar.
  */
+/**
+ * Whether the page has moved at all under the bar.
+ *
+ * Deliberately a hair-trigger: this is not "have you scrolled far", it is "is
+ * there content passing behind the bar" — the moment there is, the bar needs
+ * its tint back or a poster slides under bare type. It starts false so the
+ * server pass and first client render agree, which is also the correct state
+ * for the top of the page.
+ */
+function useScrolled(threshold = 8) {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const read = () => setScrolled(window.scrollY > threshold);
+    /* A reload part-way down the page restores the scroll position without
+       firing an event, so the first read has to be taken by hand. */
+    read();
+    window.addEventListener("scroll", read, { passive: true });
+    return () => window.removeEventListener("scroll", read);
+  }, [threshold]);
+
+  return scrolled;
+}
+
 function TopBar({
   filters,
   onChange,
@@ -323,13 +347,21 @@ function TopBar({
 }) {
   const { data: session } = useSession();
   const { count } = useFavorites();
+  const scrolled = useScrolled();
 
   const firstName = session?.user?.name?.trim().split(/\s+/)[0];
 
   return (
     // Desktop already has the shared site header pinned at top-0, so only the
     // mobile bar sticks — two sticky bars at top-0 would stack on each other.
-    <div className="chrome sticky top-0 z-40 md:static md:bg-transparent">
+    //
+    // At rest the bar carries no tint, so the hero glow reads through it; it
+    // fills in as soon as anything has scrolled under it. See `.chrome-clear`.
+    <div
+      className={`chrome sticky top-0 z-40 md:static md:bg-transparent ${
+        scrolled ? "" : "chrome-clear"
+      }`}
+    >
       <div className="mx-auto flex h-16 w-full max-w-[96rem] items-center gap-1 px-4 md:hidden">
         {/* The mark sits beside a title in both states — signed in the title
             names you, signed out it names the screen. Dropping the words when
@@ -373,13 +405,13 @@ function TopBar({
           everything else centres, and the page loses its left edge. */}
       <div className="mx-auto w-full max-w-[96rem]">
         <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-8 md:pt-1 lg:px-12">
-          <div className="flex w-max items-center gap-2">
+          <div className="pill-row flex w-max items-center gap-2">
             {filters.trade ? (
               <Pill
                 active
                 onClick={() => onChange({ ...filters, trade: null })}
                 label={`${TRADE_LABELS[filters.trade]}s`}
-                trailing={<X size={13} strokeWidth={2.6} aria-hidden />}
+                trailing={<X size={14} strokeWidth={2.6} aria-hidden />}
               />
             ) : null}
 
@@ -393,14 +425,14 @@ function TopBar({
               }
               label="Top rated"
               leading={
-                <Star size={12} strokeWidth={2.4} fill="currentColor" aria-hidden />
+                <Star size={13} strokeWidth={2.4} fill="currentColor" aria-hidden />
               }
             />
 
             <Pill
               onClick={onOpenFilters}
               label="Categories"
-              trailing={<ChevronDown size={14} strokeWidth={2.4} aria-hidden />}
+              trailing={<ChevronDown size={15} strokeWidth={2.4} aria-hidden />}
             />
 
             {/* Not a filter — the one action pill in the row, so it wears the
@@ -432,10 +464,10 @@ function Pill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`pressable flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[0.8125rem] font-semibold ${
-        active
-          ? "border-transparent bg-ink text-canvas"
-          : "chrome border-line text-ink"
+      /* Rounded rect, not a capsule — Netflix's unselected pills are slabs with
+         a generous corner, and only the selected one goes fully round. */
+      className={`pressable pill-glass flex items-center gap-1.5 border px-3.5 py-2 text-sm font-bold text-ink ${
+        active ? "pill-glass-on rounded-full" : "rounded-[0.625rem]"
       }`}
     >
       {leading}

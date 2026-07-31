@@ -20,8 +20,8 @@
      rather than derived with color-mix because the fallback a browser without
      color-mix gets is the accent at full strength — a red slab across the top
      of the page, which is worse than no glow at all. */
-  --glow: rgba(229, 9, 20, 0.15);
-  --glow-far: rgba(229, 9, 20, 0.05);
+  --glow: rgba(229, 9, 20, 0.2);
+  --glow-far: rgba(229, 9, 20, 0.07);
   /* Amber, not red. The accent is now red, so a red error would be the same
      colour as the button next to it — failure has to be a different hue or it
      reads as another action. */
@@ -84,6 +84,19 @@
   /* Tools are steel across every trade, so it is shared. */
   --t-steel: #9aa3af;
   --t-steel-deep: #6b7280;
+}
+
+/* On a phone almost all of the hero glow is covered — by the bar above the
+   billboard and by the billboard card itself — so what is left to see is the
+   gradient's outer skirt, and it has to be carried at roughly twice the alpha
+   to read at all. The geometry that goes with these numbers is in
+   `.hero-glow`. Unlayered, like the tokens themselves: a `:root` written
+   inside `@layer components` would lose to the one above and do nothing. */
+@media (max-width: 767px) {
+  :root {
+    --glow: rgba(229, 9, 20, 0.36);
+    --glow-far: rgba(229, 9, 20, 0.12);
+  }
 }
 
 @theme inline {
@@ -279,6 +292,7 @@
     background: var(--chrome);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
+    transition: background-color 260ms ease;
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -289,45 +303,139 @@
     }
   }
 
+  /* A chrome bar with its tint taken away — the blur stays. Netflix's phone
+     bar does exactly this: at the top of the page it is glass over the hero
+     light, and it only fills in once you have scrolled something under it.
+     Without it the hero glow is brightest precisely where a 72%-opaque bar
+     is sitting on top of it, and the effect is thrown away.
+
+     After the reduced-transparency block on purpose: that rule and this one
+     have the same weight, so source order decides. Nothing has scrolled under
+     the bar yet when this class is on, so there is no transparency here to
+     reduce — an opaque bar at the top of the page is only hiding the glow. */
+  .chrome-clear {
+    background: transparent;
+  }
+
+  /* Netflix's filter pills. They are read by their *fill*, not their edge: a
+     soft grey slab, with a hairline only a shade lighter than the fill itself
+     — just enough to hold the shape where the artwork behind it happens to be
+     bright. A bright border here turns a row of quiet chips into a row of
+     outlines, which is the thing Netflix is carefully not doing.
+
+     The blur is what keeps the row a material laid over the hero rather than
+     five boxes painted on it — at the top of the page `.chrome-clear` leaves
+     the glow showing, and these pills are the only thing softening it. */
+  .pill-glass {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(26px) saturate(190%);
+    -webkit-backdrop-filter: blur(26px) saturate(190%);
+  }
+
+
+  /* Selected. Netflix keeps the grey and lifts it — brighter fill, and the one
+     visible hairline in the row. Swapping to a solid white chip would make the
+     selected filter read as the row's button, which is the wrong claim. The
+     capsule radius on the active pill (set at the call site) is the other half
+     of the signal: shape changes, so it survives a glance. */
+  .pill-glass-on {
+    background: rgba(255, 255, 255, 0.17);
+    border-color: rgba(255, 255, 255, 0.38);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .pill-glass {
+      background: var(--fill);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .pill-glass-on {
+      background: rgba(255, 255, 255, 0.22);
+    }
+  }
+
   /* Hero glow — the radial light Netflix puts behind the top of its home
      screen. It is not decoration: a page that is flat #0b0b0e from edge to
-     edge reads as an unfinished surface, and one soft ellipse of light behind
-     the first screenful is enough to make the same black read as lit.
+     edge reads as an unfinished surface, and light behind the first screenful
+     is what makes the same black read as lit rather than as unpainted.
 
-     Two stops, because one is not enough. The accent stop tints the top of
-     the page so the brand colour is present before any button is; the white
-     stop, tighter and fainter, is the actual light — without it the red reads
-     as a wash laid over black rather than black being lit. Both are far below
-     the alpha where a gradient becomes a shape you can point at: the moment
-     you can see where it ends, it stops looking like light.
+     Shape first, because it is what the effect lives or dies on. This is a
+     wide, shallow ellipse whose centre sits *above* the top edge of the
+     screen, so what lands on the page is the bottom half of it: full strength
+     corner to corner along the top, falling off almost purely downwards. The
+     obvious version — a circle centred on the top edge — is wrong, and reads
+     as a dome someone parked on the page, with two dark corners either side of
+     it announcing where the gradient stops. Light does not have a silhouette.
 
-     The falloff is the whole trick. It must be gone before the first rail, so
-     the glow belongs to the billboard and not to the rows — a gradient still
-     visible at the third poster row is a coloured background, which is a
+     Two stops, because one is not enough. The accent stop tints the band so
+     the brand colour is present before any button is; the white stop, wider
+     and fainter, is the light itself — without it the red reads as a wash laid
+     over black rather than black being lit.
+
+     The falloff is the other half. It is gone by the top of the billboard, so
+     the glow belongs to the head of the page and not to the rails — a gradient
+     still visible at the third poster row is a coloured background, which is a
      different and worse idea. */
   .hero-glow {
     pointer-events: none;
     position: absolute;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 140%;
-    /* Viewport-relative so the light covers roughly the first screenful on a
-       phone and a 27" display alike, capped so it cannot run down a very tall
-       window into the rails. */
-    height: min(72vh, 640px);
+    left: 0;
+    width: 100%;
+    /* Viewport-relative so the band covers the same share of the first
+       screenful on a phone and a 27" display, capped so it cannot run down a
+       very tall window into the rails. */
+    height: min(70vh, 680px);
     background:
       radial-gradient(
-        62% 100% at 50% 0%,
+        130% 68% at 50% -10%,
         var(--glow) 0%,
-        var(--glow-far) 38%,
-        transparent 72%
+        var(--glow-far) 44%,
+        transparent 76%
       ),
       radial-gradient(
-        40% 62% at 50% 0%,
-        rgba(255, 255, 255, 0.07) 0%,
+        100% 46% at 50% -8%,
+        rgba(255, 255, 255, 0.09) 0%,
         transparent 70%
       );
+  }
+
+  /* The phone gets the same shape carried harder, not a smaller copy of it.
+
+     On a wide screen the billboard is an inset card inside a 96rem column and
+     the light spills around it on both sides, so the desktop alphas read as
+     atmosphere. On a phone that card is 448px of opaque photograph behind a
+     16px gutter, and the bar above it is another 110px — between them they
+     cover nearly the whole band, and what is left to see is the top strip
+     behind the bar and the pills. That strip is the effect on a phone, which
+     is exactly where Netflix's lands too, so it has to carry.
+
+     Shorter as well as stronger: the light now dies at the top edge of the
+     billboard instead of running past its bottom. A tail emerging below an
+     opaque card reads as a second, unrelated glow — the eye cannot connect it
+     to the one above through 448px of photograph.
+
+     The alphas themselves ride on the tokens, overridden outside this layer:
+     unlayered declarations beat layered ones, so a `:root` written in here
+     would lose to the one at the top of the file and quietly do nothing. */
+  @media (max-width: 767px) {
+    .hero-glow {
+      height: min(52vh, 420px);
+      background:
+        radial-gradient(
+          150% 72% at 50% -12%,
+          var(--glow) 0%,
+          var(--glow-far) 48%,
+          transparent 80%
+        ),
+        radial-gradient(
+          120% 50% at 50% -10%,
+          rgba(255, 255, 255, 0.13) 0%,
+          transparent 74%
+        );
+    }
   }
 
   /* Hover is desktop-only; taps must never leave a stuck state. */
@@ -495,5 +603,31 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* The filter row's outer corners go capsule on a phone, so the run of pills
+   reads as one object with rounded ends rather than a line of loose slabs —
+   the scroll starts and finishes on a soft edge. Phone only: on desktop the
+   row sits in a wide centred column with air on both sides, and there is no
+   viewport edge for the shape to resolve against.
+
+   :first-child/:last-child rather than a prop because which pill is first
+   changes with the filters — the trade pill only exists once a trade is
+   picked, so a hard-coded "first" would round the wrong one.
+
+   Unlayered on purpose. Tailwind's utilities are a later cascade layer than
+   @layer components, and a later layer wins on layer order alone no matter
+   how specific the earlier rule is — so `rounded-[0.625rem]` on the pill
+   itself would beat this if it lived up there with the rest. */
+@media (max-width: 767px) {
+  .pill-row > :first-child {
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+  }
+
+  .pill-row > :last-child {
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
   }
 }

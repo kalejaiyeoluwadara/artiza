@@ -55,7 +55,7 @@ export function ApplyControl() {
 
   if (pending) {
     return (
-      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-fill px-3.5 py-1.5 text-[0.8125rem] font-semibold text-sub">
+      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-fill px-3.5 py-2 text-sm font-bold text-sub">
         <Hourglass size={12} strokeWidth={2.4} aria-hidden />
         Application pending
       </span>
@@ -72,7 +72,7 @@ export function ApplyControl() {
         whileHover="swing"
         whileFocus="swing"
         whileTap="swing"
-        className="pressable flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-1.5 text-[0.8125rem] font-semibold text-accent"
+        className="pressable flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-2 text-sm font-bold text-accent"
       >
         {/* <HammerIcon size={13} /> */}
         Are you an artisan?
