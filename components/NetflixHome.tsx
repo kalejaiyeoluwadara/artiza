@@ -338,22 +338,23 @@ function useScrolled(threshold = 8) {
 }
 
 /**
- * Whether the filter row should be folded away — Netflix's rule: on the way
- * down the page the categories collapse out of the bar, and the first upward
- * flick brings them straight back.
+ * Whether the top bar should be off-screen — Netflix's rule: on the way down
+ * the page the bar rides up out of view, and the first upward flick brings it
+ * straight back.
  *
- * Direction, not depth. Someone travelling down the rails has already chosen
- * to browse and does not need the filters following them; someone reversing is
- * looking for a control, and the row has to be there before they reach the top
- * rather than after. Anything above `threshold` is the top of the page, where
- * the row is always open.
+ * Direction, not depth. Someone travelling down the rails has already chosen to
+ * browse and does not need a bar following them down; someone reversing is
+ * looking for a control, and the bar has to be there before they reach the top
+ * rather than after. The threshold is roughly the bar's own height: above it
+ * the bar is still sitting in its own space at the top of the page, and hiding
+ * it there would only be a flinch.
  *
- * The delta is only read once per frame and small moves are ignored, because
- * scroll fires far faster than paint and a one-pixel wobble on a trackpad
- * would otherwise flip the row open and shut. Ignored moves deliberately do
- * not advance `last`, so a slow drag still accumulates into a real direction.
+ * The delta is read once per frame and small moves are ignored, because scroll
+ * fires far faster than paint and a one-pixel wobble would otherwise flip the
+ * bar in and out. Ignored moves deliberately do not advance `last`, so a slow
+ * drag still accumulates into a real direction.
  */
-function useCollapsed(threshold = 72, jitter = 6) {
+function useCollapsed(threshold = 112, jitter = 6) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -425,11 +426,10 @@ function TopBar({
   const phone = useMediaQuery("(max-width: 767px)");
   const reduceMotion = useReducedMotion();
 
-  /* Desktop keeps its filters: the bar there is `md:static`, so folding it
-     would pull the page up under the cursor mid-scroll, and the layout has the
-     room anyway. Starts closed-to-false on the server, which is also the
-     correct state for the top of the page. */
-  const folded = phone && collapsed;
+  /* Desktop never hides its bar: it is `md:static`, so there is nothing to
+     slide out of the way, and the layout has the room. Starts false on the
+     server, which is also the correct state for the top of the page. */
+  const hidden = phone && collapsed;
 
   const firstName = session?.user?.name?.trim().split(/\s+/)[0];
 
@@ -439,10 +439,35 @@ function TopBar({
     //
     // At rest the bar carries no tint, so the hero glow reads through it; it
     // fills in as soon as anything has scrolled under it. See `.chrome-clear`.
-    <div
+    //
+    // Netflix's rule for the whole bar — title row and pills together: on the
+    // way down the page it rides up out of view, and the first upward flick
+    // brings it straight back. It is one movement, not a fold: the bar never
+    // changes height, so the feed under it never reflows.
+    //
+    // That is the whole reason this is a transform and nothing else. Animating
+    // the row's height re-laid-out a sticky element on every frame of a
+    // momentum scroll, and iOS resolves that fight by moving the scroll
+    // position — which is the jump you get on the way back up. A transform is
+    // composited: it cannot move the document, so it cannot move the scroll.
+    //
+    // -100% is its own height, so nothing has to be measured, and it travels
+    // exactly far enough to clear the top no matter what the bar is carrying.
+    <motion.div
       className={`chrome sticky top-0 z-40 md:static md:bg-transparent ${
         scrolled ? "" : "chrome-clear"
       }`}
+      /* No entry animation: the bar is simply there on first paint. */
+      initial={false}
+      animate={{ y: hidden ? "-100%" : "0%" }}
+      transition={
+        reduceMotion
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 460, damping: 44, mass: 0.9 }
+      }
+      /* Off-screen it is gone, not merely out of sight: `inert` keeps Tab and
+         a screen reader out of a bar nobody can see. */
+      inert={hidden}
     >
       <div className="mx-auto flex h-16 w-full max-w-[96rem] items-center gap-1 px-4 md:hidden">
         {/* The mark sits beside a title in both states — signed in the title
@@ -485,46 +510,8 @@ function TopBar({
       {/* Same centred column as the billboard and the rails below — without it
           the pills stay pinned to the viewport edge past the 96rem cap while
           everything else centres, and the page loses its left edge. */}
-      {/* The fold. Height to `auto` rather than a fixed number — the row is as
-          tall as the pills need, and any constant here dies on a longer trade
-          name. Motion measures it, so nothing has to be hard-coded.
-
-          The slide is the point: the row leaves upward, behind the bar, rather
-          than being guillotined in place. Height and offset ride one spring so
-          they arrive together; the fade is a shorter tween, because opacity
-          reaching zero early is what makes the last few pixels of collapse
-          read as the row going *behind* the bar and not shrinking on top of it.
-
-          Spring, not a duration: this is interruptible. A flick back up
-          mid-collapse has to reverse from wherever the row currently is, and a
-          tween would restart the journey.
-
-          Phone only, decided in JS rather than with `md:` classes — Motion
-          writes inline styles, which no class could override. */}
-      <motion.div
-        className="mx-auto w-full max-w-[96rem] overflow-hidden"
-        /* No entry animation: the row is simply open on first paint. */
-        initial={false}
-        animate={folded ? "folded" : "open"}
-        variants={{
-          open: { height: "auto", opacity: 1, y: 0 },
-          folded: { height: 0, opacity: 0, y: -8 },
-        }}
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : {
-                height: { type: "spring", stiffness: 420, damping: 40, mass: 0.9 },
-                y: { type: "spring", stiffness: 420, damping: 40, mass: 0.9 },
-                opacity: { duration: 0.18, ease: "easeOut" },
-              }
-        }
-        /* Folded away the row is gone, not merely invisible: `inert` takes it
-           out of the tab order and the accessibility tree, so a Tab key cannot
-           land on a filter nobody can see. */
-        inert={folded}
-      >
-        <div className="no-scrollbar overflow-y-hidden overflow-x-auto px-4 pb-2 md:px-8 md:pt-1 lg:px-12">
+      <div className="mx-auto w-full max-w-[96rem]">
+        <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-8 md:pt-1 lg:px-12">
           {/* Which pill opens the row moves with the filters — the trade pill
               only exists once a trade is picked — so the bookend is handed to
               whichever one is actually first rather than assumed. */}
@@ -566,8 +553,8 @@ function TopBar({
             <ApplyControl />
           </div>
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 }
 
