@@ -78,7 +78,7 @@ export default function AccountPage() {
         </div>
         <div className="border-t border-line px-4 py-3">
           <p className="text-[0.8125rem] text-sub">
-            Each credit unlocks one artisan contact. Single unlocks cost{" "}
+            Each credit unlocks one artizan contact. Single unlocks cost{" "}
             <span className="figure text-ink">₦500</span>.
           </p>
         </div>

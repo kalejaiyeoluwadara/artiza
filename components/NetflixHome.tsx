@@ -117,10 +117,20 @@ export function NetflixHome({
   );
 
   return (
-    <div className="min-h-screen pb-28 md:pb-16">
+    <div className="relative min-h-screen overflow-x-clip pb-28 md:pb-16">
+      {/* The light behind the top of the screen. It sits under everything
+          rather than inside the billboard because it has to spill past the
+          billboard's edges — the whole point is that you cannot tell what is
+          lit, only that the top of the page is. See `.hero-glow`.
+
+          z-0 and not a negative index: `body` carries `bg-canvas`, and a
+          negative layer paints behind an ancestor's background, so the light
+          would be there and invisible. The content below claims z-10 instead. */}
+      <div className="hero-glow z-0" aria-hidden />
+
       <TopBar filters={filters} onChange={setFilters} onOpenFilters={() => setFiltersOpen(true)} />
 
-      <div className="mx-auto w-full max-w-[96rem] md:px-8 lg:px-12">
+      <div className="relative z-10 mx-auto w-full max-w-[96rem] md:px-8 lg:px-12">
         {error ? (
           <Failed onRetry={retry} />
         ) : loading ? (

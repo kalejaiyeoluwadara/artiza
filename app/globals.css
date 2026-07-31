@@ -16,6 +16,12 @@
   --faint: #6b6b75; /* tertiary label, placeholders */
   --accent: #e50914; /* actions, money, verified */
   --accent-soft: rgba(229, 9, 20, 0.18);
+  /* The accent at light-not-paint alphas, for the hero glow. Written out
+     rather than derived with color-mix because the fallback a browser without
+     color-mix gets is the accent at full strength — a red slab across the top
+     of the page, which is worse than no glow at all. */
+  --glow: rgba(229, 9, 20, 0.15);
+  --glow-far: rgba(229, 9, 20, 0.05);
   /* Amber, not red. The accent is now red, so a red error would be the same
      colour as the button next to it — failure has to be a different hue or it
      reads as another action. */
@@ -281,6 +287,47 @@
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
+  }
+
+  /* Hero glow — the radial light Netflix puts behind the top of its home
+     screen. It is not decoration: a page that is flat #0b0b0e from edge to
+     edge reads as an unfinished surface, and one soft ellipse of light behind
+     the first screenful is enough to make the same black read as lit.
+
+     Two stops, because one is not enough. The accent stop tints the top of
+     the page so the brand colour is present before any button is; the white
+     stop, tighter and fainter, is the actual light — without it the red reads
+     as a wash laid over black rather than black being lit. Both are far below
+     the alpha where a gradient becomes a shape you can point at: the moment
+     you can see where it ends, it stops looking like light.
+
+     The falloff is the whole trick. It must be gone before the first rail, so
+     the glow belongs to the billboard and not to the rows — a gradient still
+     visible at the third poster row is a coloured background, which is a
+     different and worse idea. */
+  .hero-glow {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    /* Viewport-relative so the light covers roughly the first screenful on a
+       phone and a 27" display alike, capped so it cannot run down a very tall
+       window into the rails. */
+    height: min(72vh, 640px);
+    background:
+      radial-gradient(
+        62% 100% at 50% 0%,
+        var(--glow) 0%,
+        var(--glow-far) 38%,
+        transparent 72%
+      ),
+      radial-gradient(
+        40% 62% at 50% 0%,
+        rgba(255, 255, 255, 0.07) 0%,
+        transparent 70%
+      );
   }
 
   /* Hover is desktop-only; taps must never leave a stuck state. */
