@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   ChevronDown,
   Clock,
@@ -336,6 +337,78 @@ function useScrolled(threshold = 8) {
   return scrolled;
 }
 
+/**
+ * Whether the filter row should be folded away — Netflix's rule: on the way
+ * down the page the categories collapse out of the bar, and the first upward
+ * flick brings them straight back.
+ *
+ * Direction, not depth. Someone travelling down the rails has already chosen
+ * to browse and does not need the filters following them; someone reversing is
+ * looking for a control, and the row has to be there before they reach the top
+ * rather than after. Anything above `threshold` is the top of the page, where
+ * the row is always open.
+ *
+ * The delta is only read once per frame and small moves are ignored, because
+ * scroll fires far faster than paint and a one-pixel wobble on a trackpad
+ * would otherwise flip the row open and shut. Ignored moves deliberately do
+ * not advance `last`, so a slow drag still accumulates into a real direction.
+ */
+function useCollapsed(threshold = 72, jitter = 6) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    let last = window.scrollY;
+    let frame = 0;
+
+    const read = () => {
+      frame = 0;
+      const y = window.scrollY;
+      if (y <= threshold) {
+        last = y;
+        setCollapsed(false);
+        return;
+      }
+      const delta = y - last;
+      if (Math.abs(delta) < jitter) return;
+      last = y;
+      setCollapsed(delta > 0);
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(read);
+    };
+
+    read();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [threshold, jitter]);
+
+  return collapsed;
+}
+
+/**
+ * A media query, as state.
+ *
+ * Starts false so the server pass and first client render agree — the real
+ * answer arrives on the effect, before paint.
+ */
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const read = () => setMatches(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, [query]);
+
+  return matches;
+}
+
 function TopBar({
   filters,
   onChange,
@@ -348,6 +421,15 @@ function TopBar({
   const { data: session } = useSession();
   const { count } = useFavorites();
   const scrolled = useScrolled();
+  const collapsed = useCollapsed();
+  const phone = useMediaQuery("(max-width: 767px)");
+  const reduceMotion = useReducedMotion();
+
+  /* Desktop keeps its filters: the bar there is `md:static`, so folding it
+     would pull the page up under the cursor mid-scroll, and the layout has the
+     room anyway. Starts closed-to-false on the server, which is also the
+     correct state for the top of the page. */
+  const folded = phone && collapsed;
 
   const firstName = session?.user?.name?.trim().split(/\s+/)[0];
 
@@ -403,12 +485,54 @@ function TopBar({
       {/* Same centred column as the billboard and the rails below — without it
           the pills stay pinned to the viewport edge past the 96rem cap while
           everything else centres, and the page loses its left edge. */}
-      <div className="mx-auto w-full max-w-[96rem]">
-        <div className="no-scrollbar overflow-x-auto px-4 pb-2 md:px-8 md:pt-1 lg:px-12">
-          <div className="pill-row flex w-max items-center gap-2">
+      {/* The fold. Height to `auto` rather than a fixed number — the row is as
+          tall as the pills need, and any constant here dies on a longer trade
+          name. Motion measures it, so nothing has to be hard-coded.
+
+          The slide is the point: the row leaves upward, behind the bar, rather
+          than being guillotined in place. Height and offset ride one spring so
+          they arrive together; the fade is a shorter tween, because opacity
+          reaching zero early is what makes the last few pixels of collapse
+          read as the row going *behind* the bar and not shrinking on top of it.
+
+          Spring, not a duration: this is interruptible. A flick back up
+          mid-collapse has to reverse from wherever the row currently is, and a
+          tween would restart the journey.
+
+          Phone only, decided in JS rather than with `md:` classes — Motion
+          writes inline styles, which no class could override. */}
+      <motion.div
+        className="mx-auto w-full max-w-[96rem] overflow-hidden"
+        /* No entry animation: the row is simply open on first paint. */
+        initial={false}
+        animate={folded ? "folded" : "open"}
+        variants={{
+          open: { height: "auto", opacity: 1, y: 0 },
+          folded: { height: 0, opacity: 0, y: -8 },
+        }}
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : {
+                height: { type: "spring", stiffness: 420, damping: 40, mass: 0.9 },
+                y: { type: "spring", stiffness: 420, damping: 40, mass: 0.9 },
+                opacity: { duration: 0.18, ease: "easeOut" },
+              }
+        }
+        /* Folded away the row is gone, not merely invisible: `inert` takes it
+           out of the tab order and the accessibility tree, so a Tab key cannot
+           land on a filter nobody can see. */
+        inert={folded}
+      >
+        <div className="no-scrollbar overflow-y-hidden overflow-x-auto px-4 pb-2 md:px-8 md:pt-1 lg:px-12">
+          {/* Which pill opens the row moves with the filters — the trade pill
+              only exists once a trade is picked — so the bookend is handed to
+              whichever one is actually first rather than assumed. */}
+          <div className="flex w-max items-center gap-2">
             {filters.trade ? (
               <Pill
                 active
+                starts
                 onClick={() => onChange({ ...filters, trade: null })}
                 label={`${TRADE_LABELS[filters.trade]}s`}
                 trailing={<X size={14} strokeWidth={2.6} aria-hidden />}
@@ -416,6 +540,7 @@ function TopBar({
             ) : null}
 
             <Pill
+              starts={!filters.trade}
               active={filters.minRating !== null}
               onClick={() =>
                 onChange({
@@ -441,7 +566,7 @@ function TopBar({
             <ApplyControl />
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -452,22 +577,41 @@ function Pill({
   leading,
   trailing,
   onClick,
+  starts = false,
 }: {
   label: string;
   active?: boolean;
   leading?: React.ReactNode;
   trailing?: React.ReactNode;
   onClick: () => void;
+  /** First in the row: takes the capsule left edge on a phone. */
+  starts?: boolean;
 }) {
+  /* Rounded rect, not a capsule — Netflix's unselected pills are slabs with a
+     generous corner, and only the selected one goes fully round.
+
+     The pill that opens the row keeps that corner on its inner side and takes a
+     capsule on the outer one, so it reads as the row's bookend rather than a
+     lozenge that fell out of it. Two plain utilities, and the `max-md:` variant
+     is emitted after the base radius so it overrides only the two corners it
+     names — the other two stay on --pill-radius.
+
+     A pill that both opens the row and is selected drops the all-round capsule:
+     the left edge already carries it, and rounding all four would take the
+     inner corner with it. */
+  const shape = starts
+    ? "rounded-(--pill-radius) max-md:rounded-l-full"
+    : active
+      ? "rounded-full"
+      : "rounded-(--pill-radius)";
+
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      /* Rounded rect, not a capsule — Netflix's unselected pills are slabs with
-         a generous corner, and only the selected one goes fully round. */
-      className={`pressable pill-glass flex items-center gap-1.5 border px-3.5 py-2 text-sm font-bold text-ink ${
-        active ? "pill-glass-on rounded-full" : "rounded-[0.625rem]"
+      className={`pressable pill-glass flex items-center gap-1.5 border px-3.5 py-2 text-sm font-bold text-ink ${shape} ${
+        active ? "pill-glass-on" : ""
       }`}
     >
       {leading}

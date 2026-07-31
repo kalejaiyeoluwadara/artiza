@@ -55,7 +55,7 @@ export function ApplyControl() {
 
   if (pending) {
     return (
-      <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-fill px-3.5 py-2 text-sm font-bold text-sub">
+      <span className="flex shrink-0 items-center gap-1.5 rounded-(--pill-radius) bg-fill px-3.5 py-2 text-sm font-bold text-sub max-md:rounded-r-full">
         <Hourglass size={12} strokeWidth={2.4} aria-hidden />
         Application pending
       </span>
@@ -72,7 +72,12 @@ export function ApplyControl() {
         whileHover="swing"
         whileFocus="swing"
         whileTap="swing"
-        className="pressable flex shrink-0 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 py-2 text-sm font-bold text-accent"
+        /* This pill always ends the filter row, so it carries the row's right
+           bookend itself rather than leaning on a :last-child rule — the sheet
+           it renders beside it makes "last child" a thing that could quietly
+           stop being true. Capsule on the outer edge, the row's own corner on
+           the inner one, and only on a phone. */
+        className="pressable flex shrink-0 items-center gap-1.5 rounded-(--pill-radius) bg-accent-soft px-3.5 py-2 text-sm font-bold text-accent max-md:rounded-r-full"
       >
         {/* <HammerIcon size={13} /> */}
         Are you an artisan?

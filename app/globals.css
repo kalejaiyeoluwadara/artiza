@@ -27,6 +27,11 @@
      reads as another action. */
   --danger: #f5a524;
   --chrome: rgba(11, 11, 14, 0.72); /* translucent bars */
+  /* The filter pills' corner. A token because three elements share it — the
+     pills, and the accent action that ends their row — and the ones at either
+     end of the row keep it on their inner side while going capsule on the
+     outer, so the value must not drift between them. */
+  --pill-radius: 0.625rem;
 
   /* -------------------------------------------------------------
      Illustration palette — imagery, not UI.
@@ -603,31 +608,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-}
-
-/* The filter row's outer corners go capsule on a phone, so the run of pills
-   reads as one object with rounded ends rather than a line of loose slabs —
-   the scroll starts and finishes on a soft edge. Phone only: on desktop the
-   row sits in a wide centred column with air on both sides, and there is no
-   viewport edge for the shape to resolve against.
-
-   :first-child/:last-child rather than a prop because which pill is first
-   changes with the filters — the trade pill only exists once a trade is
-   picked, so a hard-coded "first" would round the wrong one.
-
-   Unlayered on purpose. Tailwind's utilities are a later cascade layer than
-   @layer components, and a later layer wins on layer order alone no matter
-   how specific the earlier rule is — so `rounded-[0.625rem]` on the pill
-   itself would beat this if it lived up there with the rest. */
-@media (max-width: 767px) {
-  .pill-row > :first-child {
-    border-top-left-radius: 9999px;
-    border-bottom-left-radius: 9999px;
-  }
-
-  .pill-row > :last-child {
-    border-top-right-radius: 9999px;
-    border-bottom-right-radius: 9999px;
   }
 }
