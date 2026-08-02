@@ -600,6 +600,34 @@
   }
 }
 
+/* The billboard art (components/HomeBillboard.tsx) — a slow Ken Burns push.
+   Netflix's trick: the still is never quite still, so a slide that holds for
+   six seconds still reads as alive.
+   It runs `alternate`, breathing back out rather than looping, because a jump
+   from the far end back to the start would announce itself far louder than the
+   drift it interrupts. Pure scale reads as nothing at this speed — the eye
+   catches change in position long before it catches change in size — so the
+   push carries a small diagonal drift with it, which is what makes it legible
+   as movement rather than as a photo that looks slightly different later. */
+.billboard-art {
+  /* Not --ease-in-out: that curve's fast middle would make an 18s drift
+     visibly accelerate. This one is barely off linear — just enough to soften
+     the turn at each end so the direction change isn't a hinge. */
+  animation: billboard-push 18s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+  will-change: transform;
+}
+
+/* Starts already at 1.03 so there is overscan on every side at all times: the
+   drift can move the photo without ever walking an edge into the frame. */
+@keyframes billboard-push {
+  from {
+    transform: scale(1.03) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(-1.4%, -1%, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

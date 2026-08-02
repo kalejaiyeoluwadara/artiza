@@ -151,7 +151,9 @@ function Slide({
           fill
           priority={priority}
           sizes="(min-width: 1024px) 1536px, 100vw"
-          className="object-cover"
+          /* The slow push lives on the art itself, inside the card's
+             overflow-hidden, so the frame stays put while the photo drifts. */
+          className="billboard-art object-cover"
         />
         {/* Scrim, not a tint: type has to hold at any photo brightness without
             draining the colour out of the art underneath it. On a phone the
