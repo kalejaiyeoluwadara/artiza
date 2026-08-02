@@ -115,16 +115,31 @@ export function ArtisanProfile({
                 type="button"
                 onClick={() => setPhoto({ id: artisan.id, index: i })}
                 aria-label={`View ${workAlt(artisan, i)} full screen`}
-                className="pressable relative h-40 w-56 shrink-0 snap-start overflow-hidden rounded-2xl bg-fill"
+                className="pressable relative h-64 w-52 shrink-0 snap-start overflow-hidden rounded-2xl bg-fill sm:h-72 sm:w-60"
               >
+                {/* The photo is shown whole (`contain`), because a thumbnail
+                    that crops the finished garment out of a garment photo is
+                    worse than no thumbnail. A blurred, over-scaled copy of the
+                    same photo fills whatever the fit leaves over, so a portrait
+                    shot in this frame reads as one image rather than as art
+                    stranded between two grey bars. */}
+                <Image
+                  src={src}
+                  alt=""
+                  aria-hidden
+                  fill
+                  sizes="64px"
+                  quality={30}
+                  className="scale-125 object-cover blur-xl saturate-150"
+                />
                 {/* The button carries the name; a described image here
                     would only be read out twice. */}
                 <Image
                   src={src}
                   alt=""
                   fill
-                  sizes="224px"
-                  className="object-cover"
+                  sizes="(min-width: 640px) 240px, 208px"
+                  className="object-contain"
                 />
               </button>
             ))}

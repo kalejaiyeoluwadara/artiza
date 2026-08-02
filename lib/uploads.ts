@@ -25,10 +25,10 @@ import type { ApiEnvelope, UploadResult } from "./api/types";
 /**
  * The longest edge we send.
  *
- * Above the 1600px the `work` crop needs, deliberately: the crop is 3:2 and a
- * source photo is rarely 3:2, so Cloudinary throws away one axis to get there
- * and the surviving axis has to still be 1600. 2048 leaves that headroom on any
- * orientation while cutting a 12-megapixel photo by roughly 90%.
+ * Above the 1600px box `work` photos land in, deliberately: that box is a fit
+ * rather than a crop, so the longest edge survives at 1600 whichever way the
+ * photo was taken. 2048 leaves headroom for the square portrait crop as well,
+ * while still cutting a 12-megapixel photo by roughly 90%.
  */
 const MAX_EDGE = 2048;
 
